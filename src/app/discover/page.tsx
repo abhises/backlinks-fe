@@ -38,7 +38,7 @@ export default function DiscoverPage() {
   };
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'100vh' }}>
+    <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
       <div className="page-header">
         <div className="page-header-left">
           <h1 className="page-title">Discover</h1>
@@ -46,7 +46,7 @@ export default function DiscoverPage() {
         </div>
       </div>
 
-      <div style={{ padding:'16px 32px', borderBottom:'1px solid var(--border)' }}>
+      <div style={{ padding:'16px 24px', borderBottom:'1px solid var(--border)' }}>
         <div style={{ position:'relative', maxWidth:400 }}>
           <Search size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
           <input value={search} onChange={e => setSearch(e.target.value)}
@@ -54,7 +54,7 @@ export default function DiscoverPage() {
         </div>
       </div>
 
-      <div style={{ flex:1, overflowY:'auto', padding:'20px 32px' }}>
+      <div style={{ flex:1, overflowY:'auto', padding:'20px 24px' }}>
         {loading ? (
           <div className="empty-state">
             <Loader2 size={28} className="animate-spin" style={{ color:'var(--accent)' }} />

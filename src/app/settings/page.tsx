@@ -136,7 +136,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-base)' }}>
+    <div style={{ display: 'flex', height: '100%', background: 'var(--bg-base)' }}>
       {/* Settings Sub-Sidebar Navigation */}
       <aside style={{ width: 220, borderRight: '1px solid var(--border)', background: 'var(--bg-surface)', padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: 6, overflowY: 'auto' }}>
         <h2 style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0 8px 12px' }}>Settings</h2>
@@ -163,7 +163,7 @@ export default function SettingsPage() {
       <div style={{ flex: 1, overflowY: 'auto', padding: '0 40px 60px', scrollBehavior: 'smooth' }}>
         
         {/* Header */}
-        <div style={{ padding: '40px 140px 20px 0', borderBottom: '1px solid var(--border)', marginBottom: 32 }}>
+        <div style={{ padding: '24px 0 20px', borderBottom: '1px solid var(--border)', marginBottom: 32 }}>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Workspace Settings</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: 4 }}>Configure website specs, permissions, billing, and team collaboration options.</p>
         </div>

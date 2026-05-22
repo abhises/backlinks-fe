@@ -70,7 +70,7 @@ export default function LinksPage() {
   };
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'100vh' }}>
+    <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
       {/* Header */}
       <div className="page-header">
         <div className="page-header-left">
@@ -88,7 +88,7 @@ export default function LinksPage() {
       </div>
 
       {/* Filters Bar */}
-      <div style={{ padding:'12px 32px', display:'flex', gap:16, borderBottom:'1px solid var(--border)', flexWrap:'wrap', alignItems:'center', background:'var(--bg-surface)' }}>
+      <div style={{ padding:'12px 24px', display:'flex', gap:16, borderBottom:'1px solid var(--border)', flexWrap:'wrap', alignItems:'center', background:'var(--bg-surface)' }}>
         <div style={{ display:'flex', alignItems:'center', gap:8 }}>
           <span style={{ fontSize:'0.75rem', fontWeight:600, color:'var(--text-secondary)' }}>Direction:</span>
           <select value={directionFilter} onChange={e => setDirectionFilter(e.target.value as any)} className="input-field" style={{ width:220, padding:'4px 8px', fontSize:'0.8125rem', height:32, cursor:'pointer' }}>

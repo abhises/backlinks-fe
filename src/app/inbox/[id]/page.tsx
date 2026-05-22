@@ -128,7 +128,7 @@ export default function ThreadPage() {
 
   if (loading || !thread || !workspace) {
     return (
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh' }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%' }}>
         <Loader2 size={28} className="animate-spin" style={{ color:'var(--accent)' }} />
       </div>
     );
@@ -140,7 +140,7 @@ export default function ThreadPage() {
   const hasLink = !!thread.linkPlacement;
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'100vh' }}>
+    <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
       {/* Top bar */}
       <div style={{ padding:'14px 80px 14px 24px', borderBottom:'1px solid var(--border)', display:'flex', alignItems:'center', gap:12, background:'var(--bg-surface)', flexShrink:0 }}>
         <button onClick={() => router.push('/inbox')} className="btn btn-ghost btn-icon">

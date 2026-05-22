@@ -73,9 +73,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('dark');
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const isThreadPage = pathname ? (pathname.startsWith('/inbox/') && pathname !== '/inbox') : false;
-  const topPosition = isThreadPage ? 16 : 30;
-  const rightPosition = isThreadPage ? 24 : 32;
 
   useEffect(() => {
     const saved = (localStorage.getItem('bl_theme') as Theme) || 'dark';
@@ -196,72 +193,98 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main */}
-      <main className="main-content" style={{ position: 'relative' }}>
-        {/* Floating Controls in Top Right: Notification Bell + Theme Toggle */}
-        <div style={{ position: 'absolute', top: topPosition, right: rightPosition, zIndex: 100, display: 'flex', gap: 8, alignItems: 'center' }}>
-
-          {/* Notification Bell */}
-          <div style={{ position: 'relative' }}>
-            <button
-              onClick={() => setShowDropdown(!showDropdown)}
-              className="btn btn-secondary btn-icon"
-              title="Notifications"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 36, width: 36, padding: 0, borderRadius: 'var(--radius-sm)', position: 'relative' }}
-            >
-              <Bell size={16} />
-              {notifications.some(n => !n.read) && (
-                <span style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, background: 'var(--red)', borderRadius: '50%' }} />
-              )}
-            </button>
-
-            {/* Notifications Dropdown */}
-            {showDropdown && (
-              <div style={{ position: 'absolute', right: 0, marginTop: 8, width: 320, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column', zIndex: 110 }}>
-                <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 700, fontSize: '0.875rem' }}>Notifications</span>
-                  {notifications.some(n => !n.read) && (
-                    <button onClick={markAllRead} style={{ fontSize: '0.75rem', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer' }}>
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-
-                <div style={{ maxHeight: 280, overflowY: 'auto' }}>
-                  {notifications.length === 0 ? (
-                    <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8125rem' }}>
-                      No new notifications
-                    </div>
-                  ) : (
-                    notifications.map(n => (
-                      <div
-                        key={n.id}
-                        onClick={() => handleNotifClick(n)}
-                        style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', cursor: 'pointer', background: n.read ? 'transparent' : 'var(--bg-hover)', transition: 'background 0.2s' }}
-                      >
-                        <p style={{ fontWeight: n.read ? 600 : 700, fontSize: '0.8125rem', color: 'var(--text-primary)', marginBottom: 2 }}>{n.title}</p>
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.4, marginBottom: 4 }}>{n.body}</p>
-                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                          {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
+      <main className="main-content" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', width: '100%' }}>
+        {/* Sticky Top Header Bar */}
+        <header style={{ 
+          height: '60px', 
+          borderBottom: '1px solid var(--border)', 
+          background: 'var(--bg-surface)', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          padding: '0 24px', 
+          flexShrink: 0,
+          zIndex: 100 
+        }}>
+          {/* Breadcrumb Workspace / Category */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Workspace</span>
+            <span style={{ color: 'var(--text-muted)' }}>/</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', textTransform: 'capitalize' }}>
+              {pathname?.split('/')[1] === 'links' ? 'Placed Links' : pathname?.split('/')[1] || 'Overview'}
+            </span>
           </div>
 
-          {/* Theme Toggle */}
-          <button
-            onClick={cycleTheme}
-            className="btn btn-secondary btn-icon"
-            title="Cycle Theme"
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 36, width: 36, padding: 0, borderRadius: 'var(--radius-sm)' }}
-          >
-            <ThemeIcon size={16} />
-          </button>
+          {/* Top Right Controls: Notification Bell + Theme Toggle */}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            
+            {/* Notification Bell */}
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="btn btn-secondary btn-icon"
+                title="Notifications"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 36, width: 36, padding: 0, borderRadius: 'var(--radius-sm)', position: 'relative' }}
+              >
+                <Bell size={16} />
+                {notifications.some(n => !n.read) && (
+                  <span style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, background: 'var(--red)', borderRadius: '50%' }} />
+                )}
+              </button>
+
+              {/* Notifications Dropdown */}
+              {showDropdown && (
+                <div style={{ position: 'absolute', right: 0, marginTop: 8, width: 320, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column', zIndex: 110 }}>
+                  <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 700, fontSize: '0.875rem' }}>Notifications</span>
+                    {notifications.some(n => !n.read) && (
+                      <button onClick={markAllRead} style={{ fontSize: '0.75rem', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer' }}>
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+                  
+                  <div style={{ maxHeight: 280, overflowY: 'auto' }}>
+                    {notifications.length === 0 ? (
+                      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8125rem' }}>
+                        No new notifications
+                      </div>
+                    ) : (
+                      notifications.map(n => (
+                        <div 
+                          key={n.id} 
+                          onClick={() => handleNotifClick(n)}
+                          style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', cursor: 'pointer', background: n.read ? 'transparent' : 'var(--bg-hover)', transition: 'background 0.2s' }}
+                        >
+                          <p style={{ fontWeight: n.read ? 600 : 700, fontSize: '0.8125rem', color: 'var(--text-primary)', marginBottom: 2 }}>{n.title}</p>
+                          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.4, marginBottom: 4 }}>{n.body}</p>
+                          <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+                            {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={cycleTheme}
+              className="btn btn-secondary btn-icon"
+              title="Cycle Theme"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 36, width: 36, padding: 0, borderRadius: 'var(--radius-sm)' }}
+            >
+              <ThemeIcon size={16} />
+            </button>
+          </div>
+        </header>
+
+        {/* Content Wrapper */}
+        <div style={{ flex: 1, overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+          {children}
         </div>
-        {children}
       </main>
     </div>
   );

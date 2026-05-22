@@ -86,7 +86,7 @@ export default function InboxPage() {
     isIncoming(t) ? t.giverWorkspace : t.receiverWorkspace;
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'100vh' }}>
+    <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
       {/* Header */}
       <div className="page-header">
         <div className="page-header-left">
@@ -104,7 +104,7 @@ export default function InboxPage() {
       </div>
 
       {/* Filter chips */}
-      <div style={{ padding:'16px 32px', display:'flex', gap:8, borderBottom:'1px solid var(--border)', flexWrap:'wrap' }}>
+      <div style={{ padding:'16px 24px', display:'flex', gap:8, borderBottom:'1px solid var(--border)', flexWrap:'wrap' }}>
         {FILTERS.map(f => (
           <button key={f.key} id={`filter-${f.key}`}
             className={`chip ${filter === f.key ? 'active' : ''}`}
@@ -115,7 +115,7 @@ export default function InboxPage() {
       </div>
 
       {/* Thread list */}
-      <div style={{ flex:1, overflowY:'auto', padding:'20px 32px', display:'flex', flexDirection:'column', gap:10 }}>
+      <div style={{ flex:1, overflowY:'auto', padding:'20px 24px', display:'flex', flexDirection:'column', gap:10 }}>
         {loading ? (
           <div className="empty-state">
             <Loader2 size={32} className="animate-spin" style={{ color:'var(--accent)' }} />
