@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import {
   ArrowLeft, Send, Link2, ExternalLink, Loader2,
-  ArrowRight, Info, CheckCircle2, AlertCircle
+  ArrowRight, Info, CheckCircle2, AlertCircle, Ban
 } from 'lucide-react';
 import AddLinkModal from '@/components/AddLinkModal';
 import { io } from 'socket.io-client';
@@ -152,14 +152,24 @@ export default function ThreadPage() {
         <div style={{ flex:1 }}>
           <p style={{ fontWeight:700, fontSize:'0.9375rem' }}>{theirDomain}</p>
           <p style={{ fontSize:'0.75rem', color:'var(--text-muted)' }}>
-            Stage: <span style={{ color:'var(--accent)', fontWeight:600 }}>{thread.stage}</span>
+            Status: <span style={{ color: thread.status === 'REJECTED' ? 'var(--red)' : thread.stage === 'PLACED' ? 'var(--green)' : 'var(--accent)', fontWeight:600 }}>
+              {thread.status === 'REJECTED' ? 'Rejected' : thread.stage === 'NEW' ? 'Pending Approval' : thread.stage === 'CHAT' ? 'Chatting' : 'Link Placed ✓'}
+            </span>
           </p>
         </div>
-        <button id="add-link-btn" onClick={() => setShowLinkModal(true)}
-          className={`btn btn-sm ${hasLink ? 'btn-secondary' : 'btn-primary'}`}>
-          <Link2 size={14} />
-          {hasLink ? 'View Link Details' : 'Add Link Details'}
-        </button>
+        {/* Giver: show Add/Edit button. Receiver: show View only if link exists */}
+        {(isGiver || hasLink) && (
+          <button id="add-link-btn" onClick={() => setShowLinkModal(true)}
+            className={`btn btn-sm ${hasLink ? 'btn-secondary' : 'btn-primary'}`}>
+            <Link2 size={14} />
+            {isGiver ? (hasLink ? 'Edit Link Details' : 'Add Link Details') : 'View Link Details'}
+          </button>
+        )}
+        {!isGiver && !hasLink && (
+          <span style={{ fontSize:'0.75rem', color:'var(--text-muted)', display:'flex', alignItems:'center', gap:5 }}>
+            <Loader2 size={13} style={{ opacity:0.4 }} /> Awaiting giver to add link
+          </span>
+        )}
       </div>
 
       {/* Directional Banner */}
@@ -180,12 +190,17 @@ export default function ThreadPage() {
         <span className="direction-domain" style={{ color: isGiver ? 'var(--green)' : 'var(--accent)' }}>
           {thread.receiverWorkspace.domain}
         </span>
-        {hasLink && (
+        {thread.status === 'REJECTED' && (
+          <span className="pill pill-rejected" style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:5 }}>
+            <Ban size={11} /> Connection Rejected
+          </span>
+        )}
+        {thread.status !== 'REJECTED' && hasLink && (
           <span className="pill pill-live" style={{ marginLeft:'auto' }}>
             <CheckCircle2 size={11} /> Link Placed
           </span>
         )}
-        {!hasLink && isGiver && (
+        {thread.status !== 'REJECTED' && !hasLink && isGiver && (
           <span style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:5, fontSize:'0.75rem', color:'var(--amber)' }}>
             <AlertCircle size={13} /> Awaiting your link submission
           </span>
@@ -220,21 +235,30 @@ export default function ThreadPage() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
-      <form onSubmit={sendMessage} style={{ padding:'16px 24px', borderTop:'1px solid var(--border)', display:'flex', gap:10, background:'var(--bg-surface)', flexShrink:0 }}>
-        <input
-          id="chat-input"
-          value={text}
-          onChange={e => setText(e.target.value)}
-          className="input-field"
-          placeholder="Type a message…"
-          style={{ flex:1 }}
-          disabled={sending}
-        />
-        <button id="chat-send" type="submit" className="btn btn-primary btn-icon" disabled={!text.trim() || sending}>
-          {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-        </button>
-      </form>
+      {/* Input — locked when rejected */}
+      {thread.status === 'REJECTED' ? (
+        <div style={{ padding:'16px 24px', borderTop:'1px solid var(--border)', background:'var(--bg-surface)', display:'flex', alignItems:'center', gap:10, flexShrink:0 }}>
+          <Ban size={16} style={{ color:'var(--red)', flexShrink:0 }} />
+          <span style={{ fontSize:'0.875rem', color:'var(--text-muted)' }}>
+            This connection was rejected — messaging is disabled.
+          </span>
+        </div>
+      ) : (
+        <form onSubmit={sendMessage} style={{ padding:'16px 24px', borderTop:'1px solid var(--border)', display:'flex', gap:10, background:'var(--bg-surface)', flexShrink:0 }}>
+          <input
+            id="chat-input"
+            value={text}
+            onChange={e => setText(e.target.value)}
+            className="input-field"
+            placeholder="Type a message…"
+            style={{ flex:1 }}
+            disabled={sending}
+          />
+          <button id="chat-send" type="submit" className="btn btn-primary btn-icon" disabled={!text.trim() || sending}>
+            {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+          </button>
+        </form>
+      )}
 
       {showLinkModal && (
         <AddLinkModal

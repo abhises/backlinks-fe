@@ -41,7 +41,7 @@ export default function DashboardPage() {
     <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
       <div className="page-header">
         <div className="page-header-left">
-          <h1 className="page-title">Dashboard</h1>
+          <h1 className="page-title">Discover</h1>
           <p className="page-sub">Find partner sites for backlink exchanges</p>
         </div>
       </div>

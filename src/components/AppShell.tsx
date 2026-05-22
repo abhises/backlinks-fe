@@ -11,7 +11,7 @@ import { io } from 'socket.io-client';
 
 type NotificationItem = {
   id: string;
-  type: 'new_message' | 'new_connection' | 'connection_accepted';
+  type: 'new_message' | 'new_connection' | 'connection_accepted' | 'connection_rejected';
   title: string;
   body: string;
   timestamp: Date;
@@ -58,8 +58,8 @@ const playNotificationSound = () => {
 
 const NAV = [
   { href: '/inbox', icon: Inbox, label: 'Inbox' },
-  { href: '/links', icon: ExternalLink, label: 'Placed Links' },
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/links', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/dashboard', icon: Globe, label: 'Discover' },
   { href: '/settings', icon: Settings, label: 'Settings' },
 ];
 
@@ -108,8 +108,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         body = `${data.senderWorkspaceName} (${data.senderWorkspaceDomain}) sent you a backlink exchange request.`;
         link = '/inbox';
       } else if (data.type === 'connection_accepted') {
-        title = 'Request Accepted';
+        title = 'Request Accepted ✅';
         body = `${data.receiverWorkspaceName} accepted your backlink request!`;
+        link = `/inbox/${data.threadId}`;
+      } else if (data.type === 'connection_rejected') {
+        title = 'Request Rejected';
+        body = `${data.receiverWorkspaceName} declined your backlink exchange request.`;
         link = `/inbox/${data.threadId}`;
       }
 
@@ -232,7 +236,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Workspace</span>
             <span style={{ color: 'var(--text-muted)' }}>/</span>
             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', textTransform: 'capitalize' }}>
-              {pathname?.split('/')[1] === 'links' ? 'Placed Links' : pathname?.split('/')[1] || 'Overview'}
+              {pathname?.split('/')[1] === 'links' ? 'Dashboard' : pathname?.split('/')[1] === 'dashboard' ? 'Discover' : pathname?.split('/')[1] ? pathname.split('/')[1].charAt(0).toUpperCase() + pathname.split('/')[1].slice(1) : 'Overview'}
             </span>
           </div>
 

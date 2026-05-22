@@ -74,7 +74,7 @@ export default function LinksPage() {
       {/* Header */}
       <div className="page-header">
         <div className="page-header-left">
-          <h1 className="page-title">Placed Links</h1>
+          <h1 className="page-title">Dashboard</h1>
           <p className="page-sub">
             {filteredLinks.length === links.length
               ? `${links.length} link record${links.length !== 1 ? 's' : ''}`
