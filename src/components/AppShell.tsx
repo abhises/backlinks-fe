@@ -184,12 +184,33 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Bottom controls */}
-        <div style={{ padding: '8px 8px 0', display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <button onClick={logout} className="nav-item" style={{ width: '100%', color: 'var(--red)' }}>
-            <LogOut size={18} />
-            Sign Out
-          </button>
-        </div>
+        <button 
+          onClick={logout} 
+          className="nav-item" 
+          style={{ 
+            color: 'var(--red)', 
+            background: 'none', 
+            border: '1px solid rgba(239, 68, 68, 0.25)', 
+            fontFamily: 'inherit',
+            fontSize: 'inherit',
+            fontWeight: 'inherit',
+            textAlign: 'left',
+            cursor: 'pointer',
+            marginTop: 8,
+            transition: 'background 0.15s ease, border-color 0.15s ease'
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239, 68, 68, 0.12)';
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239, 68, 68, 0.6)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'none';
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239, 68, 68, 0.25)';
+          }}
+        >
+          <LogOut size={18} />
+          Sign Out
+        </button>
       </aside>
 
       {/* Main */}

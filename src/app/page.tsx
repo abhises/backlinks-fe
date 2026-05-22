@@ -54,8 +54,10 @@ export default function Home() {
 
       {/* Navigation */}
       <header style={{ 
-        position: 'sticky', 
+        position: 'fixed', 
         top: 0, 
+        left: 0,
+        right: 0,
         zIndex: 100, 
         background: 'var(--header-bg)', 
         backdropFilter: 'blur(12px)', 
@@ -86,7 +88,7 @@ export default function Home() {
               onClick={cycleTheme} 
               className="btn btn-secondary btn-icon" 
               title="Cycle Theme" 
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 8, height: 36, width: 36, borderRadius: 'var(--radius-sm)' }}
+              style={{ display: 'flex', alignItems: 'center', justifySelf: 'start', justifyContent: 'center', padding: 8, height: 36, width: 36, borderRadius: 'var(--radius-sm)' }}
             >
               <ThemeIcon size={16} />
             </button>
@@ -109,7 +111,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section style={{ maxWidth: 1200, margin: '0 auto', padding: '96px 24px 80px', position: 'relative', zIndex: 1 }}>
+      <section style={{ maxWidth: 1200, margin: '0 auto', padding: '144px 24px 80px', position: 'relative', zIndex: 1 }}>
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
