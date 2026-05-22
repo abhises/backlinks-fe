@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Link2, Inbox, ExternalLink, LayoutDashboard, Settings,
-  LogOut, Sun, Moon, Palette, ChevronDown, Globe, Bell
+  LogOut, Sun, Moon, Palette, ChevronDown, Globe, Bell, Menu, X
 } from 'lucide-react';
 import { io } from 'socket.io-client';
 
@@ -73,6 +73,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('dark');
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const saved = (localStorage.getItem('bl_theme') as Theme) || 'dark';
@@ -217,6 +218,84 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </button>
       </aside>
 
+      {/* Mobile: sidebar overlay backdrop */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 198,
+            background: 'rgba(0,0,0,0.55)',
+            backdropFilter: 'blur(3px)',
+          }}
+        />
+      )}
+
+      {/* Mobile: sidebar slide-in overlay */}
+      <aside
+        className="mobile-sidebar-overlay"
+        style={{
+          transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
+          boxShadow: sidebarOpen ? 'var(--shadow-lg)' : 'none',
+        }}
+        aria-hidden={!sidebarOpen}
+      >
+        <div className="sidebar-logo" style={{ justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div className="logo-icon"><Link2 size={17} color="#fff" /></div>
+            <span className="logo-text">SERPsupport</span>
+          </div>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="btn btn-ghost btn-icon"
+            style={{ padding: 6 }}
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {NAV.map(({ href, icon: Icon, label }) => (
+          <Link key={href} href={href}
+            className={`nav-item ${pathname.startsWith(href) ? 'active' : ''}`}
+            onClick={() => setSidebarOpen(false)}>
+            <Icon size={18} />
+            {label}
+          </Link>
+        ))}
+
+        <div style={{ flex: 1 }} />
+
+        <div style={{ margin: '0 8px', padding: '12px', background: 'var(--bg-hover)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <Globe size={13} color="var(--accent)" />
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)' }}>{workspace.domain}</span>
+          </div>
+          <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>{workspace.websiteName}</p>
+        </div>
+
+        <button
+          onClick={() => { setSidebarOpen(false); logout(); }}
+          className="nav-item"
+          style={{
+            color: 'var(--red)', background: 'none',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
+            fontFamily: 'inherit', fontSize: 'inherit', fontWeight: 'inherit',
+            textAlign: 'left', cursor: 'pointer', marginTop: 8,
+            transition: 'background 0.15s ease, border-color 0.15s ease'
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239, 68, 68, 0.12)';
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239, 68, 68, 0.6)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'none';
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239, 68, 68, 0.25)';
+          }}
+        >
+          <LogOut size={18} />
+          Sign Out
+        </button>
+      </aside>
+
       {/* Main */}
       <main className="main-content" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', width: '100%' }}>
         {/* Sticky Top Header Bar */}
@@ -231,8 +310,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           flexShrink: 0,
           zIndex: 100 
         }}>
-          {/* Breadcrumb Workspace / Category */}
+          {/* Breadcrumb — with hamburger on mobile */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Hamburger: visible only on mobile via CSS */}
+            <button
+              id="mobile-sidebar-toggle"
+              className="btn btn-ghost btn-icon mobile-menu-btn"
+              onClick={() => setSidebarOpen(v => !v)}
+              style={{ padding: 6, height: 34, width: 34 }}
+              aria-label="Toggle sidebar"
+            >
+              <Menu size={18} />
+            </button>
             <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Workspace</span>
             <span style={{ color: 'var(--text-muted)' }}>/</span>
             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', textTransform: 'capitalize' }}>

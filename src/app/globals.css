@@ -477,3 +477,151 @@ h4 { font-size: 0.9375rem; font-weight: 600; }
   transition: all 0.15s ease; border: 2px solid transparent;
 }
 .theme-dot:hover, .theme-dot.active { border-color: var(--accent); transform: scale(1.2); }
+
+/* ─── MOBILE BOTTOM NAV ───────────────────────────────────────────────────── */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 200;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  height: 60px;
+  align-items: stretch;
+}
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  transition: color 0.15s ease;
+  padding: 0;
+}
+.bottom-nav-item.active { color: var(--accent); }
+.bottom-nav-item:hover { color: var(--text-primary); }
+.bottom-nav-item svg { width: 20px; height: 20px; }
+
+/* ─── MOBILE DRAWER ───────────────────────────────────────────────────────── */
+.mobile-drawer-backdrop {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+}
+.mobile-drawer {
+  position: fixed;
+  bottom: 60px; left: 0; right: 0;
+  z-index: 301;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 20px;
+  animation: slideUp 0.2s ease;
+}
+
+/* ─── MOBILE SIDEBAR OVERLAY ──────────────────────────────────────────────── */
+.mobile-sidebar-overlay {
+  display: none !important; /* hidden on desktop */
+}
+
+/* ─── RESPONSIVE BREAKPOINTS ─────────────────────────────────────────────── */
+
+/* Desktop: hide hamburger */
+.mobile-menu-btn { display: none !important; }
+
+@media (max-width: 768px) {
+  /* App shell — hide static sidebar, content takes full width */
+  .sidebar { display: none !important; }
+
+  /* Show hamburger */
+  .mobile-menu-btn { display: flex !important; }
+
+  /* Show mobile sidebar overlay */
+  .mobile-sidebar-overlay {
+    display: flex !important;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 199;
+    width: 240px;
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border);
+    flex-direction: column;
+    padding: 24px 0;
+    gap: 4px;
+    transition: transform 0.25s ease;
+  }
+
+  .app-shell { flex-direction: column; }
+  .main-content {
+    height: 100vh !important;
+    padding-bottom: 0;
+  }
+
+  /* Page headers stack on mobile */
+  .page-header {
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* Links table scrolls horizontally */
+  .links-grid {
+    grid-template-columns: minmax(140px,1fr) minmax(120px,1fr) minmax(100px,1fr) 90px 50px 100px;
+  }
+
+  /* Thread tiles */
+  .thread-tile { gap: 10px; padding: 12px 14px; }
+
+  /* Chat bubbles full width */
+  .chat-bubble { max-width: 90%; }
+
+  /* Cards full width */
+  .overlay-panel { max-width: 100% !important; margin: 0 12px; }
+
+  /* Direction banner wraps */
+  .direction-banner { gap: 8px; padding: 8px 12px; }
+  .direction-domain { font-size: 0.8rem; }
+
+  /* Auth card */
+  .auth-card { padding: 28px 20px; margin: 0 16px; }
+}
+
+/* ─── LANDING PAGE MOBILE ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .landing-nav-links { display: none; }
+  .landing-nav-mobile { display: flex !important; }
+  .landing-mobile-menu {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 200;
+    background: var(--bg-base);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    animation: fadeIn 0.2s ease;
+  }
+  .landing-mobile-menu a, .landing-mobile-menu button {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+}
+

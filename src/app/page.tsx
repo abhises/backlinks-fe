@@ -5,12 +5,13 @@ import Link from 'next/link';
 import { 
   Link2, Globe, ShieldCheck, ArrowRight, MessageSquare, 
   CheckCircle, Zap, TrendingUp, Mail, Users, Check, Sparkles,
-  Sun, Moon, Palette
+  Sun, Moon, Palette, Menu, X
 } from 'lucide-react';
 
 export default function Home() {
   const { user } = useAuth();
   const [theme, setTheme] = useState<'dark' | 'light' | 'color'>('dark');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const saved = (localStorage.getItem('bl_theme') as 'dark' | 'light' | 'color') || 'dark';
@@ -76,7 +77,8 @@ export default function Home() {
             <span className="logo-text" style={{ fontSize: '1.25rem', letterSpacing: '-0.04em' }}>SERPsupport</span>
           </div>
 
-          <nav style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+          {/* Desktop nav links */}
+          <nav className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
             <a href="#features" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-primary)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>Features</a>
             <a href="#how-it-works" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-primary)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>How it works</a>
             <a href="#importance" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-primary)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}>Importance</a>
@@ -92,23 +94,52 @@ export default function Home() {
             >
               <ThemeIcon size={16} />
             </button>
-            {user ? (
-              <Link href="/inbox" className="btn btn-primary">
-                Dashboard <ArrowRight size={15} />
-              </Link>
-            ) : (
-              <>
-                <Link href="/auth?mode=login" className="btn btn-ghost" style={{ fontWeight: 500 }}>
-                  Sign In
+            {/* Desktop auth buttons */}
+            <span className="landing-nav-links" style={{ display: 'contents' }}>
+              {user ? (
+                <Link href="/inbox" className="btn btn-primary">
+                  Dashboard <ArrowRight size={15} />
                 </Link>
-                <Link href="/auth?mode=register" className="btn btn-primary">
-                  Sign Up
-                </Link>
-              </>
-            )}
+              ) : (
+                <>
+                  <Link href="/auth?mode=login" className="btn btn-ghost" style={{ fontWeight: 500 }}>Sign In</Link>
+                  <Link href="/auth?mode=register" className="btn btn-primary">Sign Up</Link>
+                </>
+              )}
+            </span>
+            {/* Mobile hamburger */}
+            <button
+              className="landing-nav-mobile btn btn-ghost btn-icon"
+              style={{ display: 'none', padding: 8, height: 36, width: 36 }}
+              onClick={() => setMobileMenuOpen(v => !v)}
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
         </div>
       </header>
+
+      {/* Mobile full-screen menu */}
+      {mobileMenuOpen && (
+        <div className="landing-mobile-menu" style={{ zIndex: 200 }}>
+          <button style={{ position:'absolute', top:20, right:20, background:'none', border:'none', cursor:'pointer', color:'var(--text-primary)' }} onClick={() => setMobileMenuOpen(false)}>
+            <X size={24} />
+          </button>
+          <a href="#features" onClick={() => setMobileMenuOpen(false)}>Features</a>
+          <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)}>How it works</a>
+          <a href="#importance" onClick={() => setMobileMenuOpen(false)}>Importance</a>
+          <a href="#contact" onClick={() => setMobileMenuOpen(false)}>Contact</a>
+          <div style={{ width: '100%', height: 1, background: 'var(--border)', margin: '8px 0' }} />
+          {user ? (
+            <Link href="/inbox" className="btn btn-primary" onClick={() => setMobileMenuOpen(false)}>Go to Dashboard</Link>
+          ) : (
+            <>
+              <Link href="/auth?mode=login" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
+              <Link href="/auth?mode=register" className="btn btn-primary" onClick={() => setMobileMenuOpen(false)}>Sign Up</Link>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Hero Section */}
       <section style={{ maxWidth: 1200, margin: '0 auto', padding: '144px 24px 80px', position: 'relative', zIndex: 1 }}>
