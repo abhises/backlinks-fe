@@ -20,7 +20,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401 && typeof window !== 'undefined') {
+    const isAuthRequest = err.config?.url?.includes('/api/auth/login') ||
+                          err.config?.url?.includes('/api/auth/register') ||
+                          err.config?.url?.includes('/api/auth/google');
+
+    if (err.response?.status === 401 && typeof window !== 'undefined' && !isAuthRequest) {
       localStorage.removeItem('bl_token');
       localStorage.removeItem('bl_user');
       window.location.href = '/auth';

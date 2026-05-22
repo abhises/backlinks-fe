@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import Script from 'next/script';
 import { Link2, Mail, Lock, User, ArrowRight, Loader2, Sun, Moon, Palette } from 'lucide-react';
 
 export default function AuthPage() {
@@ -28,8 +29,54 @@ export default function AuthPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, register, workspace } = useAuth();
+  const { login, register, loginWithGoogle, workspace } = useAuth();
   const router = useRouter();
+
+  const initGoogleSignIn = () => {
+    if (typeof window !== 'undefined' && (window as any).google) {
+      (window as any).google.accounts.id.initialize({
+        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1036829497479-placeholder.apps.googleusercontent.com',
+        callback: (window as any).handleGoogleResponse,
+      });
+      const btnParent = document.getElementById('google-signin-btn');
+      if (btnParent) {
+        (window as any).google.accounts.id.renderButton(
+          btnParent,
+          { 
+            theme: theme === 'light' ? 'outline' : 'filled_black', 
+            size: 'large', 
+            width: btnParent.clientWidth || 360,
+            text: mode === 'login' ? 'signin_with' : 'signup_with'
+          }
+        );
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Define the global callback
+    (window as any).handleGoogleResponse = async (response: any) => {
+      setError('');
+      setLoading(true);
+      try {
+        const ws = await loginWithGoogle(response.credential);
+        router.replace(ws ? '/inbox' : '/onboarding');
+      } catch (err: any) {
+        setError(err?.response?.data?.error || 'Google sign in failed');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Render/initialize button if google SDK is already loaded
+    if ((window as any).google) {
+      initGoogleSignIn();
+    }
+
+    return () => {
+      delete (window as any).handleGoogleResponse;
+    };
+  }, [theme, mode, loginWithGoogle, router]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -132,6 +179,18 @@ export default function AuthPage() {
           </button>
         </form>
 
+        <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0 12px 0' }}>
+          <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
+          <span style={{ padding: '0 10px', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>or</span>
+          <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
+        </div>
+
+        {/* Google Sign In Button */}
+        <div 
+          id="google-signin-btn" 
+          style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: 12, minHeight: 40 }}
+        />
+
         <div className="divider" />
 
         <p style={{ textAlign:'center', fontSize:'0.875rem', color:'var(--text-secondary)' }}>
@@ -142,6 +201,12 @@ export default function AuthPage() {
           </button>
         </p>
       </div>
+
+      <Script 
+        src="https://accounts.google.com/gsi/client" 
+        onLoad={initGoogleSignIn}
+        strategy="lazyOnload"
+      />
     </div>
   );
 }
