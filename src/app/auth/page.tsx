@@ -1,10 +1,27 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Link2, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { Link2, Mail, Lock, User, ArrowRight, Loader2, Sun, Moon, Palette } from 'lucide-react';
 
 export default function AuthPage() {
+  const [theme, setTheme] = useState<'dark' | 'light' | 'color'>('dark');
+
+  useEffect(() => {
+    const saved = (localStorage.getItem('bl_theme') as 'dark' | 'light' | 'color') || 'dark';
+    setTheme(saved);
+    document.documentElement.setAttribute('data-theme', saved);
+  }, []);
+
+  const cycleTheme = () => {
+    const next = theme === 'dark' ? 'light' : theme === 'light' ? 'color' : 'dark';
+    setTheme(next);
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('bl_theme', next);
+  };
+
+  const ThemeIcon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Palette;
+
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -14,13 +31,23 @@ export default function AuthPage() {
   const { login, register, workspace } = useAuth();
   const router = useRouter();
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const m = params.get('mode');
+      if (m === 'register' || m === 'login') {
+        setMode(m);
+      }
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(''); setLoading(true);
     try {
       if (mode === 'login') {
-        await login(email, password);
-        router.replace(workspace ? '/inbox' : '/onboarding');
+        const ws = await login(email, password);
+        router.replace(ws ? '/inbox' : '/onboarding');
       } else {
         await register(name, email, password);
         router.replace('/onboarding');
@@ -37,11 +64,23 @@ export default function AuthPage() {
       {/* background grid */}
       <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(var(--border) 1px, transparent 1px)', backgroundSize:'32px 32px', opacity:0.3, pointerEvents:'none' }} />
 
+      {/* Floating Theme Toggle in Top Right */}
+      <div style={{ position: 'absolute', top: 24, right: 24, zIndex: 100 }}>
+        <button 
+          onClick={cycleTheme} 
+          className="btn btn-secondary btn-icon" 
+          title="Cycle Theme"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 36, width: 36, padding: 0, borderRadius: 'var(--radius-sm)' }}
+        >
+          <ThemeIcon size={16} />
+        </button>
+      </div>
+
       <div className="auth-card animate-slide-up">
         {/* Logo */}
         <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:32 }}>
           <div className="logo-icon"><Link2 size={18} color="#fff" /></div>
-          <span className="logo-text">LinkLoop</span>
+          <span className="logo-text">SERPsupport</span>
         </div>
 
         <h1 style={{ fontSize:'1.5rem', fontWeight:800, marginBottom:4 }}>

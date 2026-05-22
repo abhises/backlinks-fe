@@ -22,11 +22,11 @@ interface AuthContextType {
   workspace: Workspace | null;
   token: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<any>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   setWorkspace: (ws: Workspace) => void;
-  refreshWorkspace: () => Promise<void>;
+  refreshWorkspace: () => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -42,7 +42,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await api.get('/api/auth/me');
       setUser(res.data.user);
       setWorkspaceState(res.data.workspace);
-    } catch {}
+      return res.data.workspace;
+    } catch {
+      return null;
+    }
   }, []);
 
   useEffect(() => {
@@ -61,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('bl_token', t);
     setToken(t);
     setUser(u);
-    await refreshWorkspace();
+    return await refreshWorkspace();
   };
 
   const register = async (name: string, email: string, password: string) => {
@@ -78,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(null);
     setUser(null);
     setWorkspaceState(null);
-    window.location.href = '/auth';
+    window.location.href = '/';
   };
 
   const setWorkspace = (ws: Workspace) => {

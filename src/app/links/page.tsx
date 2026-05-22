@@ -32,6 +32,16 @@ export default function LinksPage() {
   const [links, setLinks] = useState<LinkRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [directionFilter, setDirectionFilter] = useState<'ALL' | 'GIVEN' | 'RECEIVED'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'LIVE' | 'REMOVED' | 'DEPARTED'>('ALL');
+
+  const filteredLinks = links.filter(link => {
+    const isGiver = link.giverWorkspace.id === workspace?.id;
+    if (directionFilter === 'GIVEN' && !isGiver) return false;
+    if (directionFilter === 'RECEIVED' && isGiver) return false;
+    if (statusFilter !== 'ALL' && link.status !== statusFilter) return false;
+    return true;
+  });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -65,11 +75,37 @@ export default function LinksPage() {
       <div className="page-header">
         <div className="page-header-left">
           <h1 className="page-title">Placed Links</h1>
-          <p className="page-sub">{links.length} link record{links.length !== 1 ? 's' : ''}</p>
+          <p className="page-sub">
+            {filteredLinks.length === links.length
+              ? `${links.length} link record${links.length !== 1 ? 's' : ''}`
+              : `${filteredLinks.length} of ${links.length} filtered`
+            }
+          </p>
         </div>
         <button onClick={load} className="btn btn-secondary btn-sm">
           <RefreshCw size={14} /> Refresh
         </button>
+      </div>
+
+      {/* Filters Bar */}
+      <div style={{ padding:'12px 32px', display:'flex', gap:16, borderBottom:'1px solid var(--border)', flexWrap:'wrap', alignItems:'center', background:'var(--bg-surface)' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <span style={{ fontSize:'0.75rem', fontWeight:600, color:'var(--text-secondary)' }}>Direction:</span>
+          <select value={directionFilter} onChange={e => setDirectionFilter(e.target.value as any)} className="input-field" style={{ width:220, padding:'4px 8px', fontSize:'0.8125rem', height:32, cursor:'pointer' }}>
+            <option value="ALL">All Directions</option>
+            <option value="GIVEN">Backlinks Out (Given)</option>
+            <option value="RECEIVED">Backlinks In (Received)</option>
+          </select>
+        </div>
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <span style={{ fontSize:'0.75rem', fontWeight:600, color:'var(--text-secondary)' }}>Status:</span>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as any)} className="input-field" style={{ width:150, padding:'4px 8px', fontSize:'0.8125rem', height:32, cursor:'pointer' }}>
+            <option value="ALL">All Statuses</option>
+            <option value="LIVE">Live</option>
+            <option value="REMOVED">Removed</option>
+            <option value="DEPARTED">Departed</option>
+          </select>
+        </div>
       </div>
 
       {/* Table */}
@@ -85,6 +121,12 @@ export default function LinksPage() {
             <h3>No placed links yet</h3>
             <p>Once you complete an exchange thread and submit link details, they will appear here.</p>
           </div>
+        ) : filteredLinks.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state-icon"><ExternalLink /></div>
+            <h3>No matching links</h3>
+            <p>Adjust your direction or status filters above to view other records.</p>
+          </div>
         ) : (
           <div style={{ minWidth:900 }}>
             {/* Header row */}
@@ -95,7 +137,7 @@ export default function LinksPage() {
             </div>
 
             {/* Data rows */}
-            {links.map(link => {
+            {filteredLinks.map(link => {
               const isGiver = link.giverWorkspace.id === workspace?.id;
               return (
                 <div key={link.id} id={`link-row-${link.id}`} className="links-grid"

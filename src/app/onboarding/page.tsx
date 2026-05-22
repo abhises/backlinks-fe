@@ -45,7 +45,7 @@ export default function OnboardingPage() {
       <div className="auth-card animate-slide-up" style={{ maxWidth:520 }}>
         <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:28 }}>
           <div className="logo-icon"><Link2 size={18} color="#fff" /></div>
-          <span className="logo-text">LinkLoop</span>
+          <span className="logo-text">SERPsupport</span>
         </div>
 
         {/* Progress steps */}

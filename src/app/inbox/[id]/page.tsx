@@ -8,6 +8,7 @@ import {
   ArrowRight, Info, CheckCircle2, AlertCircle
 } from 'lucide-react';
 import AddLinkModal from '@/components/AddLinkModal';
+import { io } from 'socket.io-client';
 
 type Message = {
   id: string;
@@ -21,6 +22,43 @@ type Thread = {
   receiverWorkspace: { id: string; domain: string; websiteName: string };
   messages: Message[];
   linkPlacement: any;
+};
+
+const playNotificationSound = () => {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    
+    // Tone 1
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(880, ctx.currentTime); // A5
+    gain1.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start();
+    osc1.stop(ctx.currentTime + 0.3);
+
+    // Tone 2
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(1174.66, ctx.currentTime + 0.08); // D6
+    gain2.gain.setValueAtTime(0, ctx.currentTime);
+    gain2.gain.setValueAtTime(0.1, ctx.currentTime + 0.08);
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(ctx.currentTime + 0.08);
+    osc2.stop(ctx.currentTime + 0.4);
+  } catch (e) {
+    console.warn('Audio play failed', e);
+  }
 };
 
 export default function ThreadPage() {
@@ -50,13 +88,40 @@ export default function ThreadPage() {
   useEffect(() => { load(); }, [load]);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
+  useEffect(() => {
+    if (!id) return;
+
+    const socketUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    const socket = io(socketUrl);
+
+    socket.emit('join', id);
+
+    socket.on('message', (message: Message) => {
+      if (message.sender.id !== user?.id) {
+        playNotificationSound();
+      }
+      setMessages(prev => {
+        if (prev.some(m => m.id === message.id)) return prev;
+        return [...prev, message];
+      });
+    });
+
+    return () => {
+      socket.emit('leave', id);
+      socket.disconnect();
+    };
+  }, [id, user]);
+
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim()) return;
     setSending(true);
     try {
       const res = await api.post('/api/messages', { threadId: id, messageText: text.trim() });
-      setMessages(prev => [...prev, res.data.message]);
+      setMessages(prev => {
+        if (prev.some(m => m.id === res.data.message.id)) return prev;
+        return [...prev, res.data.message];
+      });
       setText('');
     } catch {} finally { setSending(false); }
   };
@@ -77,7 +142,7 @@ export default function ThreadPage() {
   return (
     <div style={{ display:'flex', flexDirection:'column', height:'100vh' }}>
       {/* Top bar */}
-      <div style={{ padding:'14px 24px', borderBottom:'1px solid var(--border)', display:'flex', alignItems:'center', gap:12, background:'var(--bg-surface)', flexShrink:0 }}>
+      <div style={{ padding:'14px 80px 14px 24px', borderBottom:'1px solid var(--border)', display:'flex', alignItems:'center', gap:12, background:'var(--bg-surface)', flexShrink:0 }}>
         <button onClick={() => router.push('/inbox')} className="btn btn-ghost btn-icon">
           <ArrowLeft size={18} />
         </button>

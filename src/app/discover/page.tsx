@@ -63,7 +63,7 @@ export default function DiscoverPage() {
           <div className="empty-state">
             <div className="empty-state-icon"><Globe /></div>
             <h3>No sites found</h3>
-            <p>Try a different search term or invite partners to join LinkLoop.</p>
+            <p>Try a different search term or invite partners to join SERPsupport.</p>
           </div>
         ) : (
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(280px, 1fr))', gap:16 }}>
