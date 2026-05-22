@@ -59,7 +59,7 @@ const playNotificationSound = () => {
 const NAV = [
   { href: '/inbox', icon: Inbox, label: 'Inbox' },
   { href: '/links', icon: ExternalLink, label: 'Placed Links' },
-  { href: '/discover', icon: LayoutDashboard, label: 'Discover' },
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/settings', icon: Settings, label: 'Settings' },
 ];
 
