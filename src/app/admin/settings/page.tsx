@@ -9,6 +9,8 @@ export default function AdminSettings() {
   const [cronExpression, setCronExpression] = useState('0 0 * * 1');
   const [matchAmount, setMatchAmount] = useState(2);
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [triggering, setTriggering] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -48,13 +50,16 @@ export default function AdminSettings() {
     }
   };
 
-  const handleTrigger = async () => {
-    if (!window.confirm('Are you sure you want to trigger the matchmaking algorithm manually right now?')) return;
+  const confirmTrigger = async () => {
+    setTriggering(true);
     try {
       await api.post('/api/admin/trigger-matching');
       setToastMessage({ type: 'success', text: 'Matchmaking triggered successfully.' });
+      setShowModal(false);
     } catch (err: any) {
       setToastMessage({ type: 'error', text: 'Failed to trigger match.' });
+    } finally {
+      setTriggering(false);
     }
   };
 
@@ -136,7 +141,7 @@ export default function AdminSettings() {
                 {saving ? 'Saving...' : 'Save Configuration'}
               </button>
               
-              <button type="button" onClick={handleTrigger} className="btn btn-secondary">
+              <button type="button" onClick={() => setShowModal(true)} className="btn btn-secondary">
                 <Settings2 size={16} />
                 Force Run Matchmaking Now
               </button>
@@ -145,10 +150,49 @@ export default function AdminSettings() {
         )}
       </div>
 
+      {showModal && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            background: 'var(--bg-surface)', padding: 32, borderRadius: 'var(--radius-lg)', maxWidth: 450, width: '90%',
+            boxShadow: 'var(--shadow-xl)', border: '1px solid var(--border)',
+            animation: 'modalIn 0.2s ease-out'
+          }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: 12 }}>Confirm Manual Run</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.5, marginBottom: 24 }}>
+              Are you sure you want to trigger the matchmaking algorithm right now? This will immediately scan all workspaces and dispatch new `NEW` backlink connections to users based on your Match Amount settings.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+              <button 
+                onClick={() => setShowModal(false)} 
+                className="btn btn-secondary"
+                disabled={triggering}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmTrigger} 
+                className="btn btn-primary"
+                disabled={triggering}
+              >
+                {triggering ? <Loader2 size={16} className="animate-spin" /> : <Settings2 size={16} />}
+                {triggering ? 'Running...' : 'Run Algorithm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes slideIn {
           from { transform: translateX(100%); opacity: 0; }
           to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes modalIn {
+          from { transform: scale(0.95); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
         }
       `}} />
     </div>

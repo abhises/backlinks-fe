@@ -12,6 +12,8 @@ type Thread = {
   receiverWorkspace: { id: string; domain: string; websiteName: string };
   messages: { messageText: string; timestamp: string }[];
   updatedAt: string;
+  giverAccepted: boolean;
+  receiverAccepted: boolean;
 };
 
 const FILTERS = [
@@ -39,7 +41,13 @@ export default function InboxPage() {
     } catch {} finally { setLoading(false); }
   }, [filter]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { 
+    load(); 
+    
+    const handleRefresh = () => load();
+    window.addEventListener('refresh_inbox', handleRefresh);
+    return () => window.removeEventListener('refresh_inbox', handleRefresh);
+  }, [load]);
 
   // Reject countdown logic
   useEffect(() => {
@@ -69,8 +77,8 @@ export default function InboxPage() {
   const handleApprove = async (id: string) => {
     setActionLoading(id);
     try {
-      await api.patch(`/api/threads/${id}/status`, { status: 'ACCEPTED' });
-      router.push(`/inbox/${id}`);
+      const res = await api.patch(`/api/threads/${id}/status`, { status: 'ACCEPTED' });
+      setThreads(prev => prev.map(t => t.id === id ? { ...t, ...res.data.thread } : t));
     } catch {} finally { setActionLoading(null); }
   };
 
@@ -174,21 +182,29 @@ export default function InboxPage() {
                 </div>
 
                 {/* Action buttons for NEW pending threads */}
-                {pending && incoming && !isRejecting && (
-                  <div style={{ display:'flex', gap:8 }} onClick={e => e.stopPropagation()}>
-                    <button id={`reject-${t.id}`}
-                      className="btn btn-danger btn-sm"
-                      onClick={() => setRejectId(t.id)}
-                      disabled={actionLoading === t.id}>
-                      <X size={14} /> Reject
-                    </button>
-                    <button id={`approve-${t.id}`}
-                      className="btn btn-primary btn-sm"
-                      onClick={() => handleApprove(t.id)}
-                      disabled={actionLoading === t.id}>
-                      {actionLoading === t.id ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                      Approve
-                    </button>
+                {pending && !isRejecting && (
+                  <div onClick={e => e.stopPropagation()}>
+                    {((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted)) ? (
+                      <div style={{ display:'flex', gap:8 }}>
+                        <button id={`reject-${t.id}`}
+                          className="btn btn-danger btn-sm"
+                          onClick={() => setRejectId(t.id)}
+                          disabled={actionLoading === t.id}>
+                          <X size={14} /> Reject
+                        </button>
+                        <button id={`approve-${t.id}`}
+                          className="btn btn-primary btn-sm"
+                          onClick={() => handleApprove(t.id)}
+                          disabled={actionLoading === t.id}>
+                          {actionLoading === t.id ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                          Accept
+                        </button>
+                      </div>
+                    ) : (
+                      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: 'var(--radius)' }}>
+                        <Loader2 size={12} className="animate-spin" /> Waiting for them to accept
+                      </span>
+                    )}
                   </div>
                 )}
 

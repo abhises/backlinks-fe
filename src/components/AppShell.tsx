@@ -139,6 +139,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         },
         ...prev
       ]);
+      
+      // Tell inbox or other pages to refresh automatically
+      if (['new_thread', 'new_connection', 'connection_accepted', 'connection_rejected'].includes(data.type)) {
+        window.dispatchEvent(new Event('refresh_inbox'));
+      }
     });
 
     return () => {
@@ -189,15 +194,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div style={{ flex: 1 }} />
 
         {/* Bottom controls */}
-        <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', marginTop: 8 }}>
+        <div style={{ padding: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', marginTop: 8, paddingBottom: 0 }}>
           <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {user.name}
           </div>
           <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: 12 }}>
             {user.email}
           </div>
+        </div>
           
-          <button 
+        <button 
           onClick={logout} 
           className="nav-item" 
           style={{ 
@@ -224,7 +230,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <LogOut size={18} />
           Sign Out
         </button>
-        </div>
       </aside>
 
       {/* Mobile: sidebar overlay backdrop */}
@@ -273,15 +278,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         <div style={{ flex: 1 }} />
 
-        <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', marginTop: 8 }}>
+        <div style={{ padding: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', marginTop: 8, paddingBottom: 0 }}>
           <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {user.name}
           </div>
           <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: 12 }}>
             {user.email}
           </div>
+        </div>
 
-          <button
+        <button
           onClick={() => { setSidebarOpen(false); logout(); }}
           className="nav-item"
           style={{
@@ -303,7 +309,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <LogOut size={18} />
           Sign Out
         </button>
-        </div>
       </aside>
 
       {/* Main */}
