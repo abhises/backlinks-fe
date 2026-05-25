@@ -136,10 +136,10 @@ export default function SettingsPage() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100%', background: 'var(--bg-base)' }}>
+    <div className="settings-layout">
       {/* Settings Sub-Sidebar Navigation */}
-      <aside style={{ width: 220, borderRight: '1px solid var(--border)', background: 'var(--bg-surface)', padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: 6, overflowY: 'auto' }}>
-        <h2 style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '0 8px 12px' }}>Settings</h2>
+      <aside className="settings-sidebar">
+        <h2>Settings</h2>
         {[
           { label: 'Website Profile', id: 'website-profile', icon: Globe },
           { label: 'Account', id: 'account', icon: User },
@@ -150,9 +150,7 @@ export default function SettingsPage() {
           { label: 'Help & FAQ', id: 'help', icon: HelpCircle },
           { label: 'Danger Zone', id: 'danger', icon: AlertTriangle, color: 'var(--red)' }
         ].map(s => (
-          <a key={s.id} href={`#${s.id}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', fontSize: '0.875rem', color: s.color || 'var(--text-secondary)', textDecoration: 'none', borderRadius: 'var(--radius-sm)', transition: 'background 0.2s' }}
-            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+          <a key={s.id} href={`#${s.id}`} className="settings-nav-item" style={{ color: s.color || 'var(--text-secondary)' }}>
             <s.icon size={16} />
             {s.label}
           </a>
@@ -160,7 +158,7 @@ export default function SettingsPage() {
       </aside>
 
       {/* Settings Sections Area */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '0 40px 60px', scrollBehavior: 'smooth' }}>
+      <div className="settings-content">
         
         {/* Header */}
         <div style={{ padding: '24px 0 20px', borderBottom: '1px solid var(--border)', marginBottom: 32 }}>
