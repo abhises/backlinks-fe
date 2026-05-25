@@ -5,8 +5,8 @@ import api from '@/lib/api';
 
 type Thread = {
   id: string;
-  giverWorkspace: { domain: string };
-  receiverWorkspace: { domain: string };
+  giverWorkspace: { id: string; domain: string };
+  receiverWorkspace: { id: string; domain: string };
   linkPlacement?: any;
 };
 
@@ -17,13 +17,20 @@ const LINK_TYPES = [
   { value:'OTHER',      label:'Other' },
 ];
 
-export default function AddLinkModal({ thread, isGiver, onClose, onSaved }: {
-  thread: Thread; isGiver: boolean;
+export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, onClose, onSaved }: {
+  thread: Thread; isGiver: boolean; hasLink: boolean; myWorkspace: any;
   onClose: () => void; onSaved: () => void;
 }) {
   const lp = thread.linkPlacement;
-  const [sourceUrl, setSourceUrl] = useState(lp?.sourceUrl || `https://${thread.giverWorkspace.domain}/`);
-  const [targetUrl, setTargetUrl] = useState(lp?.targetUrl || `https://${thread.receiverWorkspace.domain}/`);
+  const canEdit = !hasLink || isGiver;
+  
+  // If no link exists, whoever opens the modal acts as the giver for this submission.
+  const sourceDomain = hasLink ? thread.giverWorkspace.domain : myWorkspace.domain;
+  const targetDomain = hasLink 
+    ? thread.receiverWorkspace.domain 
+    : (thread.giverWorkspace.id === myWorkspace.id ? thread.receiverWorkspace.domain : thread.giverWorkspace.domain);
+  const [sourceUrl, setSourceUrl] = useState(lp?.sourceUrl || `https://${sourceDomain}/`);
+  const [targetUrl, setTargetUrl] = useState(lp?.targetUrl || `https://${targetDomain}/`);
   const [anchorText, setAnchorText] = useState(lp?.anchorText || '');
   const [linkType, setLinkType] = useState(lp?.linkType || 'GUEST_POST');
   const [loading, setLoading] = useState(false);
@@ -31,7 +38,7 @@ export default function AddLinkModal({ thread, isGiver, onClose, onSaved }: {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isGiver) { setError('Only the Giver can submit link details.'); return; }
+    if (!canEdit) { setError('Only the user who placed the link can edit it.'); return; }
     setError(''); setLoading(true);
     try {
       await api.post('/api/links', { threadId: thread.id, sourceUrl, targetUrl, anchorText, linkType });
@@ -52,10 +59,10 @@ export default function AddLinkModal({ thread, isGiver, onClose, onSaved }: {
           <button onClick={onClose} className="btn btn-ghost btn-icon"><X size={18} /></button>
         </div>
 
-        {!isGiver && (
+        {!canEdit && (
           <div style={{ background:'rgba(245,158,11,0.1)', border:'1px solid rgba(245,158,11,0.3)', borderRadius:8, padding:'10px 14px', marginBottom:20, fontSize:'0.875rem', color:'var(--amber)', display:'flex', gap:8, alignItems:'flex-start' }}>
             <AlertCircle size={15} style={{ flexShrink:0, marginTop:1 }} />
-            <span>The <strong>Giver</strong> ({thread.giverWorkspace.domain}) must fill in the technical link details. You can view but not edit.</span>
+            <span>The user who placed the link must fill in the technical details. You can view but not edit.</span>
           </div>
         )}
 
@@ -68,33 +75,33 @@ export default function AddLinkModal({ thread, isGiver, onClose, onSaved }: {
         <form onSubmit={handleSave} style={{ display:'flex', flexDirection:'column', gap:16 }}>
           <div className="input-group">
             <label className="input-label">
-              From URL <span style={{ color:'var(--text-muted)' }}>(must be on {thread.giverWorkspace.domain})</span>
+              From URL <span style={{ color:'var(--text-muted)' }}>(must be on {sourceDomain})</span>
             </label>
             <input id="link-source" type="url" value={sourceUrl} onChange={e => setSourceUrl(e.target.value)}
-              className="input-field" placeholder={`https://${thread.giverWorkspace.domain}/blog/post`}
-              disabled={!isGiver} required />
+              className="input-field" placeholder={`https://${sourceDomain}/blog/post`}
+              disabled={!canEdit} required />
           </div>
 
           <div className="input-group">
             <label className="input-label">
-              To URL <span style={{ color:'var(--text-muted)' }}>(targeting {thread.receiverWorkspace.domain})</span>
+              To URL <span style={{ color:'var(--text-muted)' }}>(targeting {targetDomain})</span>
             </label>
             <input id="link-target" type="url" value={targetUrl} onChange={e => setTargetUrl(e.target.value)}
-              className="input-field" placeholder={`https://${thread.receiverWorkspace.domain}/`}
-              disabled={!isGiver} required />
+              className="input-field" placeholder={`https://${targetDomain}/`}
+              disabled={!canEdit} required />
           </div>
 
           <div className="input-group">
             <label className="input-label">Anchor Text</label>
             <input id="link-anchor" type="text" value={anchorText} onChange={e => setAnchorText(e.target.value)}
               className="input-field" placeholder="e.g. best project management tools"
-              disabled={!isGiver} required />
+              disabled={!canEdit} required />
           </div>
 
           <div className="input-group">
             <label className="input-label">Link Type</label>
             <select id="link-type" value={linkType} onChange={e => setLinkType(e.target.value)}
-              className="input-field" disabled={!isGiver} style={{ cursor: isGiver ? 'pointer' : 'default' }}>
+              className="input-field" disabled={!canEdit} style={{ cursor: canEdit ? 'pointer' : 'default' }}>
               {LINK_TYPES.map(lt => (
                 <option key={lt.value} value={lt.value}>{lt.label}</option>
               ))}
@@ -103,9 +110,9 @@ export default function AddLinkModal({ thread, isGiver, onClose, onSaved }: {
 
           <div style={{ display:'flex', gap:10, marginTop:4 }}>
             <button type="button" onClick={onClose} className="btn btn-secondary" style={{ flex:1, justifyContent:'center' }}>
-              {isGiver ? 'Cancel' : 'Close'}
+              {canEdit ? 'Cancel' : 'Close'}
             </button>
-            {isGiver && (
+            {canEdit && (
               <button id="save-link-btn" type="submit" className="btn btn-primary" style={{ flex:2, justifyContent:'center' }} disabled={loading}>
                 {loading ? <Loader2 size={15} className="animate-spin" /> : <Link2 size={15} />}
                 {loading ? 'Saving…' : lp ? 'Update Link' : 'Save & Mark Placed'}

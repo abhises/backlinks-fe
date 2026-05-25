@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import { Inbox, Plus, Check, X, MessageSquare, ArrowUpRight, ArrowDownLeft, Loader2, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+
 type Thread = {
   id: string;
   stage: string;
@@ -19,7 +20,7 @@ type Thread = {
 const FILTERS = [
   { key: 'all', label: 'All' },
   { key: 'new', label: 'New' },
-  { key: 'in',  label: 'Backlinks In' },
+  { key: 'in', label: 'Backlinks In' },
   { key: 'out', label: 'Backlinks Out' },
 ];
 
@@ -38,12 +39,12 @@ export default function InboxPage() {
     try {
       const res = await api.get(`/api/threads?filter=${filter}`);
       setThreads(res.data.threads);
-    } catch {} finally { setLoading(false); }
+    } catch { } finally { setLoading(false); }
   }, [filter]);
 
-  useEffect(() => { 
-    load(); 
-    
+  useEffect(() => {
+    load();
+
     const handleRefresh = () => load();
     window.addEventListener('refresh_inbox', handleRefresh);
     return () => window.removeEventListener('refresh_inbox', handleRefresh);
@@ -71,7 +72,7 @@ export default function InboxPage() {
     try {
       await api.patch(`/api/threads/${id}/status`, { status: 'REJECTED' });
       setThreads(prev => prev.filter(t => t.id !== id));
-    } catch {}
+    } catch { }
   };
 
   const handleApprove = async (id: string) => {
@@ -79,7 +80,7 @@ export default function InboxPage() {
     try {
       const res = await api.patch(`/api/threads/${id}/status`, { status: 'ACCEPTED' });
       setThreads(prev => prev.map(t => t.id === id ? { ...t, ...res.data.thread } : t));
-    } catch {} finally { setActionLoading(null); }
+    } catch { } finally { setActionLoading(null); }
   };
 
   const isIncoming = (t: Thread) => t.receiverWorkspace.id === workspace?.id;
@@ -91,133 +92,146 @@ export default function InboxPage() {
     isIncoming(t) ? t.giverWorkspace : t.receiverWorkspace;
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Header */}
       <div className="page-header">
         <div className="page-header-left">
           <h1 className="page-title">Inbox</h1>
           <p className="page-sub">{threads.length} connection{threads.length !== 1 ? 's' : ''}</p>
         </div>
-        <div style={{ display:'flex', gap:8 }}>
-          <button onClick={load} className="btn btn-secondary btn-sm btn-icon" title="Refresh">
-            <RefreshCw size={15} />
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={load} className="btn btn-secondary btn-icon" disabled={loading}>
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
           </button>
         </div>
       </div>
 
-      {/* Filter chips */}
-      <div style={{ padding:'16px 24px', display:'flex', gap:8, borderBottom:'1px solid var(--border)', flexWrap:'wrap' }}>
+      {/* Filters */}
+      <div style={{ padding: '0 24px', borderBottom: '1px solid var(--border)', display: 'flex', gap: 20 }}>
         {FILTERS.map(f => (
-          <button key={f.key} id={`filter-${f.key}`}
-            className={`chip ${filter === f.key ? 'active' : ''}`}
-            onClick={() => setFilter(f.key)}>
+          <button key={f.key}
+            onClick={() => setFilter(f.key)}
+            className={`chip ${filter === f.key ? 'active' : ''}`}>
             {f.label}
           </button>
         ))}
       </div>
 
-      {/* Thread list */}
-      <div style={{ flex:1, overflowY:'auto', padding:'20px 24px', display:'flex', flexDirection:'column', gap:10 }}>
+      {/* List */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
         {loading ? (
-          <div className="empty-state">
-            <Loader2 size={32} className="animate-spin" style={{ color:'var(--accent)' }} />
-            <p>Loading threads…</p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
+            <Loader2 size={24} className="animate-spin" style={{ color: 'var(--accent)' }} />
           </div>
         ) : threads.length === 0 ? (
           <div className="empty-state">
             <div className="empty-state-icon"><Inbox /></div>
-            <h3>No connections yet</h3>
-            <p>Waiting for the system to generate your matches. Check back later!</p>
+            <h3>No conversations yet</h3>
+            <p>Once you are matched, your active connections will appear here.</p>
           </div>
         ) : (
-          threads.map(t => {
-            const other = getOtherSite(t);
-            const incoming = isIncoming(t);
-            const pending = isNew(t);
-            const isRejecting = rejectId === t.id;
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {threads.map(t => {
+              const other = getOtherSite(t);
+              const incoming = isIncoming(t);
+              const pending = isNew(t);
+              const isRejecting = rejectId === t.id;
 
-            return (
-              <div key={t.id}
-                id={`thread-${t.id}`}
-                className="thread-tile"
-                onClick={() => !pending && router.push(`/inbox/${t.id}`)}>
+              return (
+                <div key={t.id}
+                  id={`thread-${t.id}`}
+                  className="thread-tile"
+                  onClick={() => !pending && router.push(`/inbox/${t.id}`)}>
 
-                {/* Avatar */}
-                <div className="domain-avatar">{getInitials(other.domain)}</div>
+                  {/* Avatar */}
+                  <div className="domain-avatar">{getInitials(other.domain)}</div>
 
-                {/* Info */}
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:3 }}>
-                    <span style={{ fontWeight:700, fontSize:'0.9375rem' }}>{other.websiteName}</span>
-                    <span style={{ fontSize:'0.75rem', color:'var(--text-muted)' }}>{other.domain}</span>
-                    <span className={`pill pill-${t.stage.toLowerCase()}`} style={{ marginLeft:'auto' }}>
-                      {t.stage}
-                    </span>
-                  </div>
-                  <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:'0.8125rem', color:'var(--text-secondary)' }}>
-                    {incoming
-                      ? <><ArrowDownLeft size={13} color="var(--green)" /> Incoming from {t.giverWorkspace.domain}</>
-                      : <><ArrowUpRight size={13} color="var(--accent)" /> Outgoing to {t.receiverWorkspace.domain}</>
-                    }
-                    {t.messages[0] && (
-                      <span style={{ color:'var(--text-muted)', marginLeft:8 }}>
-                        · {t.messages[0].messageText.slice(0, 40)}{t.messages[0].messageText.length > 40 ? '…' : ''}
+                  {/* Info */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+                      <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>{other.websiteName}</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{other.domain}</span>
+                      <span className={`pill pill-${t.stage.toLowerCase()}`} style={{ marginLeft: 'auto' }}>
+                        {t.stage}
                       </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                      {incoming
+                        ? <><ArrowDownLeft size={13} color="var(--green)" /> Incoming from {t.giverWorkspace.domain}</>
+                        : <><ArrowUpRight size={13} color="var(--accent)" /> Outgoing to {t.receiverWorkspace.domain}</>
+                      }
+                      {t.messages && t.messages.length > 0 && (
+                        <span style={{ color: 'var(--text-muted)', marginLeft: 8 }}>
+                          · {t.messages[0].messageText.slice(0, 40)}{t.messages[0].messageText.length > 40 ? '…' : ''}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Reject countdown bar */}
+                    {isRejecting && (
+                      <div style={{ marginTop: 10 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--red)', marginBottom: 4 }}>
+                          <span>Rejecting in {rejectCount}s…</span>
+                          <button onClick={e => { e.stopPropagation(); setRejectId(null); }}
+                            style={{ color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem' }}>
+                            Cancel
+                          </button>
+                        </div>
+                        <div className="countdown-bar"><div className="countdown-fill" /></div>
+                      </div>
                     )}
                   </div>
 
-                  {/* Reject countdown bar */}
-                  {isRejecting && (
-                    <div style={{ marginTop:10 }}>
-                      <div style={{ display:'flex', justifyContent:'space-between', fontSize:'0.75rem', color:'var(--red)', marginBottom:4 }}>
-                        <span>Rejecting in {rejectCount}s…</span>
-                        <button onClick={e => { e.stopPropagation(); setRejectId(null); }}
-                          style={{ color:'var(--text-secondary)', background:'none', border:'none', cursor:'pointer', fontSize:'0.75rem' }}>
-                          Cancel
-                        </button>
-                      </div>
-                      <div className="countdown-bar"><div className="countdown-fill" /></div>
+                  {/* Action buttons for NEW pending threads */}
+                  {pending && !isRejecting && (
+                    <div onClick={e => e.stopPropagation()}>
+                      {((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted)) ? (
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button id={`reject-${t.id}`}
+                            className="btn btn-danger btn-sm"
+                            onClick={() => setRejectId(t.id)}
+                            disabled={actionLoading === t.id}>
+                            <X size={14} /> Reject
+                          </button>
+                          <button id={`approve-${t.id}`}
+                            className="btn btn-primary btn-sm"
+                            onClick={() => handleApprove(t.id)}
+                            disabled={actionLoading === t.id}>
+                            {actionLoading === t.id ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                            Accept
+                          </button>
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: 'var(--radius)' }}>
+                          <Loader2 size={12} className="animate-spin" /> Waiting for them to accept
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Chat icon for active threads */}
+                  {!pending && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      {t.status === 'REJECTED' ? (
+                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--red)' }}>Rejected</span>
+                      ) : t.status === 'PENDING' ? (
+                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: 'var(--radius)' }}>
+                          <Loader2 size={12} className="animate-spin" /> Waiting for them to accept
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: t.stage === 'PLACED' ? 'var(--green)' : 'var(--text-secondary)' }}>
+                          {t.stage === 'PLACED' ? 'Link Placed ✓' : t.stage === 'CHAT' ? 'Chatting' : ''}
+                        </span>
+                      )}
+                      <MessageSquare size={18} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
                     </div>
                   )}
                 </div>
-
-                {/* Action buttons for NEW pending threads */}
-                {pending && !isRejecting && (
-                  <div onClick={e => e.stopPropagation()}>
-                    {((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted)) ? (
-                      <div style={{ display:'flex', gap:8 }}>
-                        <button id={`reject-${t.id}`}
-                          className="btn btn-danger btn-sm"
-                          onClick={() => setRejectId(t.id)}
-                          disabled={actionLoading === t.id}>
-                          <X size={14} /> Reject
-                        </button>
-                        <button id={`approve-${t.id}`}
-                          className="btn btn-primary btn-sm"
-                          onClick={() => handleApprove(t.id)}
-                          disabled={actionLoading === t.id}>
-                          {actionLoading === t.id ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                          Accept
-                        </button>
-                      </div>
-                    ) : (
-                      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: 'var(--radius)' }}>
-                        <Loader2 size={12} className="animate-spin" /> Waiting for them to accept
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                {/* Chat icon for active threads */}
-                {!pending && (
-                  <MessageSquare size={18} style={{ color:'var(--text-muted)', flexShrink:0 }} />
-                )}
-              </div>
-            );
-          })
+              );
+            })}
+          </div>
         )}
       </div>
-
     </div>
   );
 }

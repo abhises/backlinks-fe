@@ -85,7 +85,12 @@ export default function ThreadPage() {
     finally { setLoading(false); }
   }, [id, router]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { 
+    load(); 
+    const handleRefresh = () => load();
+    window.addEventListener('refresh_inbox', handleRefresh);
+    return () => window.removeEventListener('refresh_inbox', handleRefresh);
+  }, [load]);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
   useEffect(() => {
@@ -157,39 +162,49 @@ export default function ThreadPage() {
             </span>
           </p>
         </div>
-        {/* Giver: show Add/Edit button. Receiver: show View only if link exists */}
-        {(isGiver || hasLink) && (
+        {/* Show Add/Edit button to BOTH if no link exists. If link exists, only the true giver can Edit, the other views. */}
+        {(!hasLink || isGiver) ? (
           <button id="add-link-btn" onClick={() => setShowLinkModal(true)}
             className={`btn btn-sm ${hasLink ? 'btn-secondary' : 'btn-primary'}`}>
             <Link2 size={14} />
-            {isGiver ? (hasLink ? 'Edit Link Details' : 'Add Link Details') : 'View Link Details'}
+            {hasLink ? 'Edit Link Details' : 'Add Link Details (Become Giver)'}
+          </button>
+        ) : (
+          <button id="view-link-btn" onClick={() => setShowLinkModal(true)}
+            className="btn btn-sm btn-secondary">
+            <Link2 size={14} />
+            View Link Details
           </button>
         )}
-        {!isGiver && !hasLink && (
-          <span style={{ fontSize:'0.75rem', color:'var(--text-muted)', display:'flex', alignItems:'center', gap:5 }}>
-            <Loader2 size={13} style={{ opacity:0.4 }} /> Awaiting giver to add link
-          </span>
-        )}
+
       </div>
 
       {/* Directional Banner */}
       <div className="direction-banner">
-        <span style={{ fontSize:'0.75rem', fontWeight:700, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'0.06em' }}>
-          {isGiver ? '📤 You GIVE' : '📥 You RECEIVE'}
-        </span>
-        <span className="direction-domain" style={{ color: isGiver ? 'var(--accent)' : 'var(--green)' }}>
-          {thread.giverWorkspace.domain}
-        </span>
-        <span style={{ display:'flex', alignItems:'center', gap:4, color:'var(--text-muted)' }}>
-          <ArrowRight size={14} />
-          {thread.linkPlacement?.anchorText && (
-            <span style={{ fontStyle:'italic', fontSize:'0.75rem' }}>&quot;{thread.linkPlacement.anchorText}&quot;</span>
-          )}
-          <ArrowRight size={14} />
-        </span>
-        <span className="direction-domain" style={{ color: isGiver ? 'var(--green)' : 'var(--accent)' }}>
-          {thread.receiverWorkspace.domain}
-        </span>
+        {hasLink ? (
+          <>
+            <span style={{ fontSize:'0.75rem', fontWeight:700, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'0.06em' }}>
+              {isGiver ? '📤 You GAVE' : '📥 You RECEIVED'}
+            </span>
+            <span className="direction-domain" style={{ color: isGiver ? 'var(--accent)' : 'var(--green)' }}>
+              {thread.giverWorkspace.domain}
+            </span>
+            <span style={{ display:'flex', alignItems:'center', gap:4, color:'var(--text-muted)' }}>
+              <ArrowRight size={14} />
+              {thread.linkPlacement?.anchorText && (
+                <span style={{ fontStyle:'italic', fontSize:'0.75rem' }}>&quot;{thread.linkPlacement.anchorText}&quot;</span>
+              )}
+              <ArrowRight size={14} />
+            </span>
+            <span className="direction-domain" style={{ color: isGiver ? 'var(--green)' : 'var(--accent)' }}>
+              {thread.receiverWorkspace.domain}
+            </span>
+          </>
+        ) : (
+          <span style={{ fontSize:'0.85rem', color:'var(--text-muted)' }}>
+            Discuss your websites below. Once decided, the person placing the link should click <strong>Add Link Details</strong> above.
+          </span>
+        )}
         {thread.status === 'REJECTED' && (
           <span className="pill pill-rejected" style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:5 }}>
             <Ban size={11} /> Connection Rejected
@@ -198,11 +213,6 @@ export default function ThreadPage() {
         {thread.status !== 'REJECTED' && hasLink && (
           <span className="pill pill-live" style={{ marginLeft:'auto' }}>
             <CheckCircle2 size={11} /> Link Placed
-          </span>
-        )}
-        {thread.status !== 'REJECTED' && !hasLink && isGiver && (
-          <span style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:5, fontSize:'0.75rem', color:'var(--amber)' }}>
-            <AlertCircle size={13} /> Awaiting your link submission
           </span>
         )}
       </div>
@@ -235,12 +245,19 @@ export default function ThreadPage() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input — locked when rejected */}
+      {/* Input — locked when rejected or pending */}
       {thread.status === 'REJECTED' ? (
         <div style={{ padding:'16px 24px', borderTop:'1px solid var(--border)', background:'var(--bg-surface)', display:'flex', alignItems:'center', gap:10, flexShrink:0 }}>
           <Ban size={16} style={{ color:'var(--red)', flexShrink:0 }} />
           <span style={{ fontSize:'0.875rem', color:'var(--text-muted)' }}>
             This connection was rejected — messaging is disabled.
+          </span>
+        </div>
+      ) : thread.status === 'PENDING' ? (
+        <div style={{ padding:'16px 24px', borderTop:'1px solid var(--border)', background:'var(--bg-surface)', display:'flex', alignItems:'center', gap:10, flexShrink:0 }}>
+          <Loader2 size={16} className="animate-spin" style={{ color:'var(--amber)', flexShrink:0 }} />
+          <span style={{ fontSize:'0.875rem', color:'var(--text-muted)' }}>
+            Waiting for mutual acceptance before messaging unlocks...
           </span>
         </div>
       ) : (
@@ -264,6 +281,8 @@ export default function ThreadPage() {
         <AddLinkModal
           thread={thread}
           isGiver={isGiver}
+          hasLink={hasLink}
+          myWorkspace={workspace}
           onClose={() => setShowLinkModal(false)}
           onSaved={() => { setShowLinkModal(false); load(); }}
         />

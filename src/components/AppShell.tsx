@@ -11,7 +11,7 @@ import { io } from 'socket.io-client';
 
 type NotificationItem = {
   id: string;
-  type: 'new_message' | 'new_connection' | 'connection_accepted' | 'connection_rejected';
+  type: 'new_message' | 'new_connection' | 'connection_accepted' | 'connection_rejected' | 'link_placed';
   title: string;
   body: string;
   timestamp: Date;
@@ -121,6 +121,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         title = 'Request Rejected';
         body = `${data.receiverWorkspaceName} declined your backlink exchange request.`;
         link = `/inbox/${data.threadId}`;
+      } else if (data.type === 'link_placed') {
+        title = 'Link Placed! 🎉';
+        body = data.body || `The giver has added the backlink details. Check your Dashboard!`;
+        link = `/dashboard`;
       } else if (data.type === 'admin_broadcast') {
         title = data.title || 'System Announcement';
         body = data.body || '';
@@ -141,7 +145,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       ]);
       
       // Tell inbox or other pages to refresh automatically
-      if (['new_thread', 'new_connection', 'connection_accepted', 'connection_rejected'].includes(data.type)) {
+      if (['new_thread', 'new_connection', 'connection_accepted', 'connection_rejected', 'link_placed'].includes(data.type)) {
         window.dispatchEvent(new Event('refresh_inbox'));
       }
     });
