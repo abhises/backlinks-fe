@@ -10,6 +10,8 @@ import {
 
 const NAV = [
   { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/admin/users', icon: Shield, label: 'Users' },
+  { href: '/admin/backlinks', icon: Globe, label: 'Backlinks' },
   { href: '/admin/notifications', icon: Bell, label: 'Notifications' },
   { href: '/admin/settings', icon: Settings, label: 'Settings' },
 ];
