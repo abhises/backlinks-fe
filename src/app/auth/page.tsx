@@ -59,8 +59,12 @@ export default function AuthPage() {
       setError('');
       setLoading(true);
       try {
-        const ws = await loginWithGoogle(response.credential);
-        router.replace(ws ? '/inbox' : '/onboarding');
+        const { user: loggedInUser, workspace: ws } = await loginWithGoogle(response.credential);
+        if (loggedInUser?.role === 'ADMIN') {
+          router.replace('/admin/dashboard');
+        } else {
+          router.replace(ws ? '/inbox' : '/onboarding');
+        }
       } catch (err: any) {
         setError(err?.response?.data?.error || 'Google sign in failed');
       } finally {
@@ -93,8 +97,12 @@ export default function AuthPage() {
     setError(''); setLoading(true);
     try {
       if (mode === 'login') {
-        const ws = await login(email, password);
-        router.replace(ws ? '/inbox' : '/onboarding');
+        const { user: loggedInUser, workspace: ws } = await login(email, password);
+        if (loggedInUser?.role === 'ADMIN') {
+          router.replace('/admin/dashboard');
+        } else {
+          router.replace(ws ? '/inbox' : '/onboarding');
+        }
       } else {
         await register(name, email, password);
         router.replace('/onboarding');

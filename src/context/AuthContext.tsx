@@ -6,6 +6,7 @@ interface User {
   id: string;
   name: string;
   email: string;
+  role: string;
 }
 
 interface Workspace {
@@ -43,9 +44,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await api.get('/api/auth/me');
       setUser(res.data.user);
       setWorkspaceState(res.data.workspace);
-      return res.data.workspace;
+      return { user: res.data.user, workspace: res.data.workspace };
     } catch {
-      return null;
+      return { user: null, workspace: null };
     }
   }, []);
 

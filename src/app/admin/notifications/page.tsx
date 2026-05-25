@@ -1,0 +1,165 @@
+'use client';
+import { useState, useEffect } from 'react';
+import api from '@/lib/api';
+import { Bell, Send, Loader2, Clock } from 'lucide-react';
+
+type AdminNotification = {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+};
+
+export default function AdminNotifications() {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
+  const [history, setHistory] = useState<AdminNotification[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(true);
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  const fetchHistory = async () => {
+    try {
+      const res = await api.get('/api/admin/notifications');
+      setHistory(res.data.notifications);
+    } catch (err) {
+      console.error('Failed to load notification history', err);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  const handleBroadcast = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !description) return;
+    
+    setLoading(true);
+    setSuccess('');
+    setError('');
+
+    try {
+      const res = await api.post('/api/admin/notifications', { title, description });
+      setSuccess('Notification broadcasted to all users successfully!');
+      setTitle('');
+      setDescription('');
+      
+      // Add the new notification to the top of the history
+      if (res.data.notification) {
+        setHistory(prev => [res.data.notification, ...prev]);
+      }
+    } catch (err: any) {
+      setError(err?.response?.data?.error || 'Failed to broadcast notification');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ padding: '32px 40px', maxWidth: 800 }}>
+      <div className="page-header" style={{ padding: 0, border: 'none', marginBottom: 32 }}>
+        <div className="page-header-left">
+          <h1 className="page-title">Broadcast Notification</h1>
+          <p className="page-sub">Send a system-wide alert to all users.</p>
+        </div>
+      </div>
+
+      <div className="card" style={{ padding: 32, marginBottom: 32 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+          <div style={{ width: 40, height: 40, background: 'rgba(59, 130, 246, 0.15)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Bell size={20} color="var(--blue)" />
+          </div>
+          <div>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>New Announcement</h2>
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>This will trigger a real-time alert for all online users.</p>
+          </div>
+        </div>
+
+        {success && (
+          <div style={{ background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: 8, padding: '12px 16px', marginBottom: 24, fontSize: '0.875rem', color: 'var(--green)' }}>
+            {success}
+          </div>
+        )}
+
+        {error && (
+          <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 8, padding: '12px 16px', marginBottom: 24, fontSize: '0.875rem', color: 'var(--red)' }}>
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleBroadcast} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div className="input-group">
+            <label className="input-label">Notification Title</label>
+            <input 
+              type="text" 
+              value={title} 
+              onChange={e => setTitle(e.target.value)} 
+              className="input-field" 
+              placeholder="e.g. Scheduled Maintenance" 
+              required 
+            />
+          </div>
+
+          <div className="input-group">
+            <label className="input-label">Message / Description</label>
+            <textarea 
+              value={description} 
+              onChange={e => setDescription(e.target.value)} 
+              className="input-field" 
+              placeholder="Enter the notification details here..." 
+              required 
+              rows={4}
+              style={{ resize: 'vertical', lineHeight: 1.5 }} 
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            className="btn btn-primary" 
+            style={{ alignSelf: 'flex-start', padding: '12px 32px', fontSize: '0.9375rem' }} 
+            disabled={loading || !title || !description}
+          >
+            {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+            {loading ? 'Broadcasting...' : 'Send Broadcast'}
+          </button>
+        </form>
+      </div>
+
+      <div className="card" style={{ padding: 32 }}>
+        <h2 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: 24 }}>Broadcast History</h2>
+        
+        {loadingHistory ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
+            <Loader2 className="animate-spin" size={24} color="var(--text-muted)" />
+          </div>
+        ) : history.length === 0 ? (
+          <div className="empty-state" style={{ padding: '40px 0', border: 'none', background: 'transparent' }}>
+            <div className="empty-state-icon" style={{ background: 'var(--bg-hover)' }}><Clock color="var(--text-muted)" /></div>
+            <h3>No broadcasts yet</h3>
+            <p>You haven't sent any global notifications.</p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {history.map(item => (
+              <div key={item.id} style={{ padding: 20, border: '1px solid var(--border)', borderRadius: 'var(--radius)', background: 'var(--bg-hover)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                  <h3 style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)' }}>{item.title}</h3>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', marginLeft: 16 }}>
+                    {new Date(item.createdAt).toLocaleString()}
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

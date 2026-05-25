@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Link2, Inbox, ExternalLink, LayoutDashboard, Settings,
-  LogOut, Sun, Moon, Palette, ChevronDown, Globe, Bell, Menu, X
+  LogOut, Sun, Moon, Palette, ChevronDown, Globe, Bell, Menu, X, Shield
 } from 'lucide-react';
 import { io } from 'socket.io-client';
 
@@ -84,6 +84,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading) return;
     if (!user) { router.replace('/auth'); return; }
+    if (user.role === 'ADMIN') { router.replace('/admin/dashboard'); return; }
     if (!workspace) { router.replace('/onboarding'); return; }
   }, [user, workspace, loading, router]);
 
@@ -116,6 +117,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         title = 'Request Rejected';
         body = `${data.receiverWorkspaceName} declined your backlink exchange request.`;
         link = `/inbox/${data.threadId}`;
+      } else if (data.type === 'admin_broadcast') {
+        title = data.title || 'System Announcement';
+        body = data.body || '';
+        link = '/inbox';
       }
 
       setNotifications(prev => [
@@ -178,15 +183,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         ))}
 
         <div style={{ flex: 1 }} />
-
-        {/* Workspace pill */}
-        <div style={{ margin: '0 8px', padding: '12px', background: 'var(--bg-hover)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <Globe size={13} color="var(--accent)" />
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)' }}>{workspace.domain}</span>
-          </div>
-          <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>{workspace.websiteName}</p>
-        </div>
 
         {/* Bottom controls */}
         <button 
@@ -264,14 +260,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         <div style={{ flex: 1 }} />
 
-        <div style={{ margin: '0 8px', padding: '12px', background: 'var(--bg-hover)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <Globe size={13} color="var(--accent)" />
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)' }}>{workspace.domain}</span>
-          </div>
-          <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>{workspace.websiteName}</p>
-        </div>
-
         <button
           onClick={() => { setSidebarOpen(false); logout(); }}
           className="nav-item"
@@ -341,8 +329,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 36, width: 36, padding: 0, borderRadius: 'var(--radius-sm)', position: 'relative' }}
               >
                 <Bell size={16} />
-                {notifications.some(n => !n.read) && (
-                  <span style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, background: 'var(--red)', borderRadius: '50%' }} />
+                {notifications.filter(n => !n.read).length > 0 && (
+                  <span style={{ 
+                    position: 'absolute', top: -4, right: -4, 
+                    background: 'var(--red)', color: 'white', 
+                    borderRadius: '999px', fontSize: '0.65rem', 
+                    fontWeight: 'bold', padding: '2px 6px',
+                    border: '2px solid var(--bg-surface)' 
+                  }}>
+                    {notifications.filter(n => !n.read).length}
+                  </span>
                 )}
               </button>
 
