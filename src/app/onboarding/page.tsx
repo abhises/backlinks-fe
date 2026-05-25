@@ -8,7 +8,7 @@ import api from '@/lib/api';
 const NICHES = ['Tech','Finance','Health','Travel','Fashion','Food','Education','Real Estate','SaaS','Other'];
 
 export default function OnboardingPage() {
-  const { user, setWorkspace } = useAuth();
+  const { user, setWorkspace, logout } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [domain, setDomain] = useState('');
@@ -99,9 +99,12 @@ export default function OnboardingPage() {
                   style={{ resize:'none', lineHeight:1.6 }} />
                 <p style={{ fontSize:'0.75rem', color:'var(--text-muted)' }}>Keep it to one sentence — partners will see this.</p>
               </div>
-              <button id="ob-next" type="submit" className="btn btn-primary" style={{ justifyContent:'center' }}>
-                <ArrowRight size={16} /> Continue
-              </button>
+              <div style={{ display:'flex', gap:10 }}>
+                <button type="button" onClick={logout} className="btn btn-secondary" style={{ flex:1, justifyContent:'center' }}>Back</button>
+                <button id="ob-next" type="submit" className="btn btn-primary" style={{ flex:2, justifyContent:'center' }}>
+                  Continue <ArrowRight size={16} />
+                </button>
+              </div>
             </div>
           ) : (
             <div style={{ display:'flex', flexDirection:'column', gap:16 }}>

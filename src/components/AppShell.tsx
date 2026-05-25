@@ -58,8 +58,8 @@ const playNotificationSound = () => {
 
 const NAV = [
   { href: '/inbox', icon: Inbox, label: 'Inbox' },
-  { href: '/links', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/dashboard', icon: Globe, label: 'Discover' },
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/discover', icon: Globe, label: 'Discover' },
   { href: '/settings', icon: Settings, label: 'Settings' },
 ];
 
@@ -108,6 +108,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       } else if (data.type === 'new_connection') {
         title = 'New Connection Request';
         body = `${data.senderWorkspaceName} (${data.senderWorkspaceDomain}) sent you a backlink exchange request.`;
+        link = '/inbox';
+      } else if (data.type === 'new_thread') {
+        title = data.title || 'New Connection Match!';
+        body = data.body || 'You have a new connection in your inbox.';
         link = '/inbox';
       } else if (data.type === 'connection_accepted') {
         title = 'Request Accepted ✅';
@@ -185,7 +189,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div style={{ flex: 1 }} />
 
         {/* Bottom controls */}
-        <button 
+        <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', marginTop: 8 }}>
+          <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {user.name}
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: 12 }}>
+            {user.email}
+          </div>
+          
+          <button 
           onClick={logout} 
           className="nav-item" 
           style={{ 
@@ -212,6 +224,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <LogOut size={18} />
           Sign Out
         </button>
+        </div>
       </aside>
 
       {/* Mobile: sidebar overlay backdrop */}
@@ -260,7 +273,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         <div style={{ flex: 1 }} />
 
-        <button
+        <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', marginTop: 8 }}>
+          <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {user.name}
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: 12 }}>
+            {user.email}
+          </div>
+
+          <button
           onClick={() => { setSidebarOpen(false); logout(); }}
           className="nav-item"
           style={{
@@ -282,6 +303,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <LogOut size={18} />
           Sign Out
         </button>
+        </div>
       </aside>
 
       {/* Main */}
@@ -310,10 +332,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             >
               <Menu size={18} />
             </button>
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Workspace</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{user.name}</span>
             <span style={{ color: 'var(--text-muted)' }}>/</span>
             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', textTransform: 'capitalize' }}>
-              {pathname?.split('/')[1] === 'links' ? 'Dashboard' : pathname?.split('/')[1] === 'dashboard' ? 'Discover' : pathname?.split('/')[1] ? pathname.split('/')[1].charAt(0).toUpperCase() + pathname.split('/')[1].slice(1) : 'Overview'}
+              {pathname?.split('/')[1] ? pathname.split('/')[1].charAt(0).toUpperCase() + pathname.split('/')[1].slice(1) : 'Overview'}
             </span>
           </div>
 

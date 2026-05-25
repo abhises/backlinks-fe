@@ -4,8 +4,6 @@ import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import { Inbox, Plus, Check, X, MessageSquare, ArrowUpRight, ArrowDownLeft, Loader2, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import NewThreadModal from '@/components/NewThreadModal';
-
 type Thread = {
   id: string;
   stage: string;
@@ -29,7 +27,6 @@ export default function InboxPage() {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
-  const [showNew, setShowNew] = useState(false);
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [rejectCount, setRejectCount] = useState(3);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -97,9 +94,6 @@ export default function InboxPage() {
           <button onClick={load} className="btn btn-secondary btn-sm btn-icon" title="Refresh">
             <RefreshCw size={15} />
           </button>
-          <button id="new-thread-btn" onClick={() => setShowNew(true)} className="btn btn-primary btn-sm">
-            <Plus size={15} /> New Connection
-          </button>
         </div>
       </div>
 
@@ -125,7 +119,7 @@ export default function InboxPage() {
           <div className="empty-state">
             <div className="empty-state-icon"><Inbox /></div>
             <h3>No connections yet</h3>
-            <p>Start by clicking <strong>New Connection</strong> to send a backlink exchange request.</p>
+            <p>Waiting for the system to generate your matches. Check back later!</p>
           </div>
         ) : (
           threads.map(t => {
@@ -208,7 +202,6 @@ export default function InboxPage() {
         )}
       </div>
 
-      {showNew && <NewThreadModal onClose={() => setShowNew(false)} onCreated={load} />}
     </div>
   );
 }
