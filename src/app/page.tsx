@@ -138,33 +138,16 @@ export default function Home() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
-            {/* Interactive Laptop Mockup with Video */}
-            <div style={{ 
-              width: '100%', 
-              background: '#ffffff',
-              borderRadius: '12px 12px 0 0',
-              padding: '16px',
-              border: '8px solid #222',
-              borderBottom: 'none',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
-              position: 'relative'
-            }}>
-              <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', width: '6px', height: '6px', background: '#444', borderRadius: '50%' }}></div>
-              <div style={{ width: '100%', overflow: 'hidden', borderRadius: '4px', background: '#000' }}>
-                <video 
-                  autoPlay 
-                  loop 
-                  muted 
-                  playsInline 
-                  controls={false}
-                  style={{ width: '100%', height: 'auto', display: 'block' }}
-                  src="https://www.serpsupport.com/wp-content/uploads/2024/09/SERPsupport-September.mp4" 
-                />
-              </div>
-            </div>
-            {/* Laptop Base */}
-            <div style={{ width: '105%', height: '24px', background: '#333', borderRadius: '0 0 16px 16px', position: 'relative' }}>
-               <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '120px', height: '8px', background: '#222', borderRadius: '0 0 8px 8px' }}></div>
+            <div style={{ width: '100%' }}>
+              <video 
+                autoPlay 
+                loop 
+                muted 
+                playsInline 
+                controls
+                style={{ width: '100%', height: 'auto', display: 'block' }}
+                src="https://www.serpsupport.com/wp-content/uploads/2024/09/SERPsupport-September.mp4" 
+              />
             </div>
           </div>
 
@@ -172,20 +155,111 @@ export default function Home() {
       </section>
 
       {/* What Makes Us Different */}
-      <section id="features" style={{ background: 'var(--bg-surface)', padding: '100px 24px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <h2 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>What Makes SERPsupport Different?</h2>
-            <p style={{ maxWidth: '800px', margin: '0 auto', color: 'var(--text-secondary)', fontSize: '1.125rem' }}>
-              SERPsupport offers a new way to build backlinks by connecting you directly with website owners through chat, allowing personalized and flexible link placements. 
+      <section id="features" style={{ background: '#f8fafc', padding: '120px 24px' }}>
+        <div style={{ 
+          maxWidth: 1200, 
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))',
+          gap: '60px',
+          alignItems: 'center'
+        }}>
+          {/* Left Text Content */}
+          <div style={{ textAlign: 'left' }}>
+            <h2 style={{ 
+              marginBottom: '24px', 
+              color: '#121212',
+              fontSize: '2.5rem',
+              fontWeight: 700,
+              fontFamily: 'Poppins, sans-serif',
+              lineHeight: 1.3
+            }}>
+              What Makes SERPsupport Different?
+            </h2>
+            <p style={{ color: '#334155', fontSize: '1.125rem', marginBottom: '20px', lineHeight: 1.7 }}>
+              SERPsupport offers a new way to build backlinks by connecting you directly with website owners through chat, allowing personalized and flexible link placements.
+            </p>
+            <p style={{ color: '#334155', fontSize: '1.125rem', marginBottom: '40px', lineHeight: 1.7 }}>
               Unlike traditional methods, the portal allows you to give and receive backlinks from different sites, avoiding direct link swaps. You have full control to approve or reject links, ensuring they are high-quality and relevant.
             </p>
-          </div>
-
-          <div style={{ textAlign: 'center' }}>
-            <Link href={user ? "/inbox" : "/auth?mode=register"} className="btn btn-primary" style={{ padding: '14px 32px', fontSize: '1rem', borderRadius: '4px', fontWeight: 700 }}>
+            <Link href={user ? "/inbox" : "/auth?mode=register"} className="btn btn-primary" style={{ padding: '14px 32px', fontSize: '1.1rem', borderRadius: '6px', fontWeight: 700 }}>
               Sign Up
             </Link>
+          </div>
+
+          {/* Right Graphic: The Link Loop */}
+          <div style={{ position: 'relative', width: '100%', height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            
+            {/* Circular Arrows Background SVG */}
+            <svg style={{ position: 'absolute', width: '320px', height: '320px', zIndex: 0 }} viewBox="0 0 100 100">
+              <defs>
+                <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <polygon points="0 0, 6 3, 0 6" fill="#121212" />
+                </marker>
+              </defs>
+              <path d="M 50,15 A 35,35 0 0,1 85,50" fill="none" stroke="#121212" strokeWidth="1.5" markerEnd="url(#arrowhead)"/>
+              <path d="M 85,50 A 35,35 0 0,1 50,85" fill="none" stroke="#121212" strokeWidth="1.5" markerEnd="url(#arrowhead)"/>
+              <path d="M 50,85 A 35,35 0 0,1 15,50" fill="none" stroke="#121212" strokeWidth="1.5" markerEnd="url(#arrowhead)"/>
+              <path d="M 15,50 A 35,35 0 0,1 50,15" fill="none" stroke="#121212" strokeWidth="1.5" markerEnd="url(#arrowhead)"/>
+            </svg>
+
+            {/* Browser Mockups Container */}
+            <div style={{ position: 'relative', width: '320px', height: '320px', zIndex: 1 }}>
+              
+              {/* Top Browser (Blue) */}
+              <div style={{ position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', width: '120px', height: '80px', background: '#fff', borderRadius: '6px', border: '2px solid #121212', boxShadow: '0 10px 20px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                <div style={{ height: '20px', background: '#3b82f6', borderBottom: '2px solid #121212', display: 'flex', alignItems: 'center', padding: '0 6px', gap: '4px' }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}/>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}/>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}/>
+                </div>
+                {/* Diagonal X pattern */}
+                <div style={{ height: '100%', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to bottom right, transparent 48%, #121212 48%, #121212 52%, transparent 52%)' }}/>
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top right, transparent 48%, #121212 48%, #121212 52%, transparent 52%)' }}/>
+                </div>
+              </div>
+
+              {/* Right Browser (Green) */}
+              <div style={{ position: 'absolute', top: '50%', right: '-40px', transform: 'translateY(-50%)', width: '120px', height: '80px', background: '#fff', borderRadius: '6px', border: '2px solid #121212', boxShadow: '0 10px 20px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                <div style={{ height: '20px', background: '#10b981', borderBottom: '2px solid #121212', display: 'flex', alignItems: 'center', padding: '0 6px', gap: '4px' }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}/>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}/>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}/>
+                </div>
+                <div style={{ height: '100%', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to bottom right, transparent 48%, #121212 48%, #121212 52%, transparent 52%)' }}/>
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top right, transparent 48%, #121212 48%, #121212 52%, transparent 52%)' }}/>
+                </div>
+              </div>
+
+              {/* Bottom Browser (Yellow) */}
+              <div style={{ position: 'absolute', bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '120px', height: '80px', background: '#fff', borderRadius: '6px', border: '2px solid #121212', boxShadow: '0 10px 20px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                <div style={{ height: '20px', background: '#f59e0b', borderBottom: '2px solid #121212', display: 'flex', alignItems: 'center', padding: '0 6px', gap: '4px' }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}/>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}/>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}/>
+                </div>
+                <div style={{ height: '100%', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to bottom right, transparent 48%, #121212 48%, #121212 52%, transparent 52%)' }}/>
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top right, transparent 48%, #121212 48%, #121212 52%, transparent 52%)' }}/>
+                </div>
+              </div>
+
+              {/* Left Browser (Rose) */}
+              <div style={{ position: 'absolute', top: '50%', left: '-40px', transform: 'translateY(-50%)', width: '120px', height: '80px', background: '#fff', borderRadius: '6px', border: '2px solid #121212', boxShadow: '0 10px 20px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                <div style={{ height: '20px', background: '#f43f5e', borderBottom: '2px solid #121212', display: 'flex', alignItems: 'center', padding: '0 6px', gap: '4px' }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}/>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}/>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}/>
+                </div>
+                <div style={{ height: '100%', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to bottom right, transparent 48%, #121212 48%, #121212 52%, transparent 52%)' }}/>
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to top right, transparent 48%, #121212 48%, #121212 52%, transparent 52%)' }}/>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
       </section>
@@ -206,31 +280,35 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section id="how-it-works" style={{ background: 'var(--bg-surface)', padding: '100px 24px' }}>
+      <section id="how-it-works" style={{ background: '#f4f4f6', padding: '100px 24px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', marginBottom: '60px', color: 'var(--text-primary)' }}>How it works</h2>
+          <h2 style={{ textAlign: 'center', marginBottom: '60px', color: '#121212', fontFamily: 'Poppins, sans-serif' }}>How it works</h2>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '40px' }}>
             {[
-              { title: 'Sign up to SERPsupport', icon: <Users size={32} /> },
-              { title: 'Login and add your website', icon: <Globe size={32} /> },
-              { title: 'Approve/Reject website connections', icon: <ShieldCheck size={32} /> },
-              { title: 'When both sides approve, chat will start', icon: <PlayCircle size={32} /> },
-              { title: 'Discuss and agree on the link placement', icon: <Link2 size={32} /> },
-              { title: 'Monitor your backlinks', icon: <Check size={32} /> },
+              { title: 'Sign up to SERPsupport', img: 'https://www.serpsupport.com/wp-content/uploads/2024/10/1-1.jpg' },
+              { title: 'Login and add your website', img: 'https://www.serpsupport.com/wp-content/uploads/2024/10/2-1.jpg' },
+              { title: 'Approve/Reject website connections', img: 'https://www.serpsupport.com/wp-content/uploads/2024/10/3-1.jpg' },
+              { title: 'When both sides approve, chat will start', img: 'https://www.serpsupport.com/wp-content/uploads/2024/10/4-1.jpg' },
+              { title: 'Discuss and agree on the link placement', img: 'https://www.serpsupport.com/wp-content/uploads/2024/10/5-1.jpg' },
+              { title: 'Monitor your backlinks', img: 'https://www.serpsupport.com/wp-content/uploads/2024/10/6-1.jpg' },
             ].map((step, idx) => (
-              <div key={idx} style={{ 
-                background: 'var(--bg-card)', 
-                padding: '40px 30px', 
+              <div key={idx} className="how-it-works-card" style={{ 
+                background: '#ffffff', 
                 borderRadius: '8px', 
-                boxShadow: 'var(--shadow-sm)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
                 textAlign: 'center',
-                border: '1px solid var(--border-subtle)'
+                border: '1px solid #e5e5e5',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column'
               }}>
-                <div style={{ color: 'var(--accent)', marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
-                  {step.icon}
+                <div style={{ width: '100%', aspectRatio: '16/10', overflow: 'hidden', borderBottom: '1px solid #e5e5e5', background: '#eee' }}>
+                  <img src={step.img} alt={step.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
-                <h4 style={{ color: 'var(--text-primary)' }}>{step.title}</h4>
+                <div style={{ padding: '24px 20px' }}>
+                  <h4 style={{ color: '#121212', fontFamily: 'Poppins, sans-serif', fontSize: '0.95rem', fontWeight: 600, margin: 0 }}>{step.title}</h4>
+                </div>
               </div>
             ))}
           </div>
@@ -238,52 +316,94 @@ export default function Home() {
       </section>
 
       {/* The Importance of Backlinks */}
-      <section id="importance" style={{ padding: '100px 24px', background: 'var(--bg-base)' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ marginBottom: '30px', color: 'var(--text-primary)' }}>The Importance of Backlinks</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.125rem', marginBottom: '20px' }}>
-            Backlinks are essential for SEO as they act as endorsements from other websites, signaling to search engines that your site is authoritative and relevant. Backlinks help improve search rankings, increase visibility, and drive more traffic to your website.
-          </p>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.125rem', marginBottom: '40px' }}>
-            By receiving backlinks from diverse sites, your content is perceived as valuable, boosting your domain authority and SERP placement. Additionally, backlinks enhance brand awareness by reaching a broader audience through referral traffic.
-          </p>
-          
-          <Link href={user ? "/inbox" : "/auth?mode=register"} className="btn btn-primary" style={{ padding: '14px 32px', fontSize: '1rem', borderRadius: '4px', fontWeight: 700 }}>
-            Sign Up
-          </Link>
+      <section id="importance" style={{ padding: '120px 24px', background: '#ffffff' }}>
+        <div style={{ 
+          maxWidth: 1200, 
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+          gap: '60px',
+          alignItems: 'center'
+        }}>
+          {/* Left Column: Image with offset shadow border */}
+          <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', padding: '0 20px 20px 0' }}>
+            {/* Offset Shadow Border */}
+            <div style={{
+              position: 'absolute',
+              top: '20px',
+              left: '20px',
+              width: '100%',
+              height: '100%',
+              border: '4px solid #00b899', // using the teal color
+              borderRadius: '8px',
+              zIndex: 0
+            }} />
+            <img 
+              src="https://www.serpsupport.com/wp-content/uploads/2024/10/SerpSupport1.jpg" 
+              alt="The Importance of Backlinks" 
+              style={{ 
+                width: '100%', 
+                height: 'auto', 
+                borderRadius: '8px', 
+                position: 'relative', 
+                zIndex: 1,
+                boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+              }} 
+            />
+          </div>
+
+          {/* Right Column: Content */}
+          <div style={{ textAlign: 'left' }}>
+            <h2 style={{ 
+              marginBottom: '24px', 
+              color: '#121212',
+              fontSize: '2.5rem',
+              fontWeight: 700,
+              fontFamily: 'Poppins, sans-serif',
+              lineHeight: 1.3
+            }}>
+              The Importance of Backlinks
+            </h2>
+            <p style={{ color: '#334155', fontSize: '1.125rem', marginBottom: '20px', lineHeight: 1.7 }}>
+              Backlinks are essential for SEO as they act as endorsements from other websites, signaling to search engines that your site is authoritative and relevant. Backlinks help improve search rankings, increase visibility, and drive more traffic to your website.
+            </p>
+            <p style={{ color: '#334155', fontSize: '1.125rem', marginBottom: '40px', lineHeight: 1.7 }}>
+              By receiving backlinks from diverse sites, your content is perceived as valuable, boosting your domain authority and SERP placement. Additionally, backlinks enhance brand awareness by reaching a broader audience through referral traffic.
+            </p>
+            <Link href={user ? "/inbox" : "/auth?mode=register"} className="btn" style={{ background: '#00b899', color: '#ffffff', padding: '14px 32px', fontSize: '1.1rem', borderRadius: '6px', fontWeight: 700 }}>
+              Sign Up
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Footer Matching serpsupport.com */}
-      <footer id="contact" style={{ background: 'var(--bg-footer)', color: 'var(--text-footer)', padding: '60px 24px 30px' }}>
+      <footer id="contact" style={{ background: '#0b2d56', color: '#ffffff', padding: '80px 24px 40px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '40px', marginBottom: '60px' }}>
             <div>
-              <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.5rem', fontWeight: 600, marginBottom: '20px', color: '#fff' }}>SERPsupport</h3>
-              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1rem', lineHeight: 1.6, maxWidth: '350px' }}>
+              <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.5rem', fontWeight: 600, marginBottom: '20px', color: '#ffffff' }}>SERPsupport</h3>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1rem', lineHeight: 1.6, maxWidth: '350px', marginBottom: '24px' }}>
                 Boost your SEO by exchanging high-quality backlinks. Use our portal to connect with sites and improve rankings.
               </p>
-              <div style={{ marginTop: '20px' }}>
-                <Link href="/auth?mode=register" className="btn btn-primary" style={{ borderRadius: '4px', padding: '10px 24px', fontWeight: 700 }}>
+              <div>
+                <Link href="/auth?mode=register" className="btn" style={{ background: '#00b899', color: '#ffffff', padding: '10px 24px', borderRadius: '4px', fontWeight: 700 }}>
                   Sign Up
                 </Link>
               </div>
             </div>
 
             <div>
-              <h4 style={{ color: '#fff', marginBottom: '20px', fontSize: '1.125rem' }}>Contact</h4>
-              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.25rem', fontWeight: 600, marginBottom: '20px', color: '#ffffff' }}>Contact</h3>
+              <a href="mailto:info@serpsupport.com" style={{ color: '#ffffff', textDecoration: 'none', fontWeight: 500, fontSize: '1.1rem' }}>
                 info@serpsupport.com
-              </p>
+              </a>
             </div>
           </div>
 
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '30px' }}>
             <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>
-              © {new Date().getFullYear()} SERPsupport
-            </div>
-            <div style={{ display: 'flex', gap: '24px' }}>
-              <a href="#contact" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: '0.9rem' }}>Contact</a>
+              © SERPsupport
             </div>
           </div>
         </div>
