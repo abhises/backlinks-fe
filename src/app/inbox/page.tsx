@@ -1,38 +1,109 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
-import { Inbox, Plus, Check, X, MessageSquare, ArrowUpRight, ArrowDownLeft, Loader2, RefreshCw } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { Inbox, Loader2, MessageSquare, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 type Thread = {
   id: string;
   stage: string;
   status: string;
-  giverWorkspace: { id: string; domain: string; websiteName: string };
-  receiverWorkspace: { id: string; domain: string; websiteName: string };
+  giverWorkspace: { id: string; domain: string; websiteName: string; description?: string };
+  receiverWorkspace: { id: string; domain: string; websiteName: string; description?: string };
   messages: { messageText: string; timestamp: string }[];
   updatedAt: string;
   giverAccepted: boolean;
   receiverAccepted: boolean;
 };
 
-const FILTERS = [
-  { key: 'all', label: 'All' },
-  { key: 'new', label: 'New' },
-  { key: 'in', label: 'Backlinks In' },
-  { key: 'out', label: 'Backlinks Out' },
-];
+const getAvatarColor = (domain: string) => {
+  const colors = [
+    { bg: '#d0e1fd', text: '#1e40af' }, // Blue
+    { bg: '#fed7aa', text: '#c2410c' }, // Orange
+    { bg: '#d1fae5', text: '#065f46' }, // Green
+    { bg: '#fce7f3', text: '#9d174d' }, // Pink
+    { bg: '#fef3c7', text: '#92400e' }, // Amber
+    { bg: '#e9d5ff', text: '#6b21a8' }, // Purple
+  ];
+  let sum = 0;
+  const cleanDomain = domain.toLowerCase().trim();
+  for (let i = 0; i < cleanDomain.length; i++) sum += cleanDomain.charCodeAt(i);
+  return colors[sum % colors.length];
+};
 
-export default function InboxPage() {
+const CONTACT_NAMES: Record<string, string> = {
+  'fernway.io': 'Mira',
+  'ledgerpost.com': 'Devon',
+  'byteweekly.dev': 'Lukas',
+  'petalpress.co': 'Noor',
+  'hikersguide.no': 'Ingrid',
+  'northlight.studio': 'Mira',
+  'kettle-and-bean.com': 'Owen',
+};
+
+const getContactName = (domain: string) => {
+  const normalized = domain.toLowerCase().trim();
+  if (CONTACT_NAMES[normalized]) return CONTACT_NAMES[normalized];
+  const names = ['Devon', 'Lukas', 'Noor', 'Ingrid', 'Mira', 'Owen', 'Devin', 'Sofia', 'Alex', 'Liam'];
+  let sum = 0;
+  for (let i = 0; i < normalized.length; i++) sum += normalized.charCodeAt(i);
+  return names[sum % names.length];
+};
+
+const formatRelativeTime = (dateString: string) => {
+  try {
+    const now = new Date();
+    const past = new Date(dateString);
+    const diffMs = now.getTime() - past.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHour = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHour / 24);
+
+    if (diffSec < 60) return 'Just now';
+    if (diffMin < 60) return `${diffMin}m ago`;
+    if (diffHour < 24) return `${diffHour}h ago`;
+    
+    const remHours = diffHour % 24;
+    if (remHours > 0) {
+      return `${diffDay}d ${remHours}h ago`;
+    }
+    return `${diffDay}d ago`;
+  } catch {
+    return '1d ago';
+  }
+};
+
+function InboxPageContent() {
   const { workspace } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeFilter = searchParams?.get('filter') || 'all';
+
   const [threads, setThreads] = useState<Thread[]>([]);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState(activeFilter);
   const [loading, setLoading] = useState(true);
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [rejectCount, setRejectCount] = useState(3);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Sync state filter with search params from sidebar clicks
+  useEffect(() => {
+    if (activeFilter) {
+      setFilter(activeFilter);
+    }
+  }, [activeFilter]);
+
+  // Listen to search events from AppShell sidebar input
+  useEffect(() => {
+    const handleSearch = (e: Event) => {
+      setSearchQuery((e as CustomEvent).detail || '');
+    };
+    window.addEventListener('bl_search', handleSearch);
+    return () => window.removeEventListener('bl_search', handleSearch);
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -86,29 +157,53 @@ export default function InboxPage() {
   const isIncoming = (t: Thread) => t.receiverWorkspace.id === workspace?.id;
   const isNew = (t: Thread) => t.stage === 'NEW' && t.status === 'PENDING';
 
-  const getInitials = (domain: string) => domain.substring(0, 2).toUpperCase();
+  const getInitials = (domain: string) => {
+    const parts = domain.replace(/^(https?:\/\/)?(www\.)?/, '').split('.');
+    if (parts.length > 0) {
+      return parts[0].substring(0, 2).toUpperCase();
+    }
+    return domain.substring(0, 2).toUpperCase();
+  };
 
   const getOtherSite = (t: Thread) =>
     isIncoming(t) ? t.giverWorkspace : t.receiverWorkspace;
 
+  // Filter threads based on search query
+  const filteredThreads = threads.filter(t => {
+    const other = getOtherSite(t);
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      other.websiteName.toLowerCase().includes(q) ||
+      other.domain.toLowerCase().includes(q) ||
+      (other.description && other.description.toLowerCase().includes(q))
+    );
+  });
+
+  // Calculate dynamic thread counts for chips (before searching to keep chips stable)
+  const countAll = threads.length;
+  const countNew = threads.filter(t => t.stage === 'NEW' && t.status === 'PENDING').length;
+  const countIn = threads.filter(t => t.receiverWorkspace.id === workspace?.id).length;
+  const countOut = threads.filter(t => t.giverWorkspace.id === workspace?.id).length;
+
+  const filterOptions = [
+    { key: 'all', label: `All ${countAll}` },
+    { key: 'new', label: `New ${countNew}` },
+    { key: 'in', label: `Backlinks In ${countIn}` },
+    { key: 'out', label: `Backlinks Out ${countOut}` },
+  ];
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--bg-base)' }}>
       {/* Header */}
-      <div className="page-header">
-        <div className="page-header-left">
-          <h1 className="page-title">Inbox</h1>
-          <p className="page-sub">{threads.length} connection{threads.length !== 1 ? 's' : ''}</p>
-        </div>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={load} className="btn btn-secondary btn-icon" disabled={loading}>
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-          </button>
-        </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '32px 32px 16px 32px' }}>
+        <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: '2.25rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>Inbox</h1>
+        <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{filteredThreads.length} threads</span>
       </div>
 
-      {/* Filters */}
-      <div style={{ padding: '0 24px', borderBottom: '1px solid var(--border)', display: 'flex', gap: 20 }}>
-        {FILTERS.map(f => (
+      {/* Filter Chips */}
+      <div style={{ padding: '0 32px 24px 32px', display: 'flex', gap: 12 }}>
+        {filterOptions.map(f => (
           <button key={f.key}
             onClick={() => setFilter(f.key)}
             className={`chip ${filter === f.key ? 'active' : ''}`}>
@@ -118,62 +213,130 @@ export default function InboxPage() {
       </div>
 
       {/* List */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 40px 8px' }}>
         {loading ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
-            <Loader2 size={24} className="animate-spin" style={{ color: 'var(--accent)' }} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60 }}>
+            <Loader2 size={28} className="animate-spin" style={{ color: 'var(--accent)' }} />
           </div>
         ) : threads.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-state-icon"><Inbox /></div>
+          <div className="empty-state" style={{ padding: '80px 20px' }}>
+            <div className="empty-state-icon" style={{ fontSize: '2.5rem', marginBottom: 12 }}><Inbox /></div>
             <h3>No conversations yet</h3>
             <p>Once you are matched, your active connections will appear here.</p>
           </div>
+        ) : filteredThreads.length === 0 ? (
+          <div className="empty-state" style={{ padding: '80px 20px' }}>
+            <div className="empty-state-icon" style={{ fontSize: '2.5rem', marginBottom: 12 }}><Inbox /></div>
+            <h3>No matching conversations</h3>
+            <p>Try adjusting your search query or filters above.</p>
+          </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {threads.map(t => {
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {filteredThreads.map(t => {
               const other = getOtherSite(t);
               const incoming = isIncoming(t);
               const pending = isNew(t);
               const isRejecting = rejectId === t.id;
+              
+              const isItemNewIncoming = pending && incoming && !t.receiverAccepted;
+              const avatarStyle = getAvatarColor(other.domain);
+              const contactName = getContactName(other.domain);
 
               return (
                 <div key={t.id}
                   id={`thread-${t.id}`}
                   className="thread-tile"
+                  style={{
+                    position: 'relative',
+                    borderLeft: isItemNewIncoming ? '4px solid #2e7d32' : 'none',
+                    paddingLeft: isItemNewIncoming ? '20px' : '24px'
+                  }}
                   onClick={() => !pending && router.push(`/inbox/${t.id}`)}>
 
                   {/* Avatar */}
-                  <div className="domain-avatar">{getInitials(other.domain)}</div>
+                  <div className="domain-avatar" style={{
+                    background: avatarStyle.bg,
+                    color: avatarStyle.text,
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    boxShadow: 'none',
+                    borderRadius: '50%'
+                  }}>
+                    {getInitials(other.domain)}
+                  </div>
 
                   {/* Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
-                      <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>{other.websiteName}</span>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{other.domain}</span>
-                      <span className={`pill pill-${t.stage.toLowerCase()}`} style={{ marginLeft: 'auto' }}>
-                        {t.stage}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
+                      <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{other.domain}</span>
+                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>· {contactName}</span>
+                      
+                      {/* Backlink Direction Badges */}
+                      {incoming ? (
+                        <span style={{ 
+                          fontSize: '0.75rem', 
+                          fontWeight: 600, 
+                          color: '#0284c7', 
+                          background: '#e0f2fe', 
+                          padding: '2px 8px', 
+                          borderRadius: '4px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 2
+                        }}>
+                          <ArrowDownLeft size={11} /> Backlink In
+                        </span>
+                      ) : (
+                        <span style={{ 
+                          fontSize: '0.75rem', 
+                          fontWeight: 600, 
+                          color: '#7c3aed', 
+                          background: '#f3e8ff', 
+                          padding: '2px 8px', 
+                          borderRadius: '4px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 2
+                        }}>
+                          <ArrowUpRight size={11} /> Backlink Out
+                        </span>
+                      )}
+
+                      {/* NEW state badge */}
+                      {isItemNewIncoming && (
+                        <span style={{ 
+                          fontSize: '0.7rem', 
+                          fontWeight: 700, 
+                          color: '#ffffff', 
+                          background: '#2e7d32', 
+                          padding: '2px 6px', 
+                          borderRadius: '4px' 
+                        }}>
+                          NEW
+                        </span>
+                      )}
+
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
+                        {formatRelativeTime(t.updatedAt)}
                       </span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-                      {incoming
-                        ? <><ArrowDownLeft size={13} color="var(--green)" /> Incoming from {t.giverWorkspace.domain}</>
-                        : <><ArrowUpRight size={13} color="var(--accent)" /> Outgoing to {t.receiverWorkspace.domain}</>
-                      }
-                      {t.messages && t.messages.length > 0 && (
-                        <span style={{ color: 'var(--text-muted)', marginLeft: 8 }}>
-                          · {t.messages[0].messageText.slice(0, 40)}{t.messages[0].messageText.length > 40 ? '…' : ''}
-                        </span>
+
+                    {/* Description/Last message */}
+                    <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: 1.4 }}>
+                      {other.description ? other.description : (
+                        t.messages && t.messages.length > 0 
+                          ? t.messages[0].messageText 
+                          : 'No message history yet'
                       )}
                     </div>
 
                     {/* Reject countdown bar */}
                     {isRejecting && (
-                      <div style={{ marginTop: 10 }}>
+                      <div style={{ marginTop: 12 }} onClick={e => e.stopPropagation()}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--red)', marginBottom: 4 }}>
                           <span>Rejecting in {rejectCount}s…</span>
                           <button onClick={e => { e.stopPropagation(); setRejectId(null); }}
-                            style={{ color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem' }}>
+                            style={{ color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>
                             Cancel
                           </button>
                         </div>
@@ -182,48 +345,66 @@ export default function InboxPage() {
                     )}
                   </div>
 
-                  {/* Action buttons for NEW pending threads */}
+                  {/* Action buttons for pending NEW request */}
                   {pending && !isRejecting && (
-                    <div onClick={e => e.stopPropagation()}>
+                    <div onClick={e => e.stopPropagation()} style={{ marginLeft: 16 }}>
                       {((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted)) ? (
                         <div style={{ display: 'flex', gap: 8 }}>
                           <button id={`reject-${t.id}`}
-                            className="btn btn-danger btn-sm"
+                            className="btn"
+                            style={{
+                              border: '1px solid #c62828',
+                              background: '#ffffff',
+                              color: '#c62828',
+                              borderRadius: '6px',
+                              padding: '6px 14px',
+                              fontWeight: 600,
+                              fontSize: '0.8rem',
+                              cursor: 'pointer'
+                            }}
                             onClick={() => setRejectId(t.id)}
                             disabled={actionLoading === t.id}>
-                            <X size={14} /> Reject
+                            ✕ Reject
                           </button>
                           <button id={`approve-${t.id}`}
-                            className="btn btn-primary btn-sm"
+                            className="btn"
+                            style={{
+                              background: '#2e7d32',
+                              color: '#ffffff',
+                              borderRadius: '6px',
+                              padding: '6px 14px',
+                              fontWeight: 600,
+                              fontSize: '0.8rem',
+                              cursor: 'pointer'
+                            }}
                             onClick={() => handleApprove(t.id)}
                             disabled={actionLoading === t.id}>
-                            {actionLoading === t.id ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                            Accept
+                            {actionLoading === t.id ? <Loader2 size={12} className="animate-spin" /> : '✓ Approve'}
                           </button>
                         </div>
                       ) : (
-                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: 'var(--radius)' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: '4px' }}>
                           <Loader2 size={12} className="animate-spin" /> Waiting for them to accept
                         </span>
                       )}
                     </div>
                   )}
 
-                  {/* Chat icon for active threads */}
+                  {/* Right side indicators for active threads */}
                   {!pending && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 16 }}>
                       {t.status === 'REJECTED' ? (
                         <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--red)' }}>Rejected</span>
                       ) : t.status === 'PENDING' ? (
-                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: 'var(--radius)' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: '4px' }}>
                           <Loader2 size={12} className="animate-spin" /> Waiting for them to accept
                         </span>
                       ) : (
-                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: t.stage === 'PLACED' ? 'var(--green)' : 'var(--text-secondary)' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: t.stage === 'PLACED' ? '#2e7d32' : 'var(--text-secondary)' }}>
                           {t.stage === 'PLACED' ? 'Link Placed ✓' : t.stage === 'CHAT' ? 'Chatting' : ''}
                         </span>
                       )}
-                      <MessageSquare size={18} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+                      <MessageSquare size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
                     </div>
                   )}
                 </div>
@@ -233,5 +414,17 @@ export default function InboxPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function InboxPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+        <Loader2 size={28} className="animate-spin" style={{ color: 'var(--accent)' }} />
+      </div>
+    }>
+      <InboxPageContent />
+    </Suspense>
   );
 }

@@ -61,6 +61,21 @@ const playNotificationSound = () => {
   }
 };
 
+const getAvatarColor = (domain: string) => {
+  const colors = [
+    { bg: '#d0e1fd', text: '#1e40af' }, // Blue
+    { bg: '#fed7aa', text: '#c2410c' }, // Orange
+    { bg: '#d1fae5', text: '#065f46' }, // Green
+    { bg: '#fce7f3', text: '#9d174d' }, // Pink
+    { bg: '#fef3c7', text: '#92400e' }, // Amber
+    { bg: '#e9d5ff', text: '#6b21a8' }, // Purple
+  ];
+  let sum = 0;
+  const cleanDomain = domain.toLowerCase().trim();
+  for (let i = 0; i < cleanDomain.length; i++) sum += cleanDomain.charCodeAt(i);
+  return colors[sum % colors.length];
+};
+
 export default function ThreadPage() {
   const { id } = useParams<{ id: string }>();
   const { user, workspace } = useAuth();
@@ -151,11 +166,27 @@ export default function ThreadPage() {
         <button onClick={() => router.push('/inbox')} className="btn btn-ghost btn-icon">
           <ArrowLeft size={18} />
         </button>
-        <div style={{ width:36, height:36, background:'linear-gradient(135deg, var(--accent), #a855f7)', borderRadius:9, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.75rem', fontWeight:800, color:'#fff' }}>
-          {theirDomain.substring(0,2).toUpperCase()}
-        </div>
+        {(() => {
+          const avatarStyle = getAvatarColor(theirDomain);
+          return (
+            <div style={{ 
+              width: 36, 
+              height: 36, 
+              background: avatarStyle.bg, 
+              color: avatarStyle.text, 
+              borderRadius: '50%', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontSize: '0.8rem', 
+              fontWeight: 700 
+            }}>
+              {theirDomain.substring(0,2).toUpperCase()}
+            </div>
+          );
+        })()}
         <div style={{ flex:1 }}>
-          <p style={{ fontWeight:700, fontSize:'0.9375rem' }}>{theirDomain}</p>
+          <p style={{ fontWeight:700, fontSize:'0.9375rem', color: 'var(--text-primary)' }}>{theirDomain}</p>
           <p style={{ fontSize:'0.75rem', color:'var(--text-muted)' }}>
             Status: <span style={{ color: thread.status === 'REJECTED' ? 'var(--red)' : thread.stage === 'PLACED' ? 'var(--green)' : 'var(--accent)', fontWeight:600 }}>
               {thread.status === 'REJECTED' ? 'Rejected' : thread.stage === 'NEW' ? 'Pending Approval' : thread.stage === 'CHAT' ? 'Chatting' : 'Link Placed ✓'}

@@ -50,9 +50,9 @@
   --border:        #2a2e45;
   --border-subtle: #1e2136;
   
-  --text-primary:  #f0f2ff;
-  --text-secondary:#8890b5;
-  --text-muted:    #4a5178;
+  --text-primary:  #ffffff;
+  --text-secondary:#cdd3f5;
+  --text-muted:    #5e6899;
   --text-hero:     #ffffff;
   --text-footer:   #ffffff;
   
@@ -85,9 +85,9 @@
   --border:        #2d1f6e;
   --border-subtle: #1f1550;
   
-  --text-primary:  #ede8ff;
-  --text-secondary:#a594f9;
-  --text-muted:    #6047c0;
+  --text-primary:  #ffffff;
+  --text-secondary:#dcd6ff;
+  --text-muted:    #7b5fe8;
   --text-hero:     #ede8ff;
   --text-footer:   #ffffff;
   
@@ -198,7 +198,7 @@ h4 { font-family: 'Poppins', sans-serif; font-size: 1.125rem; font-weight: 500; 
   text-decoration: none;
 }
 .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
-.nav-item.active { background: var(--accent-glow); color: var(--accent-hover); }
+.nav-item.active { background: var(--bg-hover); color: var(--text-primary); font-weight: 700; }
 .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
 
 /* ─── CARDS & SURFACES ────────────────────────────────────────────────────── */
@@ -338,7 +338,7 @@ h4 { font-family: 'Poppins', sans-serif; font-size: 1.125rem; font-weight: 500; 
   color: var(--text-secondary); background: transparent;
 }
 .chip:hover { border-color: var(--accent); color: var(--accent); }
-.chip.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent-hover); font-weight: 600; }
+.chip.active { background: var(--accent); border-color: var(--accent); color: #ffffff; font-weight: 600; }
 
 /* ─── CHAT PANEL ──────────────────────────────────────────────────────────── */
 .chat-bubble {
