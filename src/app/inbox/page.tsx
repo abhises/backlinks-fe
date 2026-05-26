@@ -108,10 +108,10 @@ function InboxPageContent() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/api/threads?filter=${filter}`);
+      const res = await api.get(`/api/threads?filter=all`);
       setThreads(res.data.threads);
     } catch { } finally { setLoading(false); }
-  }, [filter]);
+  }, []);
 
   useEffect(() => {
     load();
@@ -168,10 +168,24 @@ function InboxPageContent() {
   const getOtherSite = (t: Thread) =>
     isIncoming(t) ? t.giverWorkspace : t.receiverWorkspace;
 
-  // Filter threads based on search query
+  // Filter threads based on search query and active tab filter
   const filteredThreads = threads.filter(t => {
-    const other = getOtherSite(t);
+    const isPending = t.stage === 'NEW' && t.status === 'PENDING';
+    
+    // 1. Tab Filter
+    if (filter === 'new' && !isPending) return false;
+    if (filter === 'in') {
+      if (isPending) return false;
+      if (t.receiverWorkspace.id !== workspace?.id) return false;
+    }
+    if (filter === 'out') {
+      if (isPending) return false;
+      if (t.giverWorkspace.id !== workspace?.id) return false;
+    }
+
+    // 2. Search Filter
     if (!searchQuery) return true;
+    const other = getOtherSite(t);
     const q = searchQuery.toLowerCase();
     return (
       other.websiteName.toLowerCase().includes(q) ||
@@ -183,8 +197,8 @@ function InboxPageContent() {
   // Calculate dynamic thread counts for chips (before searching to keep chips stable)
   const countAll = threads.length;
   const countNew = threads.filter(t => t.stage === 'NEW' && t.status === 'PENDING').length;
-  const countIn = threads.filter(t => t.receiverWorkspace.id === workspace?.id).length;
-  const countOut = threads.filter(t => t.giverWorkspace.id === workspace?.id).length;
+  const countIn = threads.filter(t => t.receiverWorkspace.id === workspace?.id && !(t.stage === 'NEW' && t.status === 'PENDING')).length;
+  const countOut = threads.filter(t => t.giverWorkspace.id === workspace?.id && !(t.stage === 'NEW' && t.status === 'PENDING')).length;
 
   const filterOptions = [
     { key: 'all', label: `All ${countAll}` },
