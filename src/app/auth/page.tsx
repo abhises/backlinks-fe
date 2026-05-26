@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
+import Link from 'next/link';
 import { Link2, Mail, Lock, User, ArrowRight, Loader2, Sun, Moon, Palette } from 'lucide-react';
 
 export default function AuthPage() {
@@ -133,10 +134,10 @@ export default function AuthPage() {
 
       <div className="auth-card animate-slide-up">
         {/* Logo */}
-        <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:32 }}>
-          <div className="logo-icon"><Link2 size={18} color="#fff" /></div>
-          <span className="logo-text">SERPsupport</span>
-        </div>
+        <Link href="/" style={{ display:'flex', alignItems:'center', gap:10, marginBottom:32, textDecoration:'none' }}>
+          <div className="logo-icon" style={{ background: 'var(--accent)', boxShadow: 'none' }}><Link2 size={18} color="#fff" /></div>
+          <span className="font-serif" style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>SERPsupport</span>
+        </Link>
 
         <h1 style={{ fontSize:'1.5rem', fontWeight:800, marginBottom:4 }}>
           {mode === 'login' ? 'Welcome back' : 'Create account'}

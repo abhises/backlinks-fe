@@ -1,72 +1,77 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ─── THEME VARIABLES ─────────────────────────────────────────────────────── */
-:root, [data-theme="dark"] {
+:root, [data-theme="light"] {
+  --bg-base:       #ffffff;
+  --bg-surface:    #f7f7fc;
+  --bg-card:       #ffffff;
+  --bg-hover:      #f0f0f0;
+  --bg-hero:       #f7f7fc;
+  --bg-footer:     #022366;
+  
+  --border:        #b2b2be;
+  --border-subtle: #e5e5e5;
+  
+  --text-primary:  #121212;
+  --text-secondary:#666666;
+  --text-muted:    #b2b2be;
+  --text-hero:     #121212;
+  --text-footer:   #ffffff;
+  
+  --accent:        #00b899; /* Teal */
+  --accent-hover:  #022366; /* Dark blue */
+  --accent-glow:   rgba(0, 184, 153, 0.25);
+  
+  --green:         #00b899;
+  --red:           #e11d48;
+  --amber:         #f59e0b;
+  --blue:          #253ebb;
+  
+  --shadow-sm:     0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md:     0 4px 20px rgba(0,0,0,0.08);
+  --shadow-lg:     0 8px 40px rgba(0,0,0,0.12);
+  --radius:        12px;
+  --radius-sm:     8px;
+  --radius-lg:     16px;
+  --header-bg:     rgba(255,255,255,0.9);
+}
+
+[data-theme="dark"] {
   --bg-base:       #0d0e14;
   --bg-surface:    #13151f;
   --bg-card:       #1a1d2e;
   --bg-hover:      #222538;
+  --bg-hero:       #000000;
+  --bg-footer:     #022366;
+  
   --border:        #2a2e45;
   --border-subtle: #1e2136;
+  
   --text-primary:  #f0f2ff;
   --text-secondary:#8890b5;
   --text-muted:    #4a5178;
-  --accent:        #7c6ef7;
-  --accent-hover:  #9b8fff;
-  --accent-glow:   rgba(124,110,247,0.25);
-  --green:         #22c55e;
-  --red:           #ef4444;
+  --text-hero:     #ffffff;
+  --text-footer:   #ffffff;
+  
+  --accent:        #00b899;
+  --accent-hover:  #022366;
+  --accent-glow:   rgba(0, 184, 153, 0.25);
+  
+  --green:         #00b899;
+  --red:           #e11d48;
   --amber:         #f59e0b;
-  --blue:          #3b82f6;
-  --pill-new:      rgba(59,130,246,0.15);
-  --pill-new-text: #60a5fa;
-  --pill-live:     rgba(34,197,94,0.15);
-  --pill-live-text:#4ade80;
-  --pill-removed:  rgba(239,68,68,0.15);
-  --pill-removed-text:#f87171;
-  --pill-departed: rgba(245,158,11,0.15);
-  --pill-departed-text:#fcd34d;
+  --blue:          #253ebb;
+  
   --shadow-sm:     0 1px 3px rgba(0,0,0,0.4);
   --shadow-md:     0 4px 20px rgba(0,0,0,0.5);
   --shadow-lg:     0 8px 40px rgba(0,0,0,0.6);
   --radius:        12px;
   --radius-sm:     8px;
   --radius-lg:     16px;
-  --header-bg:     rgba(19, 21, 31, 0.75);
-}
-
-[data-theme="light"] {
-  --bg-base:       #f4f5fb;
-  --bg-surface:    #ffffff;
-  --bg-card:       #ffffff;
-  --bg-hover:      #f0f1fa;
-  --border:        #e2e5f5;
-  --border-subtle: #edeef8;
-  --text-primary:  #0f1120;
-  --text-secondary:#5a6080;
-  --text-muted:    #9ca3c0;
-  --accent:        #6355e8;
-  --accent-hover:  #7c6ef7;
-  --accent-glow:   rgba(99,85,232,0.15);
-  --green:         #16a34a;
-  --red:           #dc2626;
-  --amber:         #d97706;
-  --blue:          #2563eb;
-  --pill-new:      rgba(37,99,235,0.1);
-  --pill-new-text: #2563eb;
-  --pill-live:     rgba(22,163,74,0.1);
-  --pill-live-text:#16a34a;
-  --pill-removed:  rgba(220,38,38,0.1);
-  --pill-removed-text:#dc2626;
-  --pill-departed: rgba(217,119,6,0.1);
-  --pill-departed-text:#d97706;
-  --shadow-sm:     0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md:     0 4px 20px rgba(0,0,0,0.1);
-  --shadow-lg:     0 8px 40px rgba(0,0,0,0.12);
-  --header-bg:     rgba(255, 255, 255, 0.85);
+  --header-bg:     rgba(0,0,0,0.85);
 }
 
 [data-theme="color"] {
@@ -74,42 +79,48 @@
   --bg-surface:    #120d30;
   --bg-card:       #180f3d;
   --bg-hover:      #1f1550;
+  --bg-hero:       #0a0620;
+  --bg-footer:     #022366;
+  
   --border:        #2d1f6e;
   --border-subtle: #1f1550;
+  
   --text-primary:  #ede8ff;
   --text-secondary:#a594f9;
   --text-muted:    #6047c0;
-  --accent:        #a78bfa;
-  --accent-hover:  #c4b5fd;
-  --accent-glow:   rgba(167,139,250,0.3);
-  --green:         #34d399;
-  --red:           #f87171;
-  --amber:         #fbbf24;
-  --blue:          #60a5fa;
-  --pill-new:      rgba(96,165,250,0.2);
-  --pill-new-text: #93c5fd;
-  --pill-live:     rgba(52,211,153,0.2);
-  --pill-live-text:#6ee7b7;
-  --pill-removed:  rgba(248,113,113,0.2);
-  --pill-removed-text:#fca5a5;
-  --pill-departed: rgba(251,191,36,0.2);
-  --pill-departed-text:#fde68a;
+  --text-hero:     #ede8ff;
+  --text-footer:   #ffffff;
+  
+  --accent:        #00b899;
+  --accent-hover:  #022366;
+  --accent-glow:   rgba(0, 184, 153, 0.3);
+  
+  --green:         #00b899;
+  --red:           #e11d48;
+  --amber:         #f59e0b;
+  --blue:          #253ebb;
+  
   --shadow-sm:     0 1px 3px rgba(0,0,0,0.5);
   --shadow-md:     0 4px 20px rgba(0,0,0,0.6);
   --shadow-lg:     0 8px 40px rgba(0,0,0,0.7);
-  --header-bg:     rgba(18, 13, 48, 0.75);
+  --radius:        12px;
+  --radius-sm:     8px;
+  --radius-lg:     16px;
+  --header-bg:     rgba(10,6,32,0.85);
 }
+
+
 
 /* ─── BASE RESET ──────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+html { font-family: 'Lato', sans-serif; -webkit-font-smoothing: antialiased; }
 
 body {
   background: var(--bg-base);
   color: var(--text-primary);
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 14px;
+  font-family: 'Lato', sans-serif;
+  font-size: 16px;
   line-height: 1.6;
   min-height: 100vh;
 }
@@ -121,10 +132,14 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 /* ─── TYPOGRAPHY ──────────────────────────────────────────────────────────── */
-h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; }
-h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
-h3 { font-size: 1.125rem; font-weight: 600; }
-h4 { font-size: 0.9375rem; font-weight: 600; }
+h1 { font-family: 'Poppins', sans-serif; font-size: 3rem; font-weight: 600; line-height: 1.2; }
+h2 { font-family: 'Poppins', sans-serif; font-size: 2.25rem; font-weight: 500; }
+h3 { font-family: 'Poppins', sans-serif; font-size: 1.5rem; font-weight: 500; }
+h4 { font-family: 'Poppins', sans-serif; font-size: 1.125rem; font-weight: 500; }
+.btn-primary {
+  background: var(--accent); color: #fff;
+}
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
 
 /* ─── LAYOUT ──────────────────────────────────────────────────────────────── */
 .app-shell {
