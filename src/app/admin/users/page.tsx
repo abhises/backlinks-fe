@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
-import { Loader2, User, Edit2, Trash2, Check, X, AlertTriangle } from 'lucide-react';
+import { Loader2, User, Edit2, Trash2, Check, X, AlertTriangle, Search } from 'lucide-react';
 
 type UserData = {
   id: string;
@@ -25,6 +25,9 @@ export default function AdminUsers() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ name: '', email: '', role: '' });
   const [saving, setSaving] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
 
   // Modal and Toast state
   const [deleteModalId, setDeleteModalId] = useState<string | null>(null);
@@ -88,8 +91,22 @@ export default function AdminUsers() {
     }
   };
 
+  const filteredUsers = users.filter(u => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      u.name.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) ||
+      u.role.toLowerCase().includes(q) ||
+      u.teamMemberships.some(t => t.workspace.domain.toLowerCase().includes(q) || t.workspace.websiteName.toLowerCase().includes(q))
+    );
+  });
+
+  const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
+  const paginatedUsers = filteredUsers.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+
   return (
-    <div style={{ padding: '32px 40px', maxWidth: '100%', position: 'relative' }}>
+    <div style={{ padding: '32px 40px', maxWidth: '100%', position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Toast Notification */}
       {toastMessage && (
         <div style={{
@@ -153,14 +170,28 @@ export default function AdminUsers() {
         </div>
       )}
 
-      <div className="page-header" style={{ padding: 0, border: 'none', marginBottom: 32 }}>
+      <div className="page-header" style={{ padding: 0, border: 'none', marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div className="page-header-left">
           <h1 className="page-title">Users</h1>
           <p className="page-sub">View and manage platform users.</p>
         </div>
+        <div style={{ position: 'relative' }}>
+          <Search size={18} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="input-field"
+            style={{ paddingLeft: 40, width: 300, background: 'var(--bg-surface)' }}
+          />
+        </div>
       </div>
 
-      <div className="card" style={{ padding: 32, width: '100%', overflowX: 'auto' }}>
+      <div className="card" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, width: '100%', overflow: 'hidden' }}>
         {error && (
           <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 8, padding: '12px 16px', marginBottom: 24, fontSize: '0.875rem', color: 'var(--red)' }}>
             {error}
@@ -171,15 +202,17 @@ export default function AdminUsers() {
           <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
             <Loader2 className="animate-spin" size={24} color="var(--text-muted)" />
           </div>
-        ) : users.length === 0 ? (
-          <div className="empty-state" style={{ padding: '40px 0', border: 'none', background: 'transparent' }}>
-            <div className="empty-state-icon" style={{ background: 'var(--bg-hover)' }}><User color="var(--text-muted)" /></div>
-            <h3>No users found</h3>
+        ) : filteredUsers.length === 0 ? (
+          <div className="empty-state" style={{ padding: '40px 0', border: 'none', background: 'transparent', flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div className="empty-state-icon" style={{ background: 'var(--bg-hover)', display: 'inline-flex', padding: 20, borderRadius: '50%', marginBottom: 16 }}><User color="var(--text-muted)" size={48} /></div>
+              <h3>{searchQuery ? 'No users match your search' : 'No users found'}</h3>
+            </div>
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
+          <div style={{ flex: 1, overflow: 'auto' }}>
             <table style={{ width: '100%', minWidth: '900px', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
+              <thead style={{ position: 'sticky', top: 0, background: 'var(--bg-card)', zIndex: 10, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                 <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-secondary)' }}>
                   <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Name</th>
                   <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Email</th>
@@ -190,7 +223,7 @@ export default function AdminUsers() {
                 </tr>
               </thead>
               <tbody>
-                {users.map(u => {
+                {paginatedUsers.map(u => {
                   const isEditing = editingId === u.id;
                   const isAdmin = u.role === 'ADMIN';
 
@@ -275,6 +308,29 @@ export default function AdminUsers() {
                 })}
               </tbody>
             </table>
+          </div>
+        )}
+        {!loading && filteredUsers.length > 0 && (
+          <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-surface)' }}>
+            <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+              Showing {(currentPage - 1) * rowsPerPage + 1} to {Math.min(currentPage * rowsPerPage, filteredUsers.length)} of {filteredUsers.length} users
+            </span>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="btn btn-secondary btn-sm"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="btn btn-secondary btn-sm"
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>

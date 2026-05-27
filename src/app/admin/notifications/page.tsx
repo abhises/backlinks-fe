@@ -60,7 +60,7 @@ export default function AdminNotifications() {
   };
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 800 }}>
+    <div style={{ padding: '32px 40px', maxWidth: 800, height: '100%', overflowY: 'auto' }}>
       <div className="page-header" style={{ padding: 0, border: 'none', marginBottom: 32 }}>
         <div className="page-header-left">
           <h1 className="page-title">Broadcast Notification</h1>
