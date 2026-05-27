@@ -5,15 +5,15 @@
 
 /* ─── THEME VARIABLES ─────────────────────────────────────────────────────── */
 :root, [data-theme="light"] {
-  --bg-base:       #f4f5fb;
-  --bg-surface:    #ffffff;
+  --bg-base:       #f9fafb; /* Soft, clean off-white */
+  --bg-surface:    #ffffff; /* Pure white for contrast */
   --bg-card:       #ffffff;
-  --bg-hover:      #f0f1fa;
-  --bg-hero:       #f7f7fc;
+  --bg-hover:      #f3f4f6; /* Subtle hover effect */
+  --bg-hero:       #ffffff; /* Crisp white for hero section */
   --bg-footer:     #022366;
   
-  --border:        #e2e5f5;
-  --border-subtle: #edeef8;
+  --border:        #e5e7eb;
+  --border-subtle: #f3f4f6;
   
   --text-primary:  #0f1120;
   --text-secondary:#5a6080;
