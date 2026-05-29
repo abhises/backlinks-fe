@@ -1,7 +1,7 @@
 'use client';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import {
   Inbox, LayoutDashboard, Settings, LogOut, Sun, Moon, Palette,
@@ -83,7 +83,7 @@ const NAV = [
 const THEMES = ['dark', 'light', 'color'] as const;
 type Theme = typeof THEMES[number];
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+function AppShellContent({ children }: { children: React.ReactNode }) {
   const { user, workspace, logout, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -578,5 +578,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         )}
       </main>
     </div>
+  );
+}
+
+export default function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg-base)' }} />}>
+      <AppShellContent>{children}</AppShellContent>
+    </Suspense>
   );
 }
