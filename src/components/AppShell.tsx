@@ -1,6 +1,6 @@
 'use client';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
@@ -72,6 +72,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const { user, workspace, logout, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [theme, setTheme] = useState<Theme>('dark');
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -179,14 +180,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       const [path, query] = href.split('?');
       if (pathname !== path) return false;
       const urlParams = new URLSearchParams(query);
-      const currentParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-      return urlParams.get('filter') === currentParams.get('filter');
+      return urlParams.get('filter') === searchParams.get('filter');
     }
     if (href === '/inbox') {
       if (pathname !== '/inbox') return false;
-      const currentParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-      const filter = currentParams.get('filter');
+      const filter = searchParams.get('filter');
       return !filter || filter === 'all';
+    }
+    if (href === '/how-it-works') {
+      return pathname === '/how-it-works';
     }
     return pathname.startsWith(href);
   };
@@ -213,9 +215,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside className="sidebar">
         {/* Logo and Bell */}
-        <div style={{ padding: '20px 20px 16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ padding: '12px 20px 12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>SERPsupport</div>
+            <div style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0' }}>SERPsupport</div>
             <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', marginTop: '2px' }}>WEBSITE PORTAL</div>
           </div>
           <div style={{ position: 'relative' }}>
@@ -298,7 +300,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Search Bar */}
-        <div style={{ padding: '0 20px', marginBottom: '20px' }}>
+        <div style={{ padding: '0 20px', marginBottom: '16px' }}>
           <div style={{ position: 'relative' }}>
             <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.8rem', opacity: 0.6 }}>🔍</span>
             <input 
@@ -324,7 +326,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Theme Switcher in Sidebar */}
-        <div style={{ padding: '0 20px', marginBottom: '20px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
+        <div style={{ padding: '0 20px', marginBottom: '16px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
           {(['light', 'color', 'dark'] as Theme[]).map(t => (
             <button
               key={t}

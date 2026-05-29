@@ -30,13 +30,10 @@ export default function HowItWorksPage() {
   ];
 
   return (
-    <div style={{ padding: '60px 40px', width: '100%' }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
-      `}</style>
+    <div style={{ padding: '32px 40px', width: '100%' }}>
       <div>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '12px', fontFamily: '"Lora", "Georgia", serif' }}>How it works</h1>
-        <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '60px' }}>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '12px' }}>How it works</h1>
+        <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '40px' }}>
           A quick walkthrough of how SERPsupport connects your site with the right partners.
         </p>
       </div>
@@ -69,7 +66,7 @@ export default function HowItWorksPage() {
               {step.num}
             </div>
             <div style={{ paddingTop: '5px' }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '6px', fontFamily: '"Lora", "Georgia", serif' }}>{step.title}</h3>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '6px' }}>{step.title}</h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>{step.desc}</p>
             </div>
           </div>

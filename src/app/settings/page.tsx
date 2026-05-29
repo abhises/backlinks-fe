@@ -159,6 +159,18 @@ export default function SettingsPage() {
 
       {/* Settings Sections Area */}
       <div className="settings-content">
+        <style>{`
+          .settings-content .btn {
+            background: #1a1a1a !important;
+            color: #fff !important;
+            border: 1px solid #1a1a1a !important;
+            box-shadow: none !important;
+          }
+          .settings-content .btn:hover {
+            background: #000 !important;
+            border-color: #000 !important;
+          }
+        `}</style>
         
         {/* Header */}
         <div style={{ padding: '24px 0 20px', borderBottom: '1px solid var(--border)', marginBottom: 32 }}>
