@@ -232,7 +232,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         {/* Logo and Bell */}
         <div style={{ padding: '12px 20px 12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <div style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0' }}>SERPsupport</div>
+            <div style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0' }}>SERPSupport</div>
             <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', marginTop: '2px' }}>WEBSITE PORTAL</div>
           </div>
           <div style={{ position: 'relative' }}>
@@ -289,7 +289,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Theme Switcher in Sidebar */}
-        <div style={{ padding: '0 20px', marginBottom: '16px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
+        <div style={{ padding: '0 16px', marginBottom: '8px', display: 'flex', gap: '4px', background: 'var(--bg-hover)', borderRadius: '8px', margin: '0 16px 12px 16px', padding: '4px' }}>
           {(['light', 'color', 'dark'] as Theme[]).map(t => (
             <button
               key={t}
@@ -299,18 +299,20 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '6px',
-                padding: '6px',
+                gap: '5px',
+                padding: '5px 4px',
                 borderRadius: '6px',
-                border: theme === t ? '1px solid var(--accent)' : '1px solid var(--border)',
-                background: theme === t ? 'var(--bg-hover)' : 'transparent',
-                color: theme === t ? 'var(--text-primary)' : 'var(--text-secondary)',
-                fontSize: '0.75rem',
+                border: 'none',
+                background: theme === t ? 'var(--bg-surface)' : 'transparent',
+                color: theme === t ? 'var(--text-primary)' : 'var(--text-muted)',
+                fontSize: '0.72rem',
+                fontWeight: theme === t ? 600 : 400,
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
+                boxShadow: theme === t ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
               }}
             >
-              {t === 'light' ? <Sun size={14} /> : t === 'color' ? <Palette size={14} /> : <Moon size={14} />}
+              {t === 'light' ? <Sun size={12} /> : t === 'color' ? <Palette size={12} /> : <Moon size={12} />}
               <span style={{ textTransform: 'capitalize' }}>{t}</span>
             </button>
           ))}
