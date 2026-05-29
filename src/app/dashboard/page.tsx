@@ -93,12 +93,9 @@ export default function LinksPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '32px 32px 16px 32px' }}>
         <div>
-          <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: '2.25rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>Dashboard</h1>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>
-            {filteredLinks.length === links.length
-              ? `${links.length} link record${links.length !== 1 ? 's' : ''}`
-              : `${filteredLinks.length} of ${links.length} filtered`
-            }
+          <h1 style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '2.5rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>Dashboard</h1>
+          <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', margin: '12px 0 0 0' }}>
+            An overview of every backlink placed across your site and partner sites.
           </p>
         </div>
         <button onClick={load} className="btn" style={{
@@ -120,49 +117,66 @@ export default function LinksPage() {
       </div>
 
       {/* Filters Bar */}
-      <div style={{ padding: '0 32px 24px 32px', display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Direction:</span>
-          <select value={directionFilter} onChange={e => setDirectionFilter(e.target.value as any)} 
-            style={{
-              width: 180,
-              padding: '6px 12px',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              height: 34,
-              cursor: 'pointer',
-              background: 'var(--bg-hover)',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '6px',
-              outline: 'none'
-            }}>
-            <option value="ALL">All Directions</option>
-            <option value="GIVEN">Backlinks Out (Given)</option>
-            <option value="RECEIVED">Backlinks In (Received)</option>
-          </select>
+      <div style={{ padding: '20px 32px 24px 32px', display: 'flex', gap: 32, flexWrap: 'wrap', alignItems: 'center', borderBottom: '1px solid var(--border)', marginBottom: 24 }}>
+        {/* Type Filter */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', color: 'var(--text-muted)' }}>TYPE</span>
+          {['ALL', 'RECEIVED', 'GIVEN'].map(type => {
+            const label = type === 'ALL' ? 'All' : type === 'RECEIVED' ? 'Backlinks In' : 'Backlinks Out';
+            const isActive = directionFilter === type;
+            return (
+              <div key={type} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <button onClick={() => setDirectionFilter(type as any)} style={{
+                  background: isActive ? '#1a1a1a' : 'transparent',
+                  color: isActive ? '#fff' : 'var(--text-secondary)',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  fontSize: '0.85rem',
+                  fontWeight: isActive ? 600 : 500,
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}>
+                  {label}
+                </button>
+                {type !== 'ALL' && <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', cursor: 'help' }}>ⓘ</span>}
+              </div>
+            );
+          })}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Status:</span>
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as any)}
-            style={{
-              width: 150,
-              padding: '6px 12px',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              height: 34,
-              cursor: 'pointer',
-              background: 'var(--bg-hover)',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '6px',
-              outline: 'none'
-            }}>
-            <option value="ALL">All Statuses</option>
-            <option value="LIVE">Live</option>
-            <option value="REMOVED">Removed</option>
-            <option value="DEPARTED">Departed</option>
-          </select>
+
+        {/* Status Filter */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', color: 'var(--text-muted)' }}>STATUS</span>
+          {['ALL', 'LIVE', 'REMOVED', 'DEPARTED'].map(status => {
+            let label = 'All';
+            if (status === 'LIVE') label = '🟢 Live';
+            if (status === 'REMOVED') label = '🔴 Removed';
+            if (status === 'DEPARTED') label = '⚫ Departed';
+            const isActive = statusFilter === status;
+            return (
+              <div key={status} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <button onClick={() => setStatusFilter(status as any)} style={{
+                  background: isActive ? '#1a1a1a' : 'transparent',
+                  color: isActive ? '#fff' : 'var(--text-secondary)',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  fontSize: '0.85rem',
+                  fontWeight: isActive ? 600 : 500,
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}>
+                  {label}
+                </button>
+                {status !== 'ALL' && <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', cursor: 'help' }}>ⓘ</span>}
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ marginLeft: 'auto', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+          {filteredLinks.length} link{filteredLinks.length !== 1 ? 's' : ''}
         </div>
       </div>
 
@@ -188,8 +202,8 @@ export default function LinksPage() {
           <div style={{ minWidth: 900, background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
             {/* Header row */}
             <div className="links-grid" style={{ background: 'var(--bg-surface)' }}>
-              {['From URL', 'To URL', 'Anchor Text', 'Date Placed', 'Chat', 'Status'].map(h => (
-                <div key={h} className="links-grid-header" style={{ borderBottom: '1px solid var(--border)' }}>{h}</div>
+              {['FROM URL', 'TO URL', 'ANCHOR TEXT', 'DATE PLACED', 'CHAT', 'STATUS'].map(h => (
+                <div key={h} className="links-grid-header" style={{ borderBottom: '1px solid var(--border)', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{h}</div>
               ))}
             </div>
 
@@ -205,23 +219,20 @@ export default function LinksPage() {
                   {/* From URL */}
                   <div className="links-grid-cell">
                     <a href={link.sourceUrl} target="_blank" rel="noopener noreferrer"
-                      style={{ color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: 4, textDecoration: 'none', fontWeight: 600 }}
+                      style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 4, textDecoration: 'none', fontWeight: 500 }}
                       onClick={e => e.stopPropagation()}>
-                      <ArrowUpRight size={12} />
                       {truncate(link.sourceUrl)}
+                      <ArrowUpRight size={12} style={{ color: 'var(--text-muted)' }} />
                     </a>
-                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 2, margin: 0 }}>
-                      {isGiver ? '📤 You gave' : '📥 You received'} · {TYPE_LABELS[link.linkType] || link.linkType}
-                    </p>
                   </div>
 
                   {/* To URL */}
                   <div className="links-grid-cell">
                     <a href={link.targetUrl} target="_blank" rel="noopener noreferrer"
-                      style={{ color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 4, textDecoration: 'none' }}
+                      style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 4, textDecoration: 'none', fontWeight: 500 }}
                       onClick={e => e.stopPropagation()}>
-                      <ExternalLink size={12} style={{ color: 'var(--text-muted)' }} />
                       {truncate(link.targetUrl)}
+                      <ArrowUpRight size={12} style={{ color: 'var(--text-muted)' }} />
                     </a>
                   </div>
 
@@ -239,11 +250,12 @@ export default function LinksPage() {
                   <div className="links-grid-cell">
                     {link.thread ? (
                       <Link href={`/inbox/${link.thread.id}`}
-                        style={{ color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: 4, textDecoration: 'none' }}>
-                        <MessageSquare size={14} />
+                        style={{ color: 'var(--text-secondary)', display: 'inline-flex', flexDirection: 'column', textDecoration: 'none', fontSize: '0.8rem', lineHeight: 1.4 }}>
+                        <span>Partner</span>
+                        <span>Chat</span>
                       </Link>
                     ) : (
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>—</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>—</span>
                     )}
                   </div>
 
@@ -252,17 +264,30 @@ export default function LinksPage() {
                     {updating === link.id ? (
                       <Loader2 size={14} className="animate-spin" style={{ color: 'var(--accent)' }} />
                     ) : (
-                      <select
-                        id={`status-${link.id}`}
-                        value={link.status}
-                        className={`status-select ${link.status}`}
-                        onChange={e => handleStatusChange(link.id, e.target.value)}
-                        onClick={e => e.stopPropagation()}
-                        style={{ cursor: 'pointer', outline: 'none' }}>
-                        {STATUS_OPTIONS.map(s => (
-                          <option key={s} value={s}>{s.charAt(0) + s.slice(1).toLowerCase()}</option>
-                        ))}
-                      </select>
+                      <div style={{ position: 'relative', display: 'inline-block' }}>
+                        <select
+                          id={`status-${link.id}`}
+                          value={link.status}
+                          onChange={e => handleStatusChange(link.id, e.target.value)}
+                          onClick={e => e.stopPropagation()}
+                          style={{
+                            appearance: 'none',
+                            background: 'var(--bg-hover)',
+                            border: '1px solid var(--border-subtle)',
+                            borderRadius: '6px',
+                            padding: '4px 24px 4px 10px',
+                            fontSize: '0.75rem',
+                            fontWeight: 500,
+                            color: 'var(--text-secondary)',
+                            cursor: 'pointer',
+                            outline: 'none'
+                          }}>
+                          <option value="LIVE">🟢 Live</option>
+                          <option value="REMOVED">🔴 Removed</option>
+                          <option value="DEPARTED">⚫ Departed</option>
+                        </select>
+                        <span style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', fontSize: '0.7rem', color: 'var(--text-muted)' }}>⌄</span>
+                      </div>
                     )}
                   </div>
                 </div>

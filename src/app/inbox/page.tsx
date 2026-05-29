@@ -210,13 +210,15 @@ function InboxPageContent() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--bg-base)' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '32px 32px 16px 32px' }}>
-        <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: '2.25rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>Inbox</h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 32px 8px 32px' }}>
+        <h1 style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '2.25rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>
+          {filter === 'out' ? 'Backlinks Out' : filter === 'in' ? 'Backlinks In' : 'Inbox'}
+        </h1>
         <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{filteredThreads.length} threads</span>
       </div>
 
       {/* Filter Chips */}
-      <div style={{ padding: '0 32px 24px 32px', display: 'flex', gap: 12 }}>
+      <div style={{ padding: '0 32px 12px 32px', display: 'flex', gap: 10 }}>
         {filterOptions.map(f => (
           <button key={f.key}
             onClick={() => setFilter(f.key)}
@@ -262,9 +264,16 @@ function InboxPageContent() {
                   className="thread-tile"
                   style={{
                     position: 'relative',
-                    borderLeft: isItemNewIncoming ? '4px solid #2e7d32' : 'none',
-                    paddingLeft: isItemNewIncoming ? '20px' : '24px'
+                    borderLeft: isItemNewIncoming ? '4px solid #10b981' : '4px solid transparent',
+                    padding: '8px 24px',
+                    borderBottom: '1px solid var(--border)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: 'var(--bg-base)',
+                    cursor: pending ? 'default' : 'pointer'
                   }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-base)'}
                   onClick={() => !pending && router.push(`/inbox/${t.id}`)}>
 
                   {/* Avatar */}
@@ -322,31 +331,83 @@ function InboxPageContent() {
                           fontSize: '0.7rem', 
                           fontWeight: 700, 
                           color: '#ffffff', 
-                          background: '#2e7d32', 
+                          background: '#10b981', 
                           padding: '2px 6px', 
                           borderRadius: '4px' 
                         }}>
                           NEW
                         </span>
                       )}
-
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
-                        {formatRelativeTime(t.updatedAt)}
-                      </span>
                     </div>
 
                     {/* Description/Last message */}
-                    <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: 1.4 }}>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: 1.4 }}>
                       {other.description ? other.description : (
                         t.messages && t.messages.length > 0 
                           ? t.messages[0].messageText 
                           : 'No message history yet'
                       )}
                     </div>
+                  </div>
+
+                  {/* Right Side Actions and Timestamp */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
+                    
+                    {/* Action buttons for pending NEW request */}
+                    {pending && !isRejecting && (
+                      <div onClick={e => e.stopPropagation()}>
+                        {((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted)) ? (
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <button id={`approve-${t.id}`}
+                              className="btn"
+                              style={{
+                                background: '#10b981',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '4px',
+                                padding: '6px 16px',
+                                fontWeight: 600,
+                                fontSize: '0.8rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 6
+                              }}
+                              onClick={() => handleApprove(t.id)}
+                              disabled={actionLoading === t.id}>
+                              {actionLoading === t.id ? <Loader2 size={12} className="animate-spin" /> : '✓ Approve'}
+                            </button>
+                            <button id={`reject-${t.id}`}
+                              className="btn"
+                              style={{
+                                border: '1px solid #ef4444',
+                                background: '#ffffff',
+                                color: '#ef4444',
+                                borderRadius: '4px',
+                                padding: '6px 16px',
+                                fontWeight: 600,
+                                fontSize: '0.8rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 6
+                              }}
+                              onClick={() => setRejectId(t.id)}
+                              disabled={actionLoading === t.id}>
+                              ✕ Reject
+                            </button>
+                          </div>
+                        ) : (
+                          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: '4px' }}>
+                            <Loader2 size={12} className="animate-spin" /> Waiting for them to accept
+                          </span>
+                        )}
+                      </div>
+                    )}
 
                     {/* Reject countdown bar */}
                     {isRejecting && (
-                      <div style={{ marginTop: 12 }} onClick={e => e.stopPropagation()}>
+                      <div onClick={e => e.stopPropagation()} style={{ width: 140 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--red)', marginBottom: 4 }}>
                           <span>Rejecting in {rejectCount}s…</span>
                           <button onClick={e => { e.stopPropagation(); setRejectId(null); }}
@@ -357,70 +418,29 @@ function InboxPageContent() {
                         <div className="countdown-bar"><div className="countdown-fill" /></div>
                       </div>
                     )}
+
+                    {/* Right side indicators for active threads */}
+                    {!pending && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        {t.status === 'REJECTED' ? (
+                          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--red)' }}>Rejected</span>
+                        ) : t.status === 'PENDING' ? (
+                          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: '4px' }}>
+                            <Loader2 size={12} className="animate-spin" /> Waiting for them to accept
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: t.stage === 'PLACED' ? '#10b981' : 'var(--text-secondary)' }}>
+                            {t.stage === 'PLACED' ? 'Link Placed ✓' : t.stage === 'CHAT' ? '' : ''}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Timestamp */}
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', minWidth: '45px', textAlign: 'right' }}>
+                      {formatRelativeTime(t.updatedAt)}
+                    </span>
                   </div>
-
-                  {/* Action buttons for pending NEW request */}
-                  {pending && !isRejecting && (
-                    <div onClick={e => e.stopPropagation()} style={{ marginLeft: 16 }}>
-                      {((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted)) ? (
-                        <div style={{ display: 'flex', gap: 8 }}>
-                          <button id={`reject-${t.id}`}
-                            className="btn"
-                            style={{
-                              border: '1px solid #c62828',
-                              background: '#ffffff',
-                              color: '#c62828',
-                              borderRadius: '6px',
-                              padding: '6px 14px',
-                              fontWeight: 600,
-                              fontSize: '0.8rem',
-                              cursor: 'pointer'
-                            }}
-                            onClick={() => setRejectId(t.id)}
-                            disabled={actionLoading === t.id}>
-                            ✕ Reject
-                          </button>
-                          <button id={`approve-${t.id}`}
-                            className="btn"
-                            style={{
-                              background: '#2e7d32',
-                              color: '#ffffff',
-                              borderRadius: '6px',
-                              padding: '6px 14px',
-                              fontWeight: 600,
-                              fontSize: '0.8rem',
-                              cursor: 'pointer'
-                            }}
-                            onClick={() => handleApprove(t.id)}
-                            disabled={actionLoading === t.id}>
-                            {actionLoading === t.id ? <Loader2 size={12} className="animate-spin" /> : '✓ Approve'}
-                          </button>
-                        </div>
-                      ) : (
-                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: '4px' }}>
-                          <Loader2 size={12} className="animate-spin" /> Waiting for them to accept
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Right side indicators for active threads */}
-                  {!pending && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 16 }}>
-                      {t.status === 'REJECTED' ? (
-                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--red)' }}>Rejected</span>
-                      ) : t.status === 'PENDING' ? (
-                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: '4px' }}>
-                          <Loader2 size={12} className="animate-spin" /> Waiting for them to accept
-                        </span>
-                      ) : (
-                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: t.stage === 'PLACED' ? '#2e7d32' : 'var(--text-secondary)' }}>
-                          {t.stage === 'PLACED' ? 'Link Placed ✓' : t.stage === 'CHAT' ? 'Chatting' : ''}
-                        </span>
-                      )}
-                      <MessageSquare size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
-                    </div>
-                  )}
                 </div>
               );
             })}

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Inbox, LayoutDashboard, Settings, LogOut, Sun, Moon, Palette,
-  Bell, Menu, X, ArrowDownLeft, ArrowUpRight, Sparkles
+  Bell, Menu, X, ArrowDownLeft, ArrowUpRight, Sparkles, MessageCircle, Check, User
 } from 'lucide-react';
 import { io } from 'socket.io-client';
 
@@ -54,6 +54,21 @@ const playNotificationSound = () => {
   } catch (e) {
     console.warn('Audio play failed', e);
   }
+};
+
+const formatTimeAgo = (date: Date) => {
+  const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
+  let interval = seconds / 31536000;
+  if (interval > 1) return Math.floor(interval) + "y ago";
+  interval = seconds / 2592000;
+  if (interval > 1) return Math.floor(interval) + "mo ago";
+  interval = seconds / 86400;
+  if (interval > 1) return Math.floor(interval) + "d ago";
+  interval = seconds / 3600;
+  if (interval > 1) return Math.floor(interval) + "h ago";
+  interval = seconds / 60;
+  if (interval > 1) return Math.floor(interval) + "m ago";
+  return Math.floor(seconds) + "s ago";
 };
 
 const NAV = [
@@ -244,58 +259,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 </span>
               )}
             </button>
-            {/* Notifications Dropdown for Sidebar */}
-            {showDropdown && (
-              <div style={{ 
-                position: 'absolute', 
-                left: '100%', 
-                top: 0, 
-                marginLeft: '12px',
-                width: 320, 
-                background: 'var(--bg-surface)', 
-                border: '1px solid var(--border)', 
-                borderRadius: 'var(--radius)', 
-                boxShadow: 'var(--shadow-lg)', 
-                overflow: 'hidden', 
-                display: 'flex', 
-                flexDirection: 'column', 
-                zIndex: 1000 
-              }}>
-                <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-hover)' }}>
-                  <span style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text-primary)' }}>Notifications</span>
-                  {notifications.some(n => !n.read) && (
-                    <button 
-                      onClick={markAllRead}
-                      style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
-                    >
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-                <div style={{ maxHeight: 280, overflowY: 'auto' }}>
-                  {notifications.length === 0 ? (
-                    <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                      No notifications yet
-                    </div>
-                  ) : (
-                    notifications.map(n => (
-                      <div key={n.id} 
-                        onClick={() => handleNotifClick(n)}
-                        style={{ 
-                          padding: '12px 16px', 
-                          borderBottom: '1px solid var(--border-subtle)', 
-                          cursor: 'pointer',
-                          background: n.read ? 'transparent' : 'var(--accent-glow)'
-                        }}
-                      >
-                        <div style={{ fontWeight: 600, fontSize: '0.8rem', color: 'var(--text-primary)', marginBottom: 2 }}>{n.title}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{n.body}</div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -528,6 +491,91 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div style={{ flex: 1, overflowY: 'auto', position: 'relative', display: 'flex', flexDirection: 'column' }}>
           {children}
         </div>
+
+        {/* Notifications Slide-out Drawer */}
+        {showDropdown && (
+          <>
+            {/* Backdrop overlay */}
+            <div 
+              onClick={() => setShowDropdown(false)}
+              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.2)', zIndex: 2000, backdropFilter: 'blur(2px)' }} 
+            />
+            {/* Drawer */}
+            <div style={{
+              position: 'fixed', right: 0, top: 0, bottom: 0, width: '400px', maxWidth: '100vw',
+              background: 'var(--bg-surface)', boxShadow: '-4px 0 24px rgba(0,0,0,0.1)',
+              zIndex: 2001, display: 'flex', flexDirection: 'column',
+              transform: 'translateX(0)', transition: 'transform 0.3s ease'
+            }}>
+              {/* Header */}
+              <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <h2 style={{ fontSize: '1.4rem', fontWeight: 600, fontFamily: '"Lora", "Georgia", serif', color: 'var(--text-primary)', margin: 0 }}>Notifications</h2>
+                  {notifications.filter(n => !n.read).length > 0 && (
+                    <span style={{ background: 'var(--red)', color: 'white', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600 }}>
+                      {notifications.filter(n => !n.read).length}
+                    </span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                  {notifications.some(n => !n.read) && (
+                    <button onClick={markAllRead} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.85rem', cursor: 'pointer' }}>Mark all read</button>
+                  )}
+                  <button onClick={() => setShowDropdown(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}>
+                    <X size={20} />
+                  </button>
+                </div>
+              </div>
+
+              {/* List */}
+              <div style={{ flex: 1, overflowY: 'auto' }}>
+                {notifications.length === 0 ? (
+                  <div style={{ padding: '40px 24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                    No notifications yet.
+                  </div>
+                ) : (
+                  notifications.map(n => {
+                    let IconComp = Bell;
+                    let iconBg = 'var(--bg-hover)';
+                    let iconColor = 'var(--text-secondary)';
+                    
+                    if (n.type === 'new_message') { IconComp = MessageCircle; iconBg = 'rgba(59, 130, 246, 0.1)'; iconColor = '#3b82f6'; }
+                    else if (n.type === 'connection_accepted' || n.type === 'link_placed') { IconComp = Check; iconBg = 'rgba(16, 185, 129, 0.1)'; iconColor = '#10b981'; }
+                    else if (n.type === 'new_connection') { IconComp = Sparkles; iconBg = 'rgba(168, 85, 247, 0.1)'; iconColor = '#a855f7'; }
+                    else if (n.type === 'connection_rejected') { IconComp = X; iconBg = 'rgba(239, 68, 68, 0.1)'; iconColor = '#ef4444'; }
+                    else if (n.type === 'admin_broadcast') { IconComp = User; iconBg = 'var(--bg-hover)'; iconColor = 'var(--text-primary)'; }
+
+                    return (
+                      <div key={n.id} 
+                        onClick={() => handleNotifClick(n)}
+                        style={{ 
+                          padding: '20px 32px', 
+                          borderBottom: '1px solid var(--border)', 
+                          display: 'flex', 
+                          gap: '16px',
+                          borderLeft: n.read ? '4px solid transparent' : '4px solid #10b981',
+                          background: n.read ? 'transparent' : 'var(--bg-base)',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+                        onMouseLeave={e => e.currentTarget.style.background = n.read ? 'transparent' : 'var(--bg-base)'}
+                      >
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: iconBg, color: iconColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <IconComp size={20} />
+                        </div>
+                        <div style={{ paddingTop: '2px' }}>
+                          <div style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '4px', lineHeight: 1.4 }}>{n.title}</div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{formatTimeAgo(n.timestamp)}</div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </main>
     </div>
   );
