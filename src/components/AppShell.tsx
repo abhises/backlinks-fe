@@ -62,7 +62,7 @@ const NAV = [
   { href: '/inbox?filter=out', icon: ArrowUpRight, label: 'Backlinks Out' },
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/settings', icon: Settings, label: 'Settings' },
-  { href: '/#how-it-works', icon: Sparkles, label: 'How it works' },
+  { href: '/how-it-works', icon: Sparkles, label: 'How it works' },
 ];
 
 const THEMES = ['dark', 'light', 'color'] as const;
@@ -212,10 +212,89 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     <div className="app-shell">
       {/* Sidebar */}
       <aside className="sidebar">
-        {/* Logo */}
-        <div style={{ padding: '20px 20px 16px 20px' }}>
-          <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>SERPsupport</div>
-          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', marginTop: '2px' }}>WEBSITE PORTAL</div>
+        {/* Logo and Bell */}
+        <div style={{ padding: '20px 20px 16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>SERPsupport</div>
+            <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', marginTop: '2px' }}>WEBSITE PORTAL</div>
+          </div>
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setShowDropdown(!showDropdown)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <Bell size={20} />
+              {notifications.filter(n => !n.read).length > 0 && (
+                <span style={{ 
+                  position: 'absolute', top: '-2px', right: '-2px', 
+                  background: 'var(--red)', color: 'white', 
+                  borderRadius: '999px', fontSize: '0.6rem', 
+                  fontWeight: 'bold', width: '15px', height: '15px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  {notifications.filter(n => !n.read).length}
+                </span>
+              )}
+            </button>
+            {/* Notifications Dropdown for Sidebar */}
+            {showDropdown && (
+              <div style={{ 
+                position: 'absolute', 
+                left: '100%', 
+                top: 0, 
+                marginLeft: '12px',
+                width: 320, 
+                background: 'var(--bg-surface)', 
+                border: '1px solid var(--border)', 
+                borderRadius: 'var(--radius)', 
+                boxShadow: 'var(--shadow-lg)', 
+                overflow: 'hidden', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                zIndex: 1000 
+              }}>
+                <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-hover)' }}>
+                  <span style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text-primary)' }}>Notifications</span>
+                  {notifications.some(n => !n.read) && (
+                    <button 
+                      onClick={markAllRead}
+                      style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                    >
+                      Mark all read
+                    </button>
+                  )}
+                </div>
+                <div style={{ maxHeight: 280, overflowY: 'auto' }}>
+                  {notifications.length === 0 ? (
+                    <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                      No notifications yet
+                    </div>
+                  ) : (
+                    notifications.map(n => (
+                      <div key={n.id} 
+                        onClick={() => handleNotifClick(n)}
+                        style={{ 
+                          padding: '12px 16px', 
+                          borderBottom: '1px solid var(--border-subtle)', 
+                          cursor: 'pointer',
+                          background: n.read ? 'transparent' : 'var(--accent-glow)'
+                        }}
+                      >
+                        <div style={{ fontWeight: 600, fontSize: '0.8rem', color: 'var(--text-primary)', marginBottom: 2 }}>{n.title}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{n.body}</div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -242,6 +321,34 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
             />
           </div>
+        </div>
+
+        {/* Theme Switcher in Sidebar */}
+        <div style={{ padding: '0 20px', marginBottom: '20px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
+          {(['light', 'color', 'dark'] as Theme[]).map(t => (
+            <button
+              key={t}
+              onClick={() => changeTheme(t)}
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                padding: '6px',
+                borderRadius: '6px',
+                border: theme === t ? '1px solid var(--accent)' : '1px solid var(--border)',
+                background: theme === t ? 'var(--bg-hover)' : 'transparent',
+                color: theme === t ? 'var(--text-primary)' : 'var(--text-secondary)',
+                fontSize: '0.75rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {t === 'light' ? <Sun size={14} /> : t === 'color' ? <Palette size={14} /> : <Moon size={14} />}
+              <span style={{ textTransform: 'capitalize' }}>{t}</span>
+            </button>
+          ))}
         </div>
 
         {/* Nav links */}
@@ -380,20 +487,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main */}
-      <main className="main-content" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', width: '100%' }}>
-        {/* Sticky Top Header Bar */}
-        <header style={{ 
+      <main className="main-content" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', width: '100%', background: 'var(--bg-base)' }}>
+        {/* Mobile Header (Hidden on Desktop via CSS) */}
+        <header className="mobile-only-header" style={{ 
           height: '60px', 
           borderBottom: '1px solid var(--border-subtle)', 
           background: 'var(--bg-surface)', 
-          display: 'flex',
           alignItems: 'center', 
           justifyContent: 'space-between', 
-          padding: '0 32px', 
+          padding: '0 20px', 
           flexShrink: 0,
           zIndex: 100 
         }}>
-          {/* Breadcrumb — with hamburger on mobile */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button
               id="mobile-sidebar-toggle"
@@ -405,130 +510,20 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Menu size={18} />
             </button>
             <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{workspace?.websiteName || user.name}</span>
-            <span style={{ color: 'var(--text-muted)' }}>/</span>
-            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', textTransform: 'capitalize' }}>
-              {pathname?.split('/')[1] ? pathname.split('/')[1].charAt(0).toUpperCase() + pathname.split('/')[1].slice(1) : 'Overview'}
-            </span>
           </div>
-
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center', position: 'relative' }}>
-            {/* Theme Toggle Button */}
+          
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <button
-              onClick={cycleTheme}
-              style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 8,
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--text-secondary)',
-                transition: 'background 0.2s',
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'none'}
-              title="Toggle Theme"
+              onClick={() => setShowDropdown(!showDropdown)}
+              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)' }}
             >
-              {theme === 'dark' ? <Moon size={18} /> : theme === 'color' ? <Palette size={18} /> : <Sun size={18} />}
+              <Bell size={20} />
             </button>
-
-            {/* Notification Bell Icon */}
-            <div style={{ position: 'relative' }}>
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 8,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--text-secondary)',
-                  transition: 'background 0.2s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-                onMouseLeave={e => e.currentTarget.style.background = 'none'}
-                title="Notifications"
-              >
-                <Bell size={18} />
-                {notifications.filter(n => !n.read).length > 0 && (
-                  <span style={{ 
-                    position: 'absolute', top: 0, right: 0, 
-                    background: 'var(--red)', color: 'white', 
-                    borderRadius: '999px', fontSize: '0.6rem', 
-                    fontWeight: 'bold', width: '15px', height: '15px',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                  }}>
-                    {notifications.filter(n => !n.read).length}
-                  </span>
-                )}
-              </button>
-
-              {/* Notifications Dropdown */}
-              {showDropdown && (
-                <div style={{ 
-                  position: 'absolute', 
-                  right: 0, 
-                  top: '100%', 
-                  marginTop: '12px',
-                  width: 320, 
-                  background: 'var(--bg-surface)', 
-                  border: '1px solid var(--border)', 
-                  borderRadius: 'var(--radius)', 
-                  boxShadow: 'var(--shadow-lg)', 
-                  overflow: 'hidden', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  zIndex: 1000 
-                }}>
-                  <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-hover)' }}>
-                    <span style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text-primary)' }}>Notifications</span>
-                    {notifications.some(n => !n.read) && (
-                      <button 
-                        onClick={markAllRead}
-                        style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
-                      >
-                        Mark all read
-                      </button>
-                    )}
-                  </div>
-                  <div style={{ maxHeight: 280, overflowY: 'auto' }}>
-                    {notifications.length === 0 ? (
-                      <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                        No notifications yet
-                      </div>
-                    ) : (
-                      notifications.map(n => (
-                        <div key={n.id} 
-                          onClick={() => handleNotifClick(n)}
-                          style={{ 
-                            padding: '12px 16px', 
-                            borderBottom: '1px solid var(--border-subtle)', 
-                            cursor: 'pointer',
-                            background: n.read ? 'transparent' : 'var(--accent-glow)',
-                            transition: 'background 0.2s'
-                          }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-                          onMouseLeave={e => e.currentTarget.style.background = n.read ? 'transparent' : 'var(--accent-glow)'}
-                        >
-                          <div style={{ fontWeight: 600, fontSize: '0.8rem', color: 'var(--text-primary)', marginBottom: 2 }}>{n.title}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.3 }}>{n.body}</div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </header>
 
         {/* Content Wrapper */}
-        <div style={{ flex: 1, overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: 1, overflowY: 'auto', position: 'relative', display: 'flex', flexDirection: 'column' }}>
           {children}
         </div>
       </main>
