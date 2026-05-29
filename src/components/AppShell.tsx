@@ -289,7 +289,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Theme Switcher in Sidebar */}
-        <div style={{ padding: '0 16px', marginBottom: '8px', display: 'flex', gap: '4px', background: 'var(--bg-hover)', borderRadius: '8px', margin: '0 16px 12px 16px', padding: '4px' }}>
+        <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-hover)', borderRadius: '8px', margin: '0 16px 12px 16px', padding: '4px' }}>
           {(['light', 'color', 'dark'] as Theme[]).map(t => (
             <button
               key={t}
