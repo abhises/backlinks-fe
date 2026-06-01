@@ -8,6 +8,7 @@ import {
   Bell, Menu, X, ArrowDownLeft, ArrowUpRight, Sparkles, MessageCircle, Check, User
 } from 'lucide-react';
 import { io } from 'socket.io-client';
+import GlobalSearch from './GlobalSearch';
 
 type NotificationItem = {
   id: string;
@@ -263,30 +264,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Search Bar */}
-        <div style={{ padding: '0 20px', marginBottom: '16px' }}>
-          <div style={{ position: 'relative' }}>
-            <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.8rem', opacity: 0.6 }}>🔍</span>
-            <input 
-              type="text" 
-              placeholder="Search..." 
-              value={searchQuery}
-              onChange={e => handleSearchChange(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '6px 12px 6px 30px',
-                borderRadius: '6px',
-                border: '1px solid var(--border)',
-                background: 'var(--bg-hover)',
-                color: 'var(--text-primary)',
-                fontSize: '0.8rem',
-                outline: 'none',
-                transition: 'border-color 0.15s'
-              }}
-              onFocus={e => e.currentTarget.style.borderColor = 'var(--accent)'}
-              onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
-            />
-          </div>
-        </div>
+        <GlobalSearch />
 
         {/* Theme Switcher in Sidebar */}
         <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-hover)', borderRadius: '8px', margin: '0 16px 12px 16px', padding: '4px' }}>
