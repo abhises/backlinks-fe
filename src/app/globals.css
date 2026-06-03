@@ -338,7 +338,7 @@ h4 { font-family: 'Poppins', sans-serif; font-size: 1.125rem; font-weight: 500; 
   border: 1px solid var(--border);
   color: var(--text-secondary); background: transparent;
 }
-.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chip:hover { border-color: var(--text-muted); color: var(--text-primary); background: var(--bg-hover); }
 .chip.active { background: #1a1a1a; border-color: #1a1a1a; color: #ffffff; font-weight: 600; }
 
 /* ─── CHAT PANEL ──────────────────────────────────────────────────────────── */
