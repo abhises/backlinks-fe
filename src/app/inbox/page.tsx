@@ -175,11 +175,9 @@ function InboxPageContent() {
     // 1. Tab Filter
     if (filter === 'new' && !isPending) return false;
     if (filter === 'in') {
-      if (isPending) return false;
       if (t.receiverWorkspace.id !== workspace?.id) return false;
     }
     if (filter === 'out') {
-      if (isPending) return false;
       if (t.giverWorkspace.id !== workspace?.id) return false;
     }
 
@@ -197,8 +195,8 @@ function InboxPageContent() {
   // Calculate dynamic thread counts for chips (before searching to keep chips stable)
   const countAll = threads.length;
   const countNew = threads.filter(t => t.stage === 'NEW' && t.status === 'PENDING').length;
-  const countIn = threads.filter(t => t.receiverWorkspace.id === workspace?.id && !(t.stage === 'NEW' && t.status === 'PENDING')).length;
-  const countOut = threads.filter(t => t.giverWorkspace.id === workspace?.id && !(t.stage === 'NEW' && t.status === 'PENDING')).length;
+  const countIn = threads.filter(t => t.receiverWorkspace.id === workspace?.id).length;
+  const countOut = threads.filter(t => t.giverWorkspace.id === workspace?.id).length;
 
   const filterOptions = [
     { key: 'all', label: `All ${countAll}` },
@@ -229,7 +227,7 @@ function InboxPageContent() {
       </div>
 
       {/* List */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 40px 8px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '0 0 40px 0' }}>
         {loading ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60 }}>
             <Loader2 size={28} className="animate-spin" style={{ color: 'var(--accent)' }} />
@@ -265,7 +263,7 @@ function InboxPageContent() {
                   style={{
                     position: 'relative',
                     borderLeft: isItemNewIncoming ? '4px solid #10b981' : '4px solid transparent',
-                    padding: '8px 24px',
+                    padding: '8px 32px',
                     borderBottom: '1px solid var(--border)',
                     display: 'flex',
                     alignItems: 'center',

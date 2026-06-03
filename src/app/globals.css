@@ -290,14 +290,13 @@ h4 { font-family: 'Poppins', sans-serif; font-size: 1.125rem; font-weight: 500; 
   display: flex; align-items: center; gap: 16px;
   padding: 16px 20px;
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
 }
-.thread-tile:hover { border-color: var(--accent); background: var(--bg-hover); }
-.thread-tile.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.thread-tile:hover { background: var(--bg-hover); }
+.thread-tile.selected { background: var(--bg-hover); }
 
 .domain-avatar {
   width: 42px; height: 42px;

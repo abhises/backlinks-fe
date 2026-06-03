@@ -74,8 +74,6 @@ const formatTimeAgo = (date: Date) => {
 
 const NAV = [
   { href: '/inbox', icon: Inbox, label: 'Inbox' },
-  { href: '/inbox?filter=in', icon: ArrowDownLeft, label: 'Backlinks In' },
-  { href: '/inbox?filter=out', icon: ArrowUpRight, label: 'Backlinks Out' },
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/settings', icon: Settings, label: 'Settings' },
   { href: '/how-it-works', icon: Sparkles, label: 'How it works' },
