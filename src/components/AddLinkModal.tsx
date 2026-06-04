@@ -203,14 +203,33 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
                   }}
                 >
                   {lt.label}
-                  <AlertCircle size={12} style={{ opacity: 0.5 }} />
                 </button>
               );
             })}
           </div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+          <button
+            type="button"
+            onClick={hasLink ? () => setIsEditing(false) : onClose}
+            style={{
+              background: 'transparent',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border)',
+              borderRadius: '6px',
+              padding: '8px 16px',
+              fontWeight: 600,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              transition: 'background 0.2s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+          >
+            Back to chat
+          </button>
+          
           {canEdit && (
             <button id="save-link-btn" type="submit"
               style={{

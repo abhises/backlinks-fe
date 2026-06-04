@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import { ExternalLink, Loader2, ArrowUpRight } from 'lucide-react';
@@ -17,6 +17,94 @@ type LinkRow = {
   receiverWorkspace: { id: string; domain: string };
   thread?: { id: string; stage: string };
 };
+
+const StatusDropdown = ({ linkId, currentStatus, onStatusChange }: { linkId: string; currentStatus: string; onStatusChange: (id: string, status: string) => void }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const getStatusStyles = (status: string) => {
+    if (status === 'LIVE') return { bg: '#ecfdf5', text: '#047857', border: '#a7f3d0', dot: '#10b981', label: 'Live' };
+    if (status === 'REMOVED') return { bg: '#fff1f2', text: '#be123c', border: '#fecdd3', dot: '#f43f5e', label: 'Removed' };
+    if (status === 'DEPARTED') return { bg: '#f5f5f4', text: '#78716c', border: '#e7e5e4', dot: '#a8a29e', label: 'Departed' };
+    return { bg: '#f5f5f4', text: '#78716c', border: '#e7e5e4', dot: '#a8a29e', label: 'Unknown' };
+  };
+
+  const sStyles = getStatusStyles(currentStatus);
+  const options = ['LIVE', 'REMOVED', 'DEPARTED'];
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative', display: 'inline-block' }}>
+      <button
+        onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen); }}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          background: sStyles.bg, border: `1px solid ${sStyles.border}`,
+          borderRadius: '6px', padding: '4px 8px', fontSize: '10.5px', fontWeight: 500, color: sStyles.text, 
+          transition: 'filter 0.15s ease', cursor: 'pointer', outline: 'none'
+        }}
+        onMouseEnter={e => e.currentTarget.style.filter = 'brightness(0.95)'}
+        onMouseLeave={e => e.currentTarget.style.filter = 'brightness(1)'}
+      >
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: sStyles.dot, display: 'inline-block', flexShrink: 0 }} />
+        <span>{sStyles.label}</span>
+        <svg style={{ marginLeft: 2 }} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div style={{
+          position: 'absolute', zIndex: 50, marginTop: 4, left: 0, width: 140,
+          backgroundColor: '#FFFFFF', border: '1px solid rgba(231, 229, 228, 0.8)',
+          borderRadius: 8, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
+          padding: '4px 0', display: 'flex', flexDirection: 'column'
+        }}>
+          {options.map(opt => {
+            const optStyle = getStatusStyles(opt);
+            const isSelected = opt === currentStatus;
+            return (
+              <button
+                key={opt}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onStatusChange(linkId, opt);
+                  setIsOpen(false);
+                }}
+                style={{
+                  width: '100%', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 8,
+                  fontSize: 12, textAlign: 'left', backgroundColor: isSelected ? '#F5F5F4' : 'transparent',
+                  fontWeight: isSelected ? 600 : 400, color: '#44403C', border: 'none', cursor: 'pointer',
+                  transition: 'background-color 0.15s'
+                }}
+                onMouseEnter={e => { if (!isSelected) e.currentTarget.style.backgroundColor = '#F5F5F4'; }}
+                onMouseLeave={e => { if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent'; }}
+              >
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: optStyle.dot, display: 'inline-block', flexShrink: 0 }} />
+                <span style={{ flex: 1 }}>{optStyle.label}</span>
+                {isSelected && (
+                  <svg style={{ color: '#A8A29E', flexShrink: 0 }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
 
 export default function LinksPage() {
   const { workspace } = useAuth();
@@ -231,7 +319,6 @@ export default function LinksPage() {
             <tbody>
               {filteredLinks.map(link => {
                 const isGiver = link.giverWorkspace.id === workspace?.id;
-                const statusDotColor = link.status === 'LIVE' ? '#22c55e' : link.status === 'REMOVED' ? '#ef4444' : '#374151';
                 return (
                   <tr key={link.id}
                     style={{ borderBottom: '1px solid var(--border)', transition: 'background 0.15s' }}
@@ -270,9 +357,11 @@ export default function LinksPage() {
                     <td style={{ padding: '14px 16px' }}>
                       {link.thread ? (
                         <Link href={`/inbox/${link.thread.id}`}
-                          style={{ color: 'var(--text-secondary)', display: 'inline-flex', flexDirection: 'column', textDecoration: 'none', fontSize: '0.8rem', lineHeight: 1.4 }}>
-                          <span>Partner</span>
-                          <span>Chat</span>
+                          style={{ color: '#3b82f6', textDecoration: 'none', fontSize: '0.825rem', fontWeight: 500, display: 'inline-flex' }}
+                          onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+                          onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}
+                        >
+                          Show Chat
                         </Link>
                       ) : (
                         <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>—</span>
@@ -284,34 +373,7 @@ export default function LinksPage() {
                       {updating === link.id ? (
                         <Loader2 size={14} className="animate-spin" style={{ color: 'var(--accent)' }} />
                       ) : (
-                        <div style={{ position: 'relative', display: 'inline-block' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6,
-                            background: 'var(--bg-surface)', border: '1px solid var(--border)',
-                            borderRadius: '6px', padding: '4px 8px', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                            <span style={{ width: 7, height: 7, borderRadius: '50%', background: statusDotColor, display: 'inline-block', flexShrink: 0 }} />
-                            <select
-                              id={`status-${link.id}`}
-                              value={link.status}
-                              onChange={e => handleStatusChange(link.id, e.target.value)}
-                              onClick={e => e.stopPropagation()}
-                              style={{
-                                appearance: 'none',
-                                background: 'transparent',
-                                border: 'none',
-                                fontSize: '0.78rem',
-                                fontWeight: 500,
-                                color: 'var(--text-secondary)',
-                                cursor: 'pointer',
-                                outline: 'none',
-                                paddingRight: 14
-                              }}>
-                              <option value="LIVE">Live</option>
-                              <option value="REMOVED">Removed</option>
-                              <option value="DEPARTED">Departed</option>
-                            </select>
-                            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', pointerEvents: 'none', marginLeft: -10 }}>⌄</span>
-                          </div>
-                        </div>
+                        <StatusDropdown linkId={link.id} currentStatus={link.status} onStatusChange={handleStatusChange} />
                       )}
                     </td>
                   </tr>

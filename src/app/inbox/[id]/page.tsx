@@ -217,7 +217,7 @@ export default function ThreadPage() {
         <div style={{ flex:1, display: 'flex', flexDirection: 'column', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontWeight:700, fontSize:'1.05rem', color: 'var(--text-primary)' }}>{theirDomain}</span>
-            <span style={{ fontSize:'0.9rem', color:'var(--text-secondary)' }}>· {getContactName(theirDomain)} 🇺🇸</span>
+            <span style={{ fontSize:'0.9rem', color:'var(--text-secondary)' }}>· {getContactName(theirDomain)}</span>
           </div>
           <span style={{ fontSize:'0.85rem', color:'var(--text-secondary)', fontStyle:'italic' }}>
             {(isGiver ? thread.receiverWorkspace : thread.giverWorkspace).description || 'Async-first work tools and a weekly publication on distributed teams.'}
