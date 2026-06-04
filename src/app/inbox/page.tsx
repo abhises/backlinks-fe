@@ -109,7 +109,7 @@ function InboxPageContent() {
     setLoading(true);
     try {
       const res = await api.get(`/api/threads?filter=all`);
-      setThreads(res.data.threads);
+      setThreads(res.data.threads.filter((t: Thread) => t.stage !== 'PLACED'));
     } catch { } finally { setLoading(false); }
   }, []);
 
@@ -170,10 +170,14 @@ function InboxPageContent() {
 
   // Filter threads based on search query and active tab filter
   const filteredThreads = threads.filter(t => {
+    const incoming = t.receiverWorkspace.id === workspace?.id;
     const isPending = t.stage === 'NEW' && t.status === 'PENDING';
+    const actionRequired = isPending && ((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted));
     
     // 1. Tab Filter
-    if (filter === 'new' && !isPending) return false;
+    if (filter === 'new' && !actionRequired) return false;
+    if (filter !== 'new' && actionRequired) return false;
+    
     if (filter === 'in') {
       if (t.receiverWorkspace.id !== workspace?.id) return false;
     }
@@ -193,10 +197,15 @@ function InboxPageContent() {
   });
 
   // Calculate dynamic thread counts for chips (before searching to keep chips stable)
-  const countAll = threads.length;
-  const countNew = threads.filter(t => t.stage === 'NEW' && t.status === 'PENDING').length;
-  const countIn = threads.filter(t => t.receiverWorkspace.id === workspace?.id).length;
-  const countOut = threads.filter(t => t.giverWorkspace.id === workspace?.id).length;
+  const checkNeedsAction = (t: Thread) => {
+    const incoming = t.receiverWorkspace.id === workspace?.id;
+    const pending = t.stage === 'NEW' && t.status === 'PENDING';
+    return pending && ((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted));
+  };
+  const countAll = threads.filter(t => !checkNeedsAction(t)).length;
+  const countNew = threads.filter(t => checkNeedsAction(t)).length;
+  const countIn = threads.filter(t => t.receiverWorkspace.id === workspace?.id && !checkNeedsAction(t)).length;
+  const countOut = threads.filter(t => t.giverWorkspace.id === workspace?.id && !checkNeedsAction(t)).length;
 
   const filterOptions = [
     { key: 'all', label: `All ${countAll}` },
@@ -252,7 +261,7 @@ function InboxPageContent() {
               const pending = isNew(t);
               const isRejecting = rejectId === t.id;
               
-              const isItemNewIncoming = pending && incoming && !t.receiverAccepted;
+              const needsAction = pending && ((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted));
               const avatarStyle = getAvatarColor(other.domain);
               const contactName = getContactName(other.domain);
 
@@ -262,7 +271,7 @@ function InboxPageContent() {
                   className="thread-tile"
                   style={{
                     position: 'relative',
-                    borderLeft: isItemNewIncoming ? '4px solid #10b981' : '4px solid transparent',
+                    borderLeft: needsAction ? '4px solid #10b981' : '4px solid transparent',
                     padding: '8px 32px',
                     borderBottom: '1px solid var(--border)',
                     display: 'flex',
@@ -324,7 +333,7 @@ function InboxPageContent() {
                       )}
 
                       {/* NEW state badge */}
-                      {isItemNewIncoming && (
+                      {needsAction && (
                         <span style={{ 
                           fontSize: '0.7rem', 
                           fontWeight: 700, 

@@ -75,7 +75,6 @@ const formatTimeAgo = (date: Date) => {
 const NAV = [
   { href: '/inbox', icon: Inbox, label: 'Inbox' },
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/settings', icon: Settings, label: 'Settings' },
   { href: '/how-it-works', icon: Sparkles, label: 'How it works' },
 ];
 
@@ -309,18 +308,40 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         <div style={{ flex: 1 }} />
 
 
+
+        {/* Profile / Settings Card */}
+        <div 
+          style={{ margin: '0 8px 8px 8px', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', transition: 'background 0.2s' }} 
+          onClick={() => router.push('/settings')} 
+          onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'} 
+          onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-surface)'}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', overflow: 'hidden' }}>
+            <div style={{ width: 36, height: 36, background: '#E0E7FF', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#312E81', fontWeight: 700, fontSize: '0.9rem', flexShrink: 0 }}>
+              {(workspace?.domain || user.name).substring(0, 2).toUpperCase()}
+            </div>
+            <div style={{ minWidth: 0, overflow: 'hidden' }}>
+              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{workspace?.domain || user.name}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <Settings size={12} /> Settings · {user.name.split(' ')[0]}
+              </div>
+            </div>
+          </div>
+          <ArrowUpRight size={16} color="var(--text-muted)" style={{ flexShrink: 0, marginLeft: 8 }} />
+        </div>
+
         {/* Sign Out Button */}
-        <div style={{ padding: '0 20px 20px 20px' }}>
+        <div style={{ padding: '0 8px 20px 8px' }}>
           <button 
             onClick={logout} 
             className="nav-item" 
             style={{ 
               color: 'var(--red)', 
               background: 'none', 
-              border: '1px solid rgba(239, 68, 68, 0.2)', 
+              border: '2px solid rgba(239, 68, 68, 0.2)', 
               borderRadius: '6px',
               width: '100%',
-              margin: '8px 0 0 0',
+              margin: '0',
               padding: '8px 16px',
               fontFamily: 'inherit',
               fontSize: '0.8rem',
@@ -405,28 +426,31 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        <button
-          onClick={() => { setSidebarOpen(false); logout(); }}
-          className="nav-item"
-          style={{
-            color: 'var(--red)', background: 'none',
-            border: '1px solid rgba(239, 68, 68, 0.25)',
-            fontFamily: 'inherit', fontSize: 'inherit', fontWeight: 'inherit',
-            textAlign: 'left', cursor: 'pointer', marginTop: 8,
-            transition: 'background 0.15s ease, border-color 0.15s ease'
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239, 68, 68, 0.12)';
-            (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239, 68, 68, 0.6)';
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = 'none';
-            (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239, 68, 68, 0.25)';
-          }}
-        >
-          <LogOut size={18} />
-          Sign Out
-        </button>
+        <div style={{ padding: '0 8px 16px 8px' }}>
+          <button
+            onClick={() => { setSidebarOpen(false); logout(); }}
+            className="nav-item"
+            style={{
+              color: 'var(--red)', background: 'none',
+              border: '2px solid rgba(239, 68, 68, 0.25)',
+              borderRadius: '6px',
+              fontFamily: 'inherit', fontSize: 'inherit', fontWeight: 'inherit',
+              textAlign: 'left', cursor: 'pointer', margin: 0, width: '100%',
+              transition: 'background 0.15s ease, border-color 0.15s ease'
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239, 68, 68, 0.12)';
+              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239, 68, 68, 0.6)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'none';
+              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239, 68, 68, 0.25)';
+            }}
+          >
+            <LogOut size={18} />
+            Sign Out
+          </button>
+        </div>
       </aside>
 
       {/* Main */}
