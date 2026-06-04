@@ -106,7 +106,7 @@ export default function AdminUsers() {
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: '100%', position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--bg-base)', position: 'relative' }}>
       {/* Toast Notification */}
       {toastMessage && (
         <div style={{
@@ -114,7 +114,7 @@ export default function AdminUsers() {
           top: 80,
           right: 40,
           zIndex: 9999,
-          background: toastMessage.type === 'success' ? 'var(--green)' : 'var(--red)',
+          background: toastMessage.type === 'success' ? '#1a1a1a' : 'var(--red)',
           color: 'white',
           padding: '12px 24px',
           borderRadius: 'var(--radius)',
@@ -170,10 +170,10 @@ export default function AdminUsers() {
         </div>
       )}
 
-      <div className="page-header" style={{ padding: 0, border: 'none', marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="page-header-left">
-          <h1 className="page-title">Users</h1>
-          <p className="page-sub">View and manage platform users.</p>
+      <div style={{ padding: '28px 32px 0 32px', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '2rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>Users</h1>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '6px 0 0 0' }}>View and manage platform users.</p>
         </div>
         <div style={{ position: 'relative' }}>
           <Search size={18} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
@@ -191,7 +191,7 @@ export default function AdminUsers() {
         </div>
       </div>
 
-      <div className="card" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, width: '100%', overflow: 'hidden' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '0 32px 40px 32px' }}>
         {error && (
           <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 8, padding: '12px 16px', marginBottom: 24, fontSize: '0.875rem', color: 'var(--red)' }}>
             {error}
@@ -212,14 +212,21 @@ export default function AdminUsers() {
         ) : (
           <div style={{ flex: 1, overflow: 'auto' }}>
             <table style={{ width: '100%', minWidth: '900px', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead style={{ position: 'sticky', top: 0, background: 'var(--bg-card)', zIndex: 10, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-                <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-secondary)' }}>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Name</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Email</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Role</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Workspace</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Joined</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem', textAlign: 'right' }}>Actions</th>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  {['NAME', 'EMAIL', 'ROLE', 'WORKSPACE', 'JOINED', 'ACTIONS'].map(h => (
+                    <th key={h} style={{
+                      padding: '12px 16px',
+                      textAlign: h === 'ACTIONS' ? 'right' : 'left',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.06em',
+                      color: 'var(--text-muted)',
+                      background: 'var(--bg-base)',
+                      borderBottom: '1px solid var(--border)',
+                      whiteSpace: 'nowrap'
+                    }}>{h}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -272,10 +279,10 @@ export default function AdminUsers() {
                         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                           {isEditing ? (
                             <>
-                              <button onClick={() => handleSave(u.id)} disabled={saving} className="btn btn-primary btn-icon" style={{ width: 32, height: 32, padding: 0 }} title="Save">
+                              <button onClick={() => handleSave(u.id)} disabled={saving} style={{ width: 32, height: 32, padding: 0, background: '#1a1a1a', color: 'white', border: 'none', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} title="Save">
                                 {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                               </button>
-                              <button onClick={() => setEditingId(null)} className="btn btn-secondary btn-icon" style={{ width: 32, height: 32, padding: 0 }} title="Cancel">
+                              <button onClick={() => setEditingId(null)} className="btn btn-secondary btn-icon" style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Cancel">
                                 <X size={14} />
                               </button>
                             </>
@@ -284,7 +291,7 @@ export default function AdminUsers() {
                               <button 
                                 onClick={() => handleEditClick(u)} 
                                 className="btn btn-secondary btn-icon" 
-                                style={{ width: 32, height: 32, padding: 0, opacity: isAdmin ? 0.3 : 1, cursor: isAdmin ? 'not-allowed' : 'pointer' }} 
+                                style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: isAdmin ? 0.3 : 1, cursor: isAdmin ? 'not-allowed' : 'pointer' }} 
                                 disabled={isAdmin}
                                 title={isAdmin ? "Cannot edit an Admin" : "Edit"}
                               >
@@ -293,7 +300,7 @@ export default function AdminUsers() {
                               <button 
                                 onClick={() => !isAdmin && setDeleteModalId(u.id)} 
                                 className="btn btn-ghost btn-icon" 
-                                style={{ width: 32, height: 32, padding: 0, color: 'var(--red)', opacity: isAdmin ? 0.3 : 1, cursor: isAdmin ? 'not-allowed' : 'pointer' }} 
+                                style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--red)', opacity: isAdmin ? 0.3 : 1, cursor: isAdmin ? 'not-allowed' : 'pointer' }} 
                                 disabled={isAdmin}
                                 title={isAdmin ? "Cannot delete an Admin" : "Delete"}
                               >
@@ -311,8 +318,8 @@ export default function AdminUsers() {
           </div>
         )}
         {!loading && filteredUsers.length > 0 && (
-          <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-surface)' }}>
-            <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+          <div style={{ padding: '24px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)' }}>
               Showing {(currentPage - 1) * rowsPerPage + 1} to {Math.min(currentPage * rowsPerPage, filteredUsers.length)} of {filteredUsers.length} users
             </span>
             <div style={{ display: 'flex', gap: 8 }}>

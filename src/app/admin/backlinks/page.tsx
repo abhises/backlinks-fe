@@ -96,7 +96,7 @@ export default function AdminBacklinks() {
   };
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: '100%', position: 'relative' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--bg-base)', position: 'relative' }}>
       {/* Toast Notification */}
       {toastMessage && (
         <div style={{
@@ -160,14 +160,14 @@ export default function AdminBacklinks() {
         </div>
       )}
 
-      <div className="page-header" style={{ padding: 0, border: 'none', marginBottom: 32 }}>
-        <div className="page-header-left">
-          <h1 className="page-title">Backlinks</h1>
-          <p className="page-sub">View and manage all platform link placements.</p>
+      <div style={{ padding: '28px 32px 0 32px', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '2rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>Backlinks</h1>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '6px 0 0 0' }}>View and manage all platform link placements.</p>
         </div>
       </div>
 
-      <div className="card" style={{ padding: 32, width: '100%', overflowX: 'auto' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '0 32px 40px 32px' }}>
         {error && (
           <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 8, padding: '12px 16px', marginBottom: 24, fontSize: '0.875rem', color: 'var(--red)' }}>
             {error}
@@ -187,16 +187,20 @@ export default function AdminBacklinks() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', minWidth: '1200px', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-secondary)' }}>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Source Domain</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Target Domain</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Source URL</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Target URL</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Anchor Text</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Type</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Status</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem' }}>Date Placed</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '0.875rem', textAlign: 'right' }}>Actions</th>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  {['SOURCE DOMAIN', 'TARGET DOMAIN', 'SOURCE URL', 'TARGET URL', 'ANCHOR TEXT', 'TYPE', 'STATUS', 'DATE PLACED', 'ACTIONS'].map(h => (
+                    <th key={h} style={{
+                      padding: '12px 16px',
+                      textAlign: h === 'ACTIONS' ? 'right' : 'left',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.06em',
+                      color: 'var(--text-muted)',
+                      background: 'var(--bg-base)',
+                      borderBottom: '1px solid var(--border)',
+                      whiteSpace: 'nowrap'
+                    }}>{h}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -275,19 +279,19 @@ export default function AdminBacklinks() {
                         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                           {isEditing ? (
                             <>
-                              <button onClick={() => handleSave(link.id)} disabled={saving} className="btn btn-primary btn-icon" style={{ width: 32, height: 32, padding: 0 }} title="Save">
+                              <button onClick={() => handleSave(link.id)} disabled={saving} style={{ width: 32, height: 32, padding: 0, background: '#1a1a1a', color: 'white', border: 'none', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} title="Save">
                                 {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                               </button>
-                              <button onClick={() => setEditingId(null)} className="btn btn-secondary btn-icon" style={{ width: 32, height: 32, padding: 0 }} title="Cancel">
+                              <button onClick={() => setEditingId(null)} className="btn btn-secondary btn-icon" style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Cancel">
                                 <X size={14} />
                               </button>
                             </>
                           ) : (
                             <>
-                              <button onClick={() => handleEditClick(link)} className="btn btn-secondary btn-icon" style={{ width: 32, height: 32, padding: 0 }} title="Edit">
+                              <button onClick={() => handleEditClick(link)} className="btn btn-secondary btn-icon" style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit">
                                 <Edit2 size={14} />
                               </button>
-                              <button onClick={() => setDeleteModalId(link.id)} className="btn btn-ghost btn-icon" style={{ width: 32, height: 32, padding: 0, color: 'var(--red)' }} title="Delete">
+                              <button onClick={() => setDeleteModalId(link.id)} className="btn btn-ghost btn-icon" style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--red)' }} title="Delete">
                                 <Trash2 size={14} />
                               </button>
                             </>

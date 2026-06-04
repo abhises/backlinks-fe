@@ -60,7 +60,7 @@ export default function AdminNotifications() {
   };
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 800, height: '100%', overflowY: 'auto' }}>
+    <div style={{ padding: '32px 40px', maxWidth: 1400, margin: '0 auto', height: '100%', overflowY: 'auto' }}>
       <div className="page-header" style={{ padding: 0, border: 'none', marginBottom: 32 }}>
         <div className="page-header-left">
           <h1 className="page-title">Broadcast Notification</h1>
@@ -68,7 +68,8 @@ export default function AdminNotifications() {
         </div>
       </div>
 
-      <div className="card" style={{ padding: 32, marginBottom: 32 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'stretch' }}>
+        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', height: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
           <div style={{ width: 40, height: 40, background: 'rgba(59, 130, 246, 0.15)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Bell size={20} color="var(--blue)" />
@@ -119,8 +120,21 @@ export default function AdminNotifications() {
 
           <button 
             type="submit" 
-            className="btn btn-primary" 
-            style={{ alignSelf: 'flex-start', padding: '12px 32px', fontSize: '0.9375rem' }} 
+            style={{ 
+              alignSelf: 'flex-start', 
+              padding: '12px 32px', 
+              fontSize: '0.9375rem',
+              background: '#1a1a1a',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              cursor: (loading || !title || !description) ? 'not-allowed' : 'pointer',
+              opacity: (loading || !title || !description) ? 0.7 : 1,
+              fontWeight: 600
+            }} 
             disabled={loading || !title || !description}
           >
             {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
@@ -129,7 +143,7 @@ export default function AdminNotifications() {
         </form>
       </div>
 
-      <div className="card" style={{ padding: 32 }}>
+      <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', height: '100%' }}>
         <h2 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: 24 }}>Broadcast History</h2>
         
         {loadingHistory ? (
@@ -159,6 +173,7 @@ export default function AdminNotifications() {
             ))}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

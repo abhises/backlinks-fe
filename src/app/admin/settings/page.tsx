@@ -136,7 +136,15 @@ export default function AdminSettings() {
             </div>
 
             <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
-              <button type="submit" className="btn btn-primary" disabled={saving}>
+              <button type="submit" 
+                style={{ 
+                  background: '#1a1a1a', color: '#ffffff', border: 'none', 
+                  borderRadius: '6px', padding: '10px 16px', fontWeight: 600, fontSize: '0.875rem',
+                  display: 'flex', alignItems: 'center', gap: 8, 
+                  cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 
+                }} 
+                disabled={saving}
+              >
                 {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                 {saving ? 'Saving...' : 'Save Configuration'}
               </button>
@@ -174,7 +182,12 @@ export default function AdminSettings() {
               </button>
               <button 
                 onClick={confirmTrigger} 
-                className="btn btn-primary"
+                style={{ 
+                  background: '#1a1a1a', color: '#ffffff', border: 'none', 
+                  borderRadius: '6px', padding: '8px 16px', fontWeight: 600, fontSize: '0.875rem',
+                  display: 'flex', alignItems: 'center', gap: 8, 
+                  cursor: triggering ? 'not-allowed' : 'pointer', opacity: triggering ? 0.7 : 1 
+                }}
                 disabled={triggering}
               >
                 {triggering ? <Loader2 size={16} className="animate-spin" /> : <Settings2 size={16} />}
