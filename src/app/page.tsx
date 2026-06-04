@@ -107,7 +107,7 @@ export default function Home() {
           margin: '0 auto', 
           padding: '0 24px', 
           display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
           gap: '40px',
           alignItems: 'center' 
         }}>
@@ -184,7 +184,7 @@ export default function Home() {
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <h2 style={{ textAlign: 'center', marginBottom: '60px', color: 'var(--text-primary)' }}>How it works</h2>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px' }}>
             {[
               { title: 'Sign up to SERPsupport', icon: <Users size={32} /> },
               { title: 'Login and add your website', icon: <Globe size={32} /> },

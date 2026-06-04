@@ -615,7 +615,7 @@ h4 { font-family: 'Poppins', sans-serif; font-size: 1.125rem; font-weight: 500; 
 
 /* ─── LANDING PAGE MOBILE ─────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .landing-nav-links { display: none; }
+  .landing-nav-links { display: none !important; }
   .landing-nav-mobile { display: flex !important; }
   .landing-mobile-menu {
     position: fixed;
