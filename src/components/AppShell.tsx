@@ -91,6 +91,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeToast, setActiveToast] = useState<{ id: string, title: string, body: string } | null>(null);
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
@@ -170,6 +171,13 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
       if (['new_thread', 'new_connection', 'connection_accepted', 'connection_rejected', 'link_placed'].includes(data.type)) {
         window.dispatchEvent(new Event('refresh_inbox'));
       }
+
+      // Show toast
+      const toastId = Math.random().toString();
+      setActiveToast({ id: toastId, title, body });
+      setTimeout(() => {
+        setActiveToast(prev => prev?.id === toastId ? null : prev);
+      }, 5000);
     });
 
     return () => {
@@ -577,6 +585,40 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           </>
+        )}
+
+        {/* Global Toast Notification */}
+        {activeToast && (
+          <div style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border)',
+            boxShadow: '0 10px 40px -10px rgba(0,0,0,0.3)',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            zIndex: 9999,
+            width: '320px',
+            animation: 'slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}>
+            <style>{`
+              @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+              }
+            `}</style>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{activeToast.title}</div>
+              <button onClick={() => setActiveToast(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 0 }}>
+                <X size={16} />
+              </button>
+            </div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>{activeToast.body}</div>
+          </div>
         )}
       </main>
     </div>

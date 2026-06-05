@@ -311,23 +311,25 @@ export default function ThreadPage() {
         </div>
 
         {/* Action Button */}
-        <button id={hasLink ? 'view-link-btn' : 'add-link-btn'} onClick={() => setShowLinkModal(true)}
-          style={{
-            background: '#a855f7',
-            color: '#ffffff',
-            border: 'none',
-            borderRadius: '6px',
-            padding: '8px 16px',
-            fontWeight: 600,
-            fontSize: '0.85rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            cursor: 'pointer'
-          }}>
-          <Link2 size={16} />
-          {hasLink ? 'Link details' : 'Add link details'}
-        </button>
+        {(isGiver || hasLink) && (
+          <button id={hasLink ? 'view-link-btn' : 'add-link-btn'} onClick={() => setShowLinkModal(true)}
+            style={{
+              background: '#a855f7',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '8px 16px',
+              fontWeight: 600,
+              fontSize: '0.85rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              cursor: 'pointer'
+            }}>
+            <Link2 size={16} />
+            {hasLink ? 'Link details' : 'Add link details'}
+          </button>
+        )}
       </div>
 
       {/* Messages */}
