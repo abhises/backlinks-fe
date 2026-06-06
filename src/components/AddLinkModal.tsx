@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { X, Link2, Loader2, AlertCircle, ExternalLink, Pencil, Trash2 } from 'lucide-react';
+import { X, Link2, Loader2, AlertCircle, ExternalLink, Pencil, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import api from '@/lib/api';
 
 type Thread = {
@@ -90,12 +90,29 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
         {/* Summary rows */}
         <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
           {[
-            { label: 'FROM', value: lp.sourceUrl, isUrl: true },
-            { label: 'TO',   value: lp.targetUrl, isUrl: true },
+            { 
+              label: 'FROM', value: lp.sourceUrl, isUrl: true, 
+              tag: (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.6rem', padding: '2px 6px', color: '#a855f7', background: '#f3e8ff', borderRadius: '4px', fontWeight: 700 }}>
+                  <ArrowUpRight size={10} /> BACKLINK OUT
+                </div>
+              )
+            },
+            { 
+              label: 'TO',   value: lp.targetUrl, isUrl: true, 
+              tag: (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.6rem', padding: '2px 6px', color: '#0284c7', background: '#e0f2fe', borderRadius: '4px', fontWeight: 700 }}>
+                  <ArrowDownLeft size={10} /> BACKLINK IN
+                </div>
+              )
+            },
             { label: 'ANCHOR', value: `"${lp.anchorText}"`, isUrl: false },
-          ].map(({ label, value, isUrl }) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
-              <span style={{ minWidth: 60, fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em', paddingTop: 2 }}>{label}</span>
+          ].map(({ label, value, isUrl, tag }: any) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ minWidth: 120, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em', paddingTop: 2 }}>{label}</span>
+                {tag}
+              </div>
               {isUrl ? (
                 <a href={value} target="_blank" rel="noopener noreferrer"
                   style={{ fontSize: '0.875rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 4, textDecoration: 'none', wordBreak: 'break-all' }}>
@@ -108,7 +125,9 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
             </div>
           ))}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <span style={{ minWidth: 60, fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em' }}>TYPE</span>
+            <div style={{ minWidth: 120 }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em' }}>TYPE</span>
+            </div>
             <span style={{
               fontSize: '0.78rem', fontWeight: 600,
               background: '#e0f2fe', color: '#0284c7',
@@ -146,8 +165,11 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
 
       <form onSubmit={handleSave} style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 20 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
-            FROM URL <span style={{ textTransform: 'none', fontWeight: 500 }}>(on {sourceDomain})</span>
+          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
+            <span>FROM URL <span style={{ textTransform: 'none', fontWeight: 500 }}>(on {sourceDomain})</span></span>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.65rem', padding: '2px 8px', color: '#a855f7', background: '#f3e8ff', borderRadius: '4px', fontWeight: 700 }}>
+              <ArrowUpRight size={12} /> BACKLINK OUT
+            </div>
           </label>
           <input id="link-source" type="url" value={sourceUrl} onChange={e => setSourceUrl(e.target.value)}
             style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-base)', fontSize: '0.875rem', outline: 'none', color: 'var(--text-primary)' }}
@@ -156,8 +178,11 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
-            TO URL <span style={{ textTransform: 'none', fontWeight: 500 }}>(on {targetDomain})</span>
+          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
+            <span>TO URL <span style={{ textTransform: 'none', fontWeight: 500 }}>(on {targetDomain})</span></span>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.65rem', padding: '2px 8px', color: '#0284c7', background: '#e0f2fe', borderRadius: '4px', fontWeight: 700 }}>
+              <ArrowDownLeft size={12} /> BACKLINK IN
+            </div>
           </label>
           <input id="link-target" type="url" value={targetUrl} onChange={e => setTargetUrl(e.target.value)}
             style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-base)', fontSize: '0.875rem', outline: 'none', color: 'var(--text-primary)' }}

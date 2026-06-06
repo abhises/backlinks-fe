@@ -5,7 +5,7 @@ import api from '@/lib/api';
 import { 
   Globe, User, Users, Gift, Bell, CreditCard, 
   HelpCircle, AlertTriangle, Check, Copy, UserPlus, 
-  Mail, Shield, ArrowRight, HelpCircle as HelpIcon, Plus, Loader2
+  Mail, Shield, ArrowRight, HelpCircle as HelpIcon, Plus, Loader2, Sun, Moon
 } from 'lucide-react';
 
 type TeamMember = {
@@ -80,6 +80,21 @@ export default function SettingsPage() {
   const [team, setTeam] = useState<TeamMember[]>(INITIAL_TEAM);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<'EDITOR' | 'VIEWER'>('EDITOR');
+
+  // Theme state
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+
+  useEffect(() => {
+    let saved = localStorage.getItem('bl_theme');
+    if (saved === 'color') saved = 'dark';
+    setTheme((saved as 'light' | 'dark') || 'dark');
+  }, []);
+
+  const changeTheme = (t: 'light' | 'dark') => {
+    setTheme(t);
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('bl_theme', t);
+  };
 
   // Referral state
   const [referralLink] = useState('https://app.serpsupport.com/register?ref=jane778');
@@ -160,15 +175,23 @@ export default function SettingsPage() {
       {/* Settings Sections Area */}
       <div className="settings-content">
         <style>{`
-          .settings-content .btn {
+          .settings-content .btn:not(.btn-outline) {
             background: #1a1a1a !important;
             color: #fff !important;
             border: 1px solid #1a1a1a !important;
             box-shadow: none !important;
           }
-          .settings-content .btn:hover {
+          .settings-content .btn:not(.btn-outline):hover {
             background: #000 !important;
             border-color: #000 !important;
+          }
+          .settings-content .btn-outline {
+            background: transparent !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border) !important;
+          }
+          .settings-content .btn-outline:hover {
+            background: var(--bg-hover) !important;
           }
         `}</style>
         
@@ -246,6 +269,27 @@ export default function SettingsPage() {
               <label className="input-label">Email Address</label>
               <input type="email" value={accountEmail} onChange={e => setAccountEmail(e.target.value)} className="input-field" placeholder="email@example.com" />
             </div>
+
+            <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20, marginTop: 10 }}>
+              <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 12 }}>Appearance</h3>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <button
+                  onClick={() => changeTheme('light')}
+                  className={`btn ${theme === 'light' ? 'btn-outline' : 'btn-primary'}`}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 40 }}
+                >
+                  <Sun size={16} /> Light Mode
+                </button>
+                <button
+                  onClick={() => changeTheme('dark')}
+                  className={`btn ${theme === 'dark' ? 'btn-outline' : 'btn-primary'}`}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 40 }}
+                >
+                  <Moon size={16} /> Dark Mode
+                </button>
+              </div>
+            </div>
+
             <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20, marginTop: 10 }}>
               <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 12 }}>Change Password</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

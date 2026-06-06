@@ -4,25 +4,25 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
 import Link from 'next/link';
-import { Link2, Mail, Lock, User, ArrowRight, Loader2, Sun, Moon, Palette } from 'lucide-react';
+import { Link2, Mail, Lock, User, ArrowRight, Loader2, Sun, Moon } from 'lucide-react';
 
 export default function AuthPage() {
-  const [theme, setTheme] = useState<'dark' | 'light' | 'color'>('dark');
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
-    const saved = (localStorage.getItem('bl_theme') as 'dark' | 'light' | 'color') || 'dark';
+    const saved = (localStorage.getItem('bl_theme') as 'light' | 'dark') || 'dark';
     setTheme(saved);
     document.documentElement.setAttribute('data-theme', saved);
   }, []);
 
   const cycleTheme = () => {
-    const next = theme === 'dark' ? 'light' : theme === 'light' ? 'color' : 'dark';
+    const next = theme === 'dark' ? 'light' : 'dark';
     setTheme(next);
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('bl_theme', next);
   };
 
-  const ThemeIcon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Palette;
+  const ThemeIcon = theme === 'dark' ? Moon : Sun;
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [name, setName] = useState('');

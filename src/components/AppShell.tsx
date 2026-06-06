@@ -78,7 +78,7 @@ const NAV = [
   { href: '/how-it-works', icon: Sparkles, label: 'How it works' },
 ];
 
-const THEMES = ['dark', 'light', 'color'] as const;
+const THEMES = ['dark', 'light'] as const;
 type Theme = typeof THEMES[number];
 
 function AppShellContent({ children }: { children: React.ReactNode }) {
@@ -222,8 +222,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
   const cycleTheme = () => {
     const nextTheme: Record<Theme, Theme> = {
-      light: 'color',
-      color: 'dark',
+      light: 'dark',
       dark: 'light',
     };
     changeTheme(nextTheme[theme]);
@@ -271,35 +270,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         {/* Search Bar */}
         <GlobalSearch />
 
-        {/* Theme Switcher in Sidebar */}
-        <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-hover)', borderRadius: '8px', margin: '0 16px 12px 16px', padding: '4px' }}>
-          {(['light', 'color', 'dark'] as Theme[]).map(t => (
-            <button
-              key={t}
-              onClick={() => changeTheme(t)}
-              style={{
-                flex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '5px',
-                padding: '5px 4px',
-                borderRadius: '6px',
-                border: 'none',
-                background: theme === t ? 'var(--bg-surface)' : 'transparent',
-                color: theme === t ? 'var(--text-primary)' : 'var(--text-muted)',
-                fontSize: '0.72rem',
-                fontWeight: theme === t ? 600 : 400,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                boxShadow: theme === t ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-              }}
-            >
-              {t === 'light' ? <Sun size={12} /> : t === 'color' ? <Palette size={12} /> : <Moon size={12} />}
-              <span style={{ textTransform: 'capitalize' }}>{t}</span>
-            </button>
-          ))}
-        </div>
+
 
         {/* Nav links */}
         {NAV.map(({ href, icon: Icon, label }) => {

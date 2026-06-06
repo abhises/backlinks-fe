@@ -19,30 +19,12 @@ type Message = {
 };
 type Thread = {
   id: string; stage: string; status: string;
-  giverWorkspace: { id: string; domain: string; websiteName: string; description?: string };
-  receiverWorkspace: { id: string; domain: string; websiteName: string; description?: string };
+  giverWorkspace: { id: string; domain: string; websiteName: string; description?: string; teamMembers?: { user: { name: string } }[] };
+  receiverWorkspace: { id: string; domain: string; websiteName: string; description?: string; teamMembers?: { user: { name: string } }[] };
   messages: Message[];
   linkPlacement: any;
 };
 
-const CONTACT_NAMES: Record<string, string> = {
-  'fernway.io': 'Mira',
-  'ledgerpost.com': 'Devon',
-  'byteweekly.dev': 'Lukas',
-  'petalpress.co': 'Noor',
-  'hikersguide.no': 'Ingrid',
-  'northlight.studio': 'Mira',
-  'kettle-and-bean.com': 'Owen',
-};
-
-const getContactName = (domain: string) => {
-  const normalized = domain.toLowerCase().trim();
-  if (CONTACT_NAMES[normalized]) return CONTACT_NAMES[normalized];
-  const names = ['Devon', 'Lukas', 'Noor', 'Ingrid', 'Mira', 'Owen', 'Devin', 'Sofia', 'Alex', 'Liam'];
-  let sum = 0;
-  for (let i = 0; i < normalized.length; i++) sum += normalized.charCodeAt(i);
-  return names[sum % names.length];
-};
 
 const playNotificationSound = () => {
   try {
@@ -94,6 +76,13 @@ const getAvatarColor = (domain: string) => {
   const cleanDomain = domain.toLowerCase().trim();
   for (let i = 0; i < cleanDomain.length; i++) sum += cleanDomain.charCodeAt(i);
   return colors[sum % colors.length];
+};
+
+const getOwnerName = (workspace: any) => {
+  if (workspace?.teamMembers && workspace.teamMembers.length > 0) {
+    return workspace.teamMembers[0].user.name;
+  }
+  return 'User';
 };
 
 export default function ThreadPage() {
@@ -217,7 +206,7 @@ export default function ThreadPage() {
         <div style={{ flex:1, display: 'flex', flexDirection: 'column', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontWeight:700, fontSize:'1.05rem', color: 'var(--text-primary)' }}>{theirDomain}</span>
-            <span style={{ fontSize:'0.9rem', color:'var(--text-secondary)' }}>· {getContactName(theirDomain)}</span>
+            <span style={{ fontSize:'0.9rem', color:'var(--text-secondary)' }}>· {getOwnerName(isGiver ? thread.receiverWorkspace : thread.giverWorkspace)}</span>
           </div>
           <span style={{ fontSize:'0.85rem', color:'var(--text-secondary)', fontStyle:'italic' }}>
             {(isGiver ? thread.receiverWorkspace : thread.giverWorkspace).description || 'Async-first work tools and a weekly publication on distributed teams.'}
@@ -276,7 +265,7 @@ export default function ThreadPage() {
               gap: 2,
               letterSpacing: '0.05em'
             }}>
-              <ArrowUpRight size={12} /> GIVES
+              <ArrowUpRight size={12} /> BACKLINK OUT
             </span>
             <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)' }}>
               {thread.giverWorkspace.domain}
@@ -302,7 +291,7 @@ export default function ThreadPage() {
               gap: 2,
               letterSpacing: '0.05em'
             }}>
-              <ArrowDownLeft size={12} /> RECEIVES
+              <ArrowDownLeft size={12} /> BACKLINK IN
             </span>
             <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)' }}>
               {thread.receiverWorkspace.domain}

@@ -5,28 +5,28 @@ import Link from 'next/link';
 import { 
   Link2, Globe, ShieldCheck, ArrowRight, 
   Menu, X, Users, PlayCircle, Check,
-  Sun, Moon, Palette
+  Sun, Moon
 } from 'lucide-react';
 
 export default function Home() {
   const { user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark' | 'color'>('light');
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
-    const saved = (localStorage.getItem('bl_theme') as 'dark' | 'light' | 'color') || 'light';
+    const saved = (localStorage.getItem('bl_theme') as 'light' | 'dark') || 'light';
     setTheme(saved);
     document.documentElement.setAttribute('data-theme', saved);
   }, []);
 
   const cycleTheme = () => {
-    const next = theme === 'light' ? 'dark' : theme === 'dark' ? 'color' : 'light';
+    const next = theme === 'light' ? 'dark' : 'light';
     setTheme(next);
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('bl_theme', next);
   };
 
-  const ThemeIcon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Palette;
+  const ThemeIcon = theme === 'dark' ? Moon : Sun;
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)', overflowX: 'hidden' }}>

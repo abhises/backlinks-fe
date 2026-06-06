@@ -9,8 +9,8 @@ type Thread = {
   id: string;
   stage: string;
   status: string;
-  giverWorkspace: { id: string; domain: string; websiteName: string; description?: string };
-  receiverWorkspace: { id: string; domain: string; websiteName: string; description?: string };
+  giverWorkspace: { id: string; domain: string; websiteName: string; description?: string; teamMembers?: { user: { name: string } }[] };
+  receiverWorkspace: { id: string; domain: string; websiteName: string; description?: string; teamMembers?: { user: { name: string } }[] };
   messages: { messageText: string; timestamp: string }[];
   updatedAt: string;
   giverAccepted: boolean;
@@ -32,24 +32,13 @@ const getAvatarColor = (domain: string) => {
   return colors[sum % colors.length];
 };
 
-const CONTACT_NAMES: Record<string, string> = {
-  'fernway.io': 'Mira',
-  'ledgerpost.com': 'Devon',
-  'byteweekly.dev': 'Lukas',
-  'petalpress.co': 'Noor',
-  'hikersguide.no': 'Ingrid',
-  'northlight.studio': 'Mira',
-  'kettle-and-bean.com': 'Owen',
+const getOwnerName = (workspace: any) => {
+  if (workspace?.teamMembers && workspace.teamMembers.length > 0) {
+    return workspace.teamMembers[0].user.name;
+  }
+  return 'User';
 };
 
-const getContactName = (domain: string) => {
-  const normalized = domain.toLowerCase().trim();
-  if (CONTACT_NAMES[normalized]) return CONTACT_NAMES[normalized];
-  const names = ['Devon', 'Lukas', 'Noor', 'Ingrid', 'Mira', 'Owen', 'Devin', 'Sofia', 'Alex', 'Liam'];
-  let sum = 0;
-  for (let i = 0; i < normalized.length; i++) sum += normalized.charCodeAt(i);
-  return names[sum % names.length];
-};
 
 const formatRelativeTime = (dateString: string) => {
   try {
@@ -175,14 +164,14 @@ function InboxPageContent() {
     const actionRequired = isPending && ((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted));
     
     // 1. Tab Filter
-    if (filter === 'new' && !actionRequired) return false;
-    if (filter !== 'new' && actionRequired) return false;
-    
-    if (filter === 'in') {
+    if (filter === 'new') {
+      if (!actionRequired) return false;
+    } else if (filter === 'in') {
       if (t.receiverWorkspace.id !== workspace?.id) return false;
-    }
-    if (filter === 'out') {
+      if (actionRequired) return false;
+    } else if (filter === 'out') {
       if (t.giverWorkspace.id !== workspace?.id) return false;
+      if (actionRequired) return false;
     }
 
     // 2. Search Filter
@@ -202,7 +191,7 @@ function InboxPageContent() {
     const pending = t.stage === 'NEW' && t.status === 'PENDING';
     return pending && ((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted));
   };
-  const countAll = threads.filter(t => !checkNeedsAction(t)).length;
+  const countAll = threads.length;
   const countNew = threads.filter(t => checkNeedsAction(t)).length;
   const countIn = threads.filter(t => t.receiverWorkspace.id === workspace?.id && !checkNeedsAction(t)).length;
   const countOut = threads.filter(t => t.giverWorkspace.id === workspace?.id && !checkNeedsAction(t)).length;
@@ -263,7 +252,6 @@ function InboxPageContent() {
               
               const needsAction = pending && ((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted));
               const avatarStyle = getAvatarColor(other.domain);
-              const contactName = getContactName(other.domain);
 
               return (
                 <div key={t.id}
@@ -299,7 +287,7 @@ function InboxPageContent() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
                       <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{other.domain}</span>
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>· {contactName}</span>
+                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>· {getOwnerName(other)}</span>
                       
                       {/* Backlink Direction Badges */}
                       {incoming ? (
