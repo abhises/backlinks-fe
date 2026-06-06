@@ -2,6 +2,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
+import api from '@/lib/api';
 import Link from 'next/link';
 import {
   Inbox, LayoutDashboard, Settings, LogOut, Sun, Moon, Palette,
@@ -113,6 +114,57 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!workspace?.id) return;
+
+    api.get('/api/notifications').then(res => {
+      const persisted = res.data.notifications.map((n: any) => {
+        let title = 'Notification';
+        let body = '';
+        let link = '/inbox';
+        try {
+          const data = JSON.parse(n.payload);
+          if (data.type === 'new_message') {
+            title = `New message from ${data.senderWorkspaceDomain}`;
+            body = data.messageText.length > 45 ? data.messageText.slice(0, 45) + '...' : data.messageText;
+            link = `/inbox/${data.threadId}`;
+          } else if (data.type === 'new_connection') {
+            title = 'New BACKLINK IN Received 📥';
+            body = `${data.senderWorkspaceName} (${data.senderWorkspaceDomain}) sent you a backlink in request.`;
+            link = '/inbox';
+          } else if (data.type === 'new_thread') {
+            title = data.title || 'New Connection Match!';
+            body = data.body || 'You have a new connection in your inbox.';
+            link = '/inbox';
+          } else if (data.type === 'connection_accepted') {
+            title = 'Request Accepted ✅';
+            body = `${data.receiverWorkspaceName} accepted your backlink request!`;
+            link = `/inbox/${data.threadId}`;
+          } else if (data.type === 'connection_rejected') {
+            title = 'Request Rejected';
+            body = `${data.receiverWorkspaceName} declined your backlink exchange request.`;
+            link = `/inbox/${data.threadId}`;
+          } else if (data.type === 'link_placed') {
+            title = 'Link Placed! 🎉';
+            body = data.body || `The giver has added the backlink details. Check your Dashboard!`;
+            link = `/dashboard`;
+          } else if (data.type === 'admin_broadcast') {
+            title = data.title || 'System Announcement';
+            body = data.body || '';
+            link = '/inbox';
+          }
+        } catch(e) {}
+        return {
+          id: n.id,
+          type: n.type,
+          title,
+          body,
+          timestamp: new Date(n.createdAt),
+          read: n.read,
+          link
+        };
+      });
+      setNotifications(persisted);
+    }).catch(console.error);
+
     const socketUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
     const socket = io(socketUrl);
     socket.emit('joinWorkspace', workspace.id);
@@ -129,8 +181,8 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         body = data.messageText.length > 45 ? data.messageText.slice(0, 45) + '...' : data.messageText;
         link = `/inbox/${data.threadId}`;
       } else if (data.type === 'new_connection') {
-        title = 'New Connection Request';
-        body = `${data.senderWorkspaceName} (${data.senderWorkspaceDomain}) sent you a backlink exchange request.`;
+        title = 'New BACKLINK IN Received 📥';
+        body = `${data.senderWorkspaceName} (${data.senderWorkspaceDomain}) sent you a backlink in request.`;
         link = '/inbox';
       } else if (data.type === 'new_thread') {
         title = data.title || 'New Connection Match!';
@@ -187,6 +239,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
   }, [workspace, loading]);
 
   const markAllRead = () => {
+    api.post('/api/notifications/mark-read').catch(console.error);
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
 
