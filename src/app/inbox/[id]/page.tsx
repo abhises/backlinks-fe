@@ -80,7 +80,8 @@ const getAvatarColor = (domain: string) => {
 
 const getOwnerName = (workspace: any) => {
   if (workspace?.teamMembers && workspace.teamMembers.length > 0) {
-    return workspace.teamMembers[0].user.name;
+    const name = workspace.teamMembers[0].user.name;
+    return name ? name.split(' ')[0] : 'User';
   }
   return 'User';
 };
@@ -344,7 +345,7 @@ export default function ThreadPage() {
             return (
               <div key={msg.id} style={{ display:'flex', flexDirection:'column', alignItems: mine ? 'flex-end' : 'flex-start', gap:4 }}>
                 {!mine && (
-                  <span style={{ fontSize:'0.7rem', color:'var(--text-muted)', paddingLeft:4 }}>{msg.sender.name}</span>
+                  <span style={{ fontSize:'0.7rem', color:'var(--text-muted)', paddingLeft:4 }}>{msg.sender.name ? msg.sender.name.split(' ')[0] : 'User'}</span>
                 )}
                 <div className={`chat-bubble ${mine ? 'mine' : 'theirs'}`}>
                   {msg.messageText}

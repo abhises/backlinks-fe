@@ -34,7 +34,8 @@ const getAvatarColor = (domain: string) => {
 
 const getOwnerName = (workspace: any) => {
   if (workspace?.teamMembers && workspace.teamMembers.length > 0) {
-    return workspace.teamMembers[0].user.name;
+    const name = workspace.teamMembers[0].user.name;
+    return name ? name.split(' ')[0] : 'User';
   }
   return 'User';
 };
