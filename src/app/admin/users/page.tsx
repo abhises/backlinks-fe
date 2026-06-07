@@ -15,6 +15,8 @@ type UserData = {
       websiteName: string;
     }
   }[];
+  rejectedIn?: number;
+  rejectedOut?: number;
 };
 
 export default function AdminUsers() {
@@ -214,7 +216,7 @@ export default function AdminUsers() {
             <table style={{ width: '100%', minWidth: '900px', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {['NAME', 'EMAIL', 'ROLE', 'WORKSPACE', 'JOINED', 'ACTIONS'].map(h => (
+                  {['NAME', 'EMAIL', 'ROLE', 'WORKSPACE', 'REJECTED IN/OUT', 'JOINED', 'ACTIONS'].map(h => (
                     <th key={h} style={{
                       padding: '12px 16px',
                       textAlign: h === 'ACTIONS' ? 'right' : 'left',
@@ -271,6 +273,13 @@ export default function AdminUsers() {
                         ) : (
                           <span style={{ color: 'var(--text-muted)' }}>No workspace</span>
                         )}
+                      </td>
+                      <td style={{ padding: '16px', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                          <span style={{ color: 'var(--red)', fontWeight: 600, fontSize: '0.8rem' }} title="Rejected Incoming Requests">↓ {u.rejectedIn || 0}</span>
+                          <span style={{ color: 'var(--text-muted)' }}>/</span>
+                          <span style={{ color: 'var(--red)', fontWeight: 600, fontSize: '0.8rem' }} title="Rejected Outgoing Requests">↑ {u.rejectedOut || 0}</span>
+                        </div>
                       </td>
                       <td style={{ padding: '16px', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
                         {new Date(u.createdAt).toLocaleDateString()}

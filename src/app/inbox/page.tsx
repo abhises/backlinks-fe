@@ -76,6 +76,7 @@ function InboxPageContent() {
   const [loading, setLoading] = useState(true);
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [rejectCount, setRejectCount] = useState(3);
+  const [rejectLimit, setRejectLimit] = useState(5);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -98,8 +99,16 @@ function InboxPageContent() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/api/threads?filter=all`);
-      setThreads(res.data.threads.filter((t: Thread) => t.stage !== 'PLACED'));
+      const [allRes, rejectedRes] = await Promise.all([
+        api.get(`/api/threads?filter=all`),
+        api.get(`/api/threads?filter=rejected`)
+      ]);
+      const allThreads = allRes.data.threads.filter((t: Thread) => t.stage !== 'PLACED');
+      const rejectedThreads = rejectedRes.data.threads;
+      setThreads([...allThreads, ...rejectedThreads]);
+      if (allRes.data.rejectLimit !== undefined) {
+        setRejectLimit(allRes.data.rejectLimit);
+      }
     } catch { } finally { setLoading(false); }
   }, []);
 
@@ -166,13 +175,21 @@ function InboxPageContent() {
     
     // 1. Tab Filter
     if (filter === 'new') {
+      if (t.status === 'REJECTED') return false;
       if (!actionRequired) return false;
     } else if (filter === 'in') {
+      if (t.status === 'REJECTED') return false;
       if (t.receiverWorkspace.id !== workspace?.id) return false;
       if (actionRequired) return false;
     } else if (filter === 'out') {
+      if (t.status === 'REJECTED') return false;
       if (t.giverWorkspace.id !== workspace?.id) return false;
       if (actionRequired) return false;
+    } else if (filter === 'rejected') {
+      if (t.status !== 'REJECTED') return false;
+    } else {
+      // all
+      if (t.status === 'REJECTED') return false;
     }
 
     // 2. Search Filter
@@ -192,16 +209,18 @@ function InboxPageContent() {
     const pending = t.stage === 'NEW' && t.status === 'PENDING';
     return pending && ((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted));
   };
-  const countAll = threads.length;
-  const countNew = threads.filter(t => checkNeedsAction(t)).length;
-  const countIn = threads.filter(t => t.receiverWorkspace.id === workspace?.id && !checkNeedsAction(t)).length;
-  const countOut = threads.filter(t => t.giverWorkspace.id === workspace?.id && !checkNeedsAction(t)).length;
+  const countRejected = threads.filter(t => t.status === 'REJECTED').length;
+  const countAll = threads.length - countRejected;
+  const countNew = threads.filter(t => checkNeedsAction(t) && t.status !== 'REJECTED').length;
+  const countIn = threads.filter(t => t.receiverWorkspace.id === workspace?.id && !checkNeedsAction(t) && t.status !== 'REJECTED').length;
+  const countOut = threads.filter(t => t.giverWorkspace.id === workspace?.id && !checkNeedsAction(t) && t.status !== 'REJECTED').length;
 
   const filterOptions = [
     { key: 'all', label: `All ${countAll}` },
     { key: 'new', label: `New ${countNew}` },
     { key: 'in', label: `Backlinks In ${countIn}` },
     { key: 'out', label: `Backlinks Out ${countOut}` },
+    { key: 'rejected', label: `Rejected ${countRejected}/${rejectLimit}` },
   ];
 
   return (
@@ -209,7 +228,7 @@ function InboxPageContent() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 32px 8px 32px' }}>
         <h1 style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '2.25rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>
-          {filter === 'out' ? 'Backlinks Out' : filter === 'in' ? 'Backlinks In' : 'Inbox'}
+          {filter === 'out' ? 'Backlinks Out' : filter === 'in' ? 'Backlinks In' : filter === 'rejected' ? 'Rejected Requests' : 'Inbox'}
         </h1>
         <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{filteredThreads.length} threads</span>
       </div>
@@ -386,10 +405,17 @@ function InboxPageContent() {
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: 6
+                                gap: 6,
+                                opacity: countRejected >= rejectLimit ? 0.5 : 1
                               }}
-                              onClick={() => setRejectId(t.id)}
-                              disabled={actionLoading === t.id}>
+                              onClick={() => {
+                                if (countRejected >= rejectLimit) {
+                                  alert(`You have reached the maximum of ${rejectLimit} rejected requests.`);
+                                } else {
+                                  setRejectId(t.id);
+                                }
+                              }}
+                              disabled={actionLoading === t.id || countRejected >= rejectLimit}>
                               ✕ Reject
                             </button>
                           </div>
