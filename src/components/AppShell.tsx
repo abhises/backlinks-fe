@@ -600,7 +600,8 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
                         </div>
                         <div style={{ paddingTop: '2px' }}>
                           <div style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '4px', lineHeight: 1.4 }}>{n.title}</div>
-                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{formatTimeAgo(n.timestamp)}</div>
+                          {n.body && <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px', lineHeight: 1.4 }}>{n.body}</div>}
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{formatTimeAgo(n.timestamp)}</div>
                         </div>
                       </div>
                     );
