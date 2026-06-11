@@ -9,6 +9,8 @@ export default function AdminSettings() {
   const [cronExpression, setCronExpression] = useState('0 0 * * 1');
   const [matchAmount, setMatchAmount] = useState(2);
   const [rejectLimit, setRejectLimit] = useState(5);
+  const [answerTimeoutDays, setAnswerTimeoutDays] = useState(7);
+  const [placementTimeoutDays, setPlacementTimeoutDays] = useState(30);
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [triggering, setTriggering] = useState(false);
@@ -33,6 +35,12 @@ export default function AdminSettings() {
         if (res.data.settings.rejectLimit !== undefined) {
           setRejectLimit(res.data.settings.rejectLimit);
         }
+        if (res.data.settings.answerTimeoutDays !== undefined) {
+          setAnswerTimeoutDays(res.data.settings.answerTimeoutDays);
+        }
+        if (res.data.settings.placementTimeoutDays !== undefined) {
+          setPlacementTimeoutDays(res.data.settings.placementTimeoutDays);
+        }
       }
     } catch (err) {
       setToastMessage({ type: 'error', text: 'Failed to load settings.' });
@@ -45,7 +53,13 @@ export default function AdminSettings() {
     e.preventDefault();
     setSaving(true);
     try {
-      await api.put('/api/admin/settings', { cronExpression, matchAmount: Number(matchAmount), rejectLimit: Number(rejectLimit) });
+      await api.put('/api/admin/settings', { 
+        cronExpression, 
+        matchAmount: Number(matchAmount), 
+        rejectLimit: Number(rejectLimit),
+        answerTimeoutDays: Number(answerTimeoutDays),
+        placementTimeoutDays: Number(placementTimeoutDays)
+      });
       setToastMessage({ type: 'success', text: 'Settings saved. Matcher CRON updated.' });
     } catch (err: any) {
       setToastMessage({ type: 'error', text: err?.response?.data?.error || 'Failed to save settings.' });
@@ -68,7 +82,7 @@ export default function AdminSettings() {
   };
 
   return (
-    <div style={{ padding: '32px 40px', position: 'relative' }}>
+    <div style={{ padding: '32px 40px', position: 'relative', overflowY: 'auto', maxHeight: '100vh', paddingBottom: '100px' }}>
       {toastMessage && (
         <div style={{
           position: 'fixed', top: 80, right: 40, zIndex: 9999,
@@ -152,6 +166,36 @@ export default function AdminSettings() {
               />
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
                 The maximum number of connections a user is allowed to reject. Once reached, they can no longer reject new connections.
+              </p>
+            </div>
+
+            <div className="input-group">
+              <label className="input-label" style={{ fontWeight: 600 }}>Answer Timeout (Days)</label>
+              <input 
+                type="number" 
+                value={answerTimeoutDays} 
+                onChange={e => setAnswerTimeoutDays(Number(e.target.value))} 
+                className="input-field" 
+                min={1} 
+                required 
+              />
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
+                Number of days a user has to accept or reject a match before it expires.
+              </p>
+            </div>
+
+            <div className="input-group">
+              <label className="input-label" style={{ fontWeight: 600 }}>Link Placement Timeout (Days)</label>
+              <input 
+                type="number" 
+                value={placementTimeoutDays} 
+                onChange={e => setPlacementTimeoutDays(Number(e.target.value))} 
+                className="input-field" 
+                min={1} 
+                required 
+              />
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
+                Number of days a user has to add the link details after accepting a match.
               </p>
             </div>
 
