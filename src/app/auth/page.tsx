@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
 import Link from 'next/link';
-import { Link2, Mail, Lock, User, ArrowRight, Loader2, Sun, Moon } from 'lucide-react';
+import { Link2, Mail, Lock, User, ArrowRight, Loader2, Sun, Moon, ArrowLeft } from 'lucide-react';
 
 export default function AuthPage() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
@@ -119,6 +119,17 @@ export default function AuthPage() {
     <div className="auth-page">
       {/* background grid */}
       <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(var(--border) 1px, transparent 1px)', backgroundSize:'32px 32px', opacity:0.3, pointerEvents:'none' }} />
+
+      {/* Floating Back Button in Top Left */}
+      <div style={{ position: 'absolute', top: 24, left: 24, zIndex: 100 }}>
+        <Link 
+          href="/" 
+          className="btn btn-secondary" 
+          style={{ display: 'flex', alignItems: 'center', gap: 6, height: 36, padding: '0 12px', borderRadius: 'var(--radius-sm)', textDecoration: 'none', color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: 600 }}
+        >
+          <ArrowLeft size={16} /> Back
+        </Link>
+      </div>
 
       {/* Floating Theme Toggle in Top Right */}
       <div style={{ position: 'absolute', top: 24, right: 24, zIndex: 100 }}>
