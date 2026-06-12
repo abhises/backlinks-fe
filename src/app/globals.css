@@ -629,7 +629,7 @@ h4 { font-family: 'Poppins', sans-serif; font-size: 1.125rem; font-weight: 500; 
     gap: 24px;
     animation: fadeIn 0.2s ease;
   }
-  .landing-mobile-menu a, .landing-mobile-menu button {
+  .landing-mobile-menu a:not(.btn), .landing-mobile-menu button:not(.btn) {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-primary);
@@ -638,6 +638,14 @@ h4 { font-family: 'Poppins', sans-serif; font-size: 1.125rem; font-weight: 500; 
     border: none;
     cursor: pointer;
     font-family: inherit;
+  }
+  
+  .landing-mobile-menu .btn-primary {
+    font-size: 1.15rem;
+    text-decoration: none;
+    padding: 16px;
+    margin-top: 10px;
+    box-shadow: var(--shadow-md);
   }
 }
 
