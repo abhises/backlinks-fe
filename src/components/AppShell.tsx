@@ -188,38 +188,45 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
     socket.on('notification', (data: any) => {
       playNotificationSound();
 
-      let title = 'Notification';
-      let body = '';
-      let link = '/inbox';
+      let title = data.title || 'Notification';
+      let body = data.body || '';
+      let link = data.link || '/inbox';
 
       if (data.type === 'new_message') {
-        title = `New message from ${data.senderWorkspaceDomain}`;
-        body = data.messageText.length > 45 ? data.messageText.slice(0, 45) + '...' : data.messageText;
-        link = `/inbox/${data.threadId}`;
+        title = data.title || `New message from ${data.senderWorkspaceDomain || 'User'}`;
+        body = data.messageText ? (data.messageText.length > 45 ? data.messageText.slice(0, 45) + '...' : data.messageText) : (data.body || '');
+        link = `/inbox/${data.threadId || ''}`;
       } else if (data.type === 'new_connection') {
-        title = 'New BACKLINK IN Received 📥';
-        body = `${data.senderWorkspaceName} (${data.senderWorkspaceDomain}) sent you a backlink in request.`;
+        title = data.title || 'New BACKLINK IN Received 📥';
+        body = data.body || `${data.senderWorkspaceName || 'Someone'} sent you a backlink request.`;
         link = '/inbox';
       } else if (data.type === 'new_thread') {
         title = data.title || 'New Connection Match!';
         body = data.body || 'You have a new connection in your inbox.';
         link = '/inbox';
       } else if (data.type === 'connection_accepted') {
-        title = 'Request Accepted ✅';
-        body = `${data.receiverWorkspaceName} accepted your backlink request!`;
-        link = `/inbox/${data.threadId}`;
+        title = data.title || 'Request Accepted ✅';
+        body = data.body || `${data.receiverWorkspaceName || 'They'} accepted your request!`;
+        link = `/inbox/${data.threadId || ''}`;
       } else if (data.type === 'connection_rejected') {
-        title = 'Request Rejected';
-        body = `${data.receiverWorkspaceName} declined your backlink exchange request.`;
-        link = `/inbox/${data.threadId}`;
+        title = data.title || 'Request Rejected';
+        body = data.body || `${data.receiverWorkspaceName || 'They'} declined your request.`;
+        link = `/inbox/${data.threadId || ''}`;
       } else if (data.type === 'link_placed') {
-        title = 'Link Placed! 🎉';
+        title = data.title || 'Link Placed! 🎉';
         body = data.body || `The giver has added the backlink details. Check your Dashboard!`;
         link = `/dashboard`;
       } else if (data.type === 'admin_broadcast') {
         title = data.title || 'System Announcement';
-        body = data.body || '';
+        body = data.body || data.description || data.messageText || '';
         link = '/inbox';
+      } else if (data.type === 'system') {
+        title = data.title || 'System Alert';
+        body = data.body || '';
+        link = '/dashboard';
+      } else {
+        title = data.title || (data.type ? `Alert: ${data.type}` : 'Notification');
+        body = data.body || data.messageText || data.description || (typeof data === 'object' ? JSON.stringify(data) : String(data));
       }
 
       setNotifications(prev => [
@@ -311,7 +318,12 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
           </div>
           <div style={{ position: 'relative' }}>
             <button
-              onClick={() => setShowDropdown(!showDropdown)}
+              onClick={() => {
+                setShowDropdown(!showDropdown);
+                if (!showDropdown && notifications.some(n => !n.read)) {
+                  markAllRead();
+                }
+              }}
               style={{
                 background: 'none',
                 border: 'none',
@@ -529,7 +541,12 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
           
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <button
-              onClick={() => setShowDropdown(!showDropdown)}
+              onClick={() => {
+                setShowDropdown(!showDropdown);
+                if (!showDropdown && notifications.some(n => !n.read)) {
+                  markAllRead();
+                }
+              }}
               style={{ background: 'none', border: 'none', color: 'var(--text-secondary)' }}
             >
               <Bell size={20} />
