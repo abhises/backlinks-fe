@@ -141,7 +141,7 @@ function InboxPageContent() {
   const executeReject = async (id: string) => {
     try {
       await api.patch(`/api/threads/${id}/status`, { status: 'REJECTED' });
-      setThreads(prev => prev.filter(t => t.id !== id));
+      setThreads(prev => prev.map(t => t.id === id ? { ...t, status: 'REJECTED' } : t));
     } catch { }
   };
 
@@ -410,12 +410,17 @@ function InboxPageContent() {
                               }}
                               onClick={() => {
                                 if (countRejected >= rejectLimit) {
-                                  alert(`You have reached the maximum of ${rejectLimit} rejected requests.`);
+                                  window.dispatchEvent(new CustomEvent('bl_show_toast', {
+                                    detail: {
+                                      title: 'Rejection Limit Reached',
+                                      body: `You have reached the maximum limit of ${rejectLimit} rejected requests. Please approve some requests first.`
+                                    }
+                                  }));
                                 } else {
                                   setRejectId(t.id);
                                 }
                               }}
-                              disabled={actionLoading === t.id || countRejected >= rejectLimit}>
+                              disabled={actionLoading === t.id}>
                               ✕ Reject
                             </button>
                           </div>

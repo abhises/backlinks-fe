@@ -255,7 +255,18 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
       }, 5000);
     });
 
+    const handleGlobalToast = (e: any) => {
+      const { title, body } = e.detail;
+      const toastId = Math.random().toString();
+      setActiveToast({ id: toastId, title, body });
+      setTimeout(() => {
+        setActiveToast(prev => prev?.id === toastId ? null : prev);
+      }, 5000);
+    };
+    window.addEventListener('bl_show_toast', handleGlobalToast);
+
     return () => {
+      window.removeEventListener('bl_show_toast', handleGlobalToast);
       socket.emit('leaveWorkspace', workspace.id);
       socket.disconnect();
     };
@@ -351,7 +362,15 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         {/* Search Bar */}
         <GlobalSearch />
 
-
+        {/* Theme Toggle */}
+        <div style={{ margin: '2px 8px 16px 8px', display: 'flex', background: 'var(--bg-surface)', borderRadius: '6px', border: '1px solid var(--border)', padding: '4px' }}>
+          <button onClick={() => changeTheme('light')} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px', background: theme === 'light' ? 'var(--bg-hover)' : 'transparent', border: 'none', borderRadius: '4px', cursor: 'pointer', color: theme === 'light' ? 'var(--text-primary)' : 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, transition: 'all 0.2s' }}>
+            <Sun size={14} /> Light
+          </button>
+          <button onClick={() => changeTheme('dark')} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px', background: theme === 'dark' ? 'var(--bg-hover)' : 'transparent', border: 'none', borderRadius: '4px', cursor: 'pointer', color: theme === 'dark' ? 'var(--text-primary)' : 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, transition: 'all 0.2s' }}>
+            <Moon size={14} /> Dark
+          </button>
+        </div>
 
         {/* Nav links */}
         {NAV.map(({ href, icon: Icon, label }) => {
@@ -460,6 +479,16 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
             style={{ padding: 6 }}
           >
             <X size={18} />
+          </button>
+        </div>
+
+        {/* Theme Toggle */}
+        <div style={{ margin: '2px 8px 16px 8px', display: 'flex', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '4px' }}>
+          <button onClick={() => changeTheme('light')} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px', background: theme === 'light' ? 'rgba(255,255,255,0.1)' : 'transparent', border: 'none', borderRadius: '4px', cursor: 'pointer', color: theme === 'light' ? '#fff' : 'rgba(255,255,255,0.5)', fontSize: '0.75rem', fontWeight: 600, transition: 'all 0.2s' }}>
+            <Sun size={14} /> Light
+          </button>
+          <button onClick={() => changeTheme('dark')} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px', background: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'transparent', border: 'none', borderRadius: '4px', cursor: 'pointer', color: theme === 'dark' ? '#fff' : 'rgba(255,255,255,0.5)', fontSize: '0.75rem', fontWeight: 600, transition: 'all 0.2s' }}>
+            <Moon size={14} /> Dark
           </button>
         </div>
 
