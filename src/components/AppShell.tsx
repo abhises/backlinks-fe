@@ -117,47 +117,63 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
     api.get('/api/notifications').then(res => {
       const persisted = res.data.notifications.map((n: any) => {
-        let title = 'Notification';
-        let body = '';
-        let link = '/inbox';
+        let title = n.title || 'Notification';
+        let body = n.body || '';
+        let link = n.link || '/inbox';
         try {
-          const data = JSON.parse(n.payload);
-          if (data.type === 'new_message') {
-            title = `New message from ${data.senderWorkspaceDomain}`;
-            body = data.messageText.length > 45 ? data.messageText.slice(0, 45) + '...' : data.messageText;
-            link = `/inbox/${data.threadId}`;
-          } else if (data.type === 'new_connection') {
-            title = 'New BACKLINK IN Received 📥';
-            body = `${data.senderWorkspaceName} (${data.senderWorkspaceDomain}) sent you a backlink in request.`;
-            link = '/inbox';
-          } else if (data.type === 'new_thread') {
-            title = data.title || 'New Connection Match!';
-            body = data.body || 'You have a new connection in your inbox.';
-            link = '/inbox';
-          } else if (data.type === 'connection_accepted') {
-            title = 'Request Accepted ✅';
-            body = `${data.receiverWorkspaceName} accepted your backlink request!`;
-            link = `/inbox/${data.threadId}`;
-          } else if (data.type === 'connection_rejected') {
-            title = 'Request Rejected';
-            body = `${data.receiverWorkspaceName} declined your backlink exchange request.`;
-            link = `/inbox/${data.threadId}`;
-          } else if (data.type === 'link_placed') {
-            title = 'Link Placed! 🎉';
-            body = data.body || `The giver has added the backlink details. Check your Dashboard!`;
-            link = `/dashboard`;
-          } else if (data.type === 'admin_broadcast') {
-            title = data.title || 'System Announcement';
-            body = data.body || '';
-            link = '/inbox';
+          if (n.payload) {
+            // Sometimes it's already an object if the backend parsed it, or JSON.parse is needed
+            const data = typeof n.payload === 'string' ? JSON.parse(n.payload) : n.payload;
+            const notifType = data.type || n.type;
+            
+            if (notifType === 'new_message') {
+              title = data.title || `New message from ${data.senderWorkspaceDomain || 'User'}`;
+              body = data.messageText ? (data.messageText.length > 45 ? data.messageText.slice(0, 45) + '...' : data.messageText) : (data.body || n.body);
+              link = `/inbox/${data.threadId || ''}`;
+            } else if (notifType === 'new_connection') {
+              title = data.title || 'New BACKLINK IN Received 📥';
+              body = data.body || `${data.senderWorkspaceName || 'Someone'} sent you a backlink request.`;
+              link = '/inbox';
+            } else if (notifType === 'new_thread') {
+              title = data.title || n.title || 'New Connection Match!';
+              body = data.body || n.body || 'You have a new connection in your inbox.';
+              link = '/inbox';
+            } else if (notifType === 'connection_accepted') {
+              title = data.title || 'Request Accepted ✅';
+              body = data.body || `${data.receiverWorkspaceName || 'They'} accepted your request!`;
+              link = `/inbox/${data.threadId || ''}`;
+            } else if (notifType === 'connection_rejected') {
+              title = data.title || 'Request Rejected';
+              body = data.body || `${data.receiverWorkspaceName || 'They'} declined your request.`;
+              link = `/inbox/${data.threadId || ''}`;
+            } else if (notifType === 'link_placed') {
+              title = data.title || 'Link Placed! 🎉';
+              body = data.body || `The giver has added the backlink details. Check your Dashboard!`;
+              link = `/dashboard`;
+            } else if (notifType === 'admin_broadcast') {
+              title = data.title || n.title || 'System Announcement';
+              body = data.body || data.description || data.messageText || n.body || '';
+              link = '/inbox';
+            } else if (notifType === 'system') {
+              title = data.title || n.title || 'System Alert';
+              body = data.body || n.body || '';
+              link = '/dashboard';
+            } else {
+              // Fallback for unknown types so the user at least sees what it is
+              title = data.title || n.title || (notifType ? `Alert: ${notifType}` : 'Notification');
+              body = data.body || data.messageText || data.description || n.body || (typeof data === 'object' ? JSON.stringify(data) : String(data));
+            }
           }
-        } catch(e) {}
+        } catch(e: any) {
+          body = n.body || `Raw: ${n.payload}`;
+        }
+        
         return {
           id: n.id,
-          type: n.type,
+          type: n.type || 'unknown',
           title,
           body,
-          timestamp: new Date(n.createdAt),
+          timestamp: n.createdAt ? new Date(n.createdAt) : new Date(),
           read: n.read,
           link
         };

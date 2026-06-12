@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
-import { Loader2, Settings2, Clock, Check, Save } from 'lucide-react';
+import { Loader2, Settings2, Clock, Check, Save, Sliders, Users, Hourglass } from 'lucide-react';
 
 export default function AdminSettings() {
   const [loading, setLoading] = useState(true);
@@ -82,7 +82,7 @@ export default function AdminSettings() {
   };
 
   return (
-    <div style={{ padding: '32px 40px', position: 'relative', overflowY: 'auto', maxHeight: '100vh', paddingBottom: '100px' }}>
+    <div className="settings-layout">
       {toastMessage && (
         <div style={{
           position: 'fixed', top: 80, right: 40, zIndex: 9999,
@@ -96,19 +96,49 @@ export default function AdminSettings() {
         </div>
       )}
 
-      <div className="page-header" style={{ padding: 0, border: 'none', marginBottom: 32 }}>
-        <div className="page-header-left">
-          <h1 className="page-title">Platform Settings</h1>
-          <p className="page-sub">Configure automated system behaviors and matchmaking logic.</p>
-        </div>
-      </div>
+      {/* Settings Sub-Sidebar Navigation */}
+      <aside className="settings-sidebar">
+        <h2>Admin Settings</h2>
+        {[
+          { label: 'Matchmaking Schedule', id: 'schedule', icon: Clock },
+          { label: 'User Limits', id: 'limits', icon: Users },
+          { label: 'Timeout Configs', id: 'timeouts', icon: Hourglass },
+          { label: 'Manual Trigger', id: 'manual-trigger', icon: Sliders }
+        ].map(s => (
+          <a key={s.id} href={`#${s.id}`} className="settings-nav-item" style={{ color: 'var(--text-secondary)' }}>
+            <s.icon size={16} />
+            {s.label}
+          </a>
+        ))}
+      </aside>
 
-      <div className="card" style={{ maxWidth: 600, padding: 32 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
-          <div style={{ background: 'var(--bg-hover)', padding: 10, borderRadius: 'var(--radius)' }}>
-            <Clock size={20} color="var(--accent)" />
-          </div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Matchmaking CRON Schedule</h2>
+      {/* Settings Sections Area */}
+      <div className="settings-content">
+        <style>{`
+          .settings-content .btn:not(.btn-outline) {
+            background: #1a1a1a !important;
+            color: #fff !important;
+            border: 1px solid #1a1a1a !important;
+            box-shadow: none !important;
+          }
+          .settings-content .btn:not(.btn-outline):hover {
+            background: #000 !important;
+            border-color: #000 !important;
+          }
+          .settings-content .btn-outline {
+            background: transparent !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border) !important;
+          }
+          .settings-content .btn-outline:hover {
+            background: var(--bg-hover) !important;
+          }
+        `}</style>
+        
+        {/* Header */}
+        <div style={{ padding: '24px 0 20px', borderBottom: '1px solid var(--border)', marginBottom: 32 }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Platform Settings</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: 4 }}>Configure automated system behaviors and matchmaking logic.</p>
         </div>
 
         {loading ? (
@@ -116,94 +146,121 @@ export default function AdminSettings() {
             <Loader2 className="animate-spin" size={24} color="var(--text-muted)" />
           </div>
         ) : (
-          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div className="input-group">
-              <label className="input-label" style={{ fontWeight: 600 }}>Matchmaking Frequency</label>
-              <select 
-                value={cronExpression} 
-                onChange={e => setCronExpression(e.target.value)} 
-                className="input-field" 
-                required 
-              >
-                <option value="*/10 * * * *">Every 10 Minutes (For Testing)</option>
-                <option value="0 * * * *">Every Hour</option>
-                <option value="0 0 * * *">Every Day at Midnight</option>
-                <option value="0 0 * * 1">Every Week (Monday at Midnight)</option>
-                <option value="0 0 1 * *">Every Month (1st of the month)</option>
-                <option value={cronExpression} hidden>Custom Schedule</option>
-              </select>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                Select how often the system should automatically pair users together.
-              </p>
-            </div>
+          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+            
+            {/* 1. Matchmaking Schedule */}
+            <section id="schedule">
+              <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+                <Clock size={18} color="var(--accent)" />
+                <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Matchmaking Schedule</h2>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 600 }}>
+                <div className="input-group">
+                  <label className="input-label" style={{ fontWeight: 600 }}>Matchmaking Frequency</label>
+                  <select 
+                    value={cronExpression} 
+                    onChange={e => setCronExpression(e.target.value)} 
+                    className="input-field" 
+                    required 
+                  >
+                    <option value="*/10 * * * *">Every 10 Minutes (For Testing)</option>
+                    <option value="0 * * * *">Every Hour</option>
+                    <option value="0 0 * * *">Every Day at Midnight</option>
+                    <option value="0 0 * * 1">Every Week (Monday at Midnight)</option>
+                    <option value="0 0 1 * *">Every Month (1st of the month)</option>
+                    <option value={cronExpression} hidden>Custom Schedule</option>
+                  </select>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
+                    Select how often the system should automatically pair users together.
+                  </p>
+                </div>
+              </div>
+            </section>
 
-            <div className="input-group">
-              <label className="input-label" style={{ fontWeight: 600 }}>Matches Per User (Give/Receive)</label>
-              <input 
-                type="number" 
-                value={matchAmount} 
-                onChange={e => setMatchAmount(Number(e.target.value))} 
-                className="input-field" 
-                min={1} 
-                max={10} 
-                required 
-              />
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                The number of giving and receiving matches each user will receive per run. (e.g. 2 means 2 giving, 2 receiving).
-              </p>
-            </div>
+            {/* 2. User Limits */}
+            <section id="limits">
+              <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+                <Users size={18} color="var(--accent)" />
+                <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>User Limits</h2>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 600 }}>
+                <div className="input-group">
+                  <label className="input-label" style={{ fontWeight: 600 }}>Matches Per User (Give/Receive)</label>
+                  <input 
+                    type="number" 
+                    value={matchAmount} 
+                    onChange={e => setMatchAmount(Number(e.target.value))} 
+                    className="input-field" 
+                    min={1} 
+                    max={10} 
+                    required 
+                  />
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
+                    The number of giving and receiving matches each user will receive per run. (e.g. 2 means 2 giving, 2 receiving).
+                  </p>
+                </div>
 
-            <div className="input-group">
-              <label className="input-label" style={{ fontWeight: 600 }}>Maximum Allowed Rejections</label>
-              <input 
-                type="number" 
-                value={rejectLimit} 
-                onChange={e => setRejectLimit(Number(e.target.value))} 
-                className="input-field" 
-                min={1} 
-                max={100} 
-                required 
-              />
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                The maximum number of connections a user is allowed to reject. Once reached, they can no longer reject new connections.
-              </p>
-            </div>
+                <div className="input-group">
+                  <label className="input-label" style={{ fontWeight: 600 }}>Maximum Allowed Rejections</label>
+                  <input 
+                    type="number" 
+                    value={rejectLimit} 
+                    onChange={e => setRejectLimit(Number(e.target.value))} 
+                    className="input-field" 
+                    min={1} 
+                    max={100} 
+                    required 
+                  />
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
+                    The maximum number of connections a user is allowed to reject. Once reached, they can no longer reject new connections.
+                  </p>
+                </div>
+              </div>
+            </section>
 
-            <div className="input-group">
-              <label className="input-label" style={{ fontWeight: 600 }}>Answer Timeout (Days)</label>
-              <input 
-                type="number" 
-                value={answerTimeoutDays} 
-                onChange={e => setAnswerTimeoutDays(Number(e.target.value))} 
-                className="input-field" 
-                min={1} 
-                required 
-              />
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                Number of days a user has to accept or reject a match before it expires.
-              </p>
-            </div>
+            {/* 3. Timeout Configs */}
+            <section id="timeouts">
+              <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+                <Hourglass size={18} color="var(--accent)" />
+                <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Timeout Configurations</h2>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 600 }}>
+                <div className="input-group">
+                  <label className="input-label" style={{ fontWeight: 600 }}>Answer Timeout (Days)</label>
+                  <input 
+                    type="number" 
+                    value={answerTimeoutDays} 
+                    onChange={e => setAnswerTimeoutDays(Number(e.target.value))} 
+                    className="input-field" 
+                    min={1} 
+                    required 
+                  />
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
+                    Number of days a user has to accept or reject a match before it expires.
+                  </p>
+                </div>
 
-            <div className="input-group">
-              <label className="input-label" style={{ fontWeight: 600 }}>Link Placement Timeout (Days)</label>
-              <input 
-                type="number" 
-                value={placementTimeoutDays} 
-                onChange={e => setPlacementTimeoutDays(Number(e.target.value))} 
-                className="input-field" 
-                min={1} 
-                required 
-              />
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                Number of days a user has to add the link details after accepting a match.
-              </p>
-            </div>
+                <div className="input-group">
+                  <label className="input-label" style={{ fontWeight: 600 }}>Link Placement Timeout (Days)</label>
+                  <input 
+                    type="number" 
+                    value={placementTimeoutDays} 
+                    onChange={e => setPlacementTimeoutDays(Number(e.target.value))} 
+                    className="input-field" 
+                    min={1} 
+                    required 
+                  />
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
+                    Number of days a user has to add the link details after accepting a match.
+                  </p>
+                </div>
+              </div>
+            </section>
 
-            <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+            <div style={{ display: 'flex', gap: 12, marginTop: 8, maxWidth: 600 }}>
               <button type="submit" 
+                className="btn btn-primary"
                 style={{ 
-                  background: '#1a1a1a', color: '#ffffff', border: 'none', 
-                  borderRadius: '6px', padding: '10px 16px', fontWeight: 600, fontSize: '0.875rem',
                   display: 'flex', alignItems: 'center', gap: 8, 
                   cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 
                 }} 
@@ -212,12 +269,23 @@ export default function AdminSettings() {
                 {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                 {saving ? 'Saving...' : 'Save Configuration'}
               </button>
-              
-              <button type="button" onClick={() => setShowModal(true)} className="btn btn-secondary">
-                <Settings2 size={16} />
-                Force Run Matchmaking Now
-              </button>
             </div>
+
+            {/* 4. Manual Trigger */}
+            <section id="manual-trigger" style={{ marginTop: 24 }}>
+              <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+                <Sliders size={18} color="var(--accent)" />
+                <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Manual Trigger</h2>
+              </div>
+              <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: 20, borderRadius: 'var(--radius)', maxWidth: 600 }}>
+                <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 6 }}>Force Matchmaking Now</h3>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 16 }}>Manually trigger the matchmaking algorithm to run immediately outside of the scheduled CRON.</p>
+                <button type="button" onClick={() => setShowModal(true)} className="btn btn-secondary">
+                  <Settings2 size={16} />
+                  Force Run Matchmaking Now
+                </button>
+              </div>
+            </section>
           </form>
         )}
       </div>
@@ -234,7 +302,7 @@ export default function AdminSettings() {
           }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: 12 }}>Confirm Manual Run</h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.5, marginBottom: 24 }}>
-              Are you sure you want to trigger the matchmaking algorithm right now? This will immediately scan all workspaces and dispatch new `NEW` backlink connections to users based on your Match Amount settings.
+              Are you sure you want to trigger the matchmaking algorithm right now? This will immediately scan all workspaces and dispatch new \`NEW\` backlink connections to users based on your Match Amount settings.
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
               <button 
