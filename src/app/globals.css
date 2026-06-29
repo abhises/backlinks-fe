@@ -738,3 +738,29 @@ h4 { font-family: 'Poppins', sans-serif; font-size: 1.125rem; font-weight: 500; 
 
 .mobile-only-header { display: none !important; } @media (max-width: 768px) { .mobile-only-header { display: flex !important; } }
 [data-theme='dark'] .nav-item.active { background: #fff !important; color: #000 !important; } [data-theme='dark'] .nav-item.active svg { color: #000 !important; }
+
+/* ─── NOTIFICATIONS PAGE ──────────────────────────────────────────────────── */
+.notifications-container {
+  padding: 32px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.notifications-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: stretch;
+}
+
+@media (max-width: 768px) {
+  .notifications-container {
+    padding: 16px;
+  }
+  .notifications-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}

@@ -60,7 +60,7 @@ export default function AdminNotifications() {
   };
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 1400, margin: '0 auto', height: '100%', overflowY: 'auto' }}>
+    <div className="notifications-container">
       <div className="page-header" style={{ padding: 0, border: 'none', marginBottom: 32 }}>
         <div className="page-header-left">
           <h1 className="page-title">Broadcast Notification</h1>
@@ -68,7 +68,7 @@ export default function AdminNotifications() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'stretch' }}>
+      <div className="notifications-grid">
         <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', height: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
           <div style={{ width: 40, height: 40, background: 'rgba(59, 130, 246, 0.15)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
