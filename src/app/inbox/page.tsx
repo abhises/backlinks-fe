@@ -276,14 +276,9 @@ function InboxPageContent() {
               return (
                 <div key={t.id}
                   id={`thread-${t.id}`}
-                  className="thread-tile"
+                  className="thread-tile thread-layout"
                   style={{
-                    position: 'relative',
                     borderLeft: needsAction ? '4px solid #10b981' : '4px solid transparent',
-                    padding: '8px 32px',
-                    borderBottom: '1px solid var(--border)',
-                    display: 'flex',
-                    alignItems: 'center',
                     background: 'var(--bg-base)',
                     cursor: pending ? 'default' : 'pointer'
                   }}
@@ -291,107 +286,99 @@ function InboxPageContent() {
                   onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-base)'}
                   onClick={() => !pending && router.push(`/inbox/${t.id}`)}>
 
-                  {/* Avatar */}
-                  <div className="domain-avatar" style={{
-                    background: avatarStyle.bg,
-                    color: avatarStyle.text,
-                    fontWeight: 600,
-                    fontSize: '0.9rem',
-                    boxShadow: 'none',
-                    borderRadius: '50%'
-                  }}>
-                    {getInitials(other.domain)}
-                  </div>
-
-                  {/* Info */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
-                      <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{other.domain}</span>
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>· {getOwnerName(other)}</span>
-                      
-                      {/* Backlink Direction Badges */}
-                      {incoming ? (
-                        <span style={{ 
-                          fontSize: '0.75rem', 
-                          fontWeight: 600, 
-                          color: '#0284c7', 
-                          background: '#e0f2fe', 
-                          padding: '2px 8px', 
-                          borderRadius: '4px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 2
-                        }}>
-                          <ArrowDownLeft size={11} /> Backlink In
-                        </span>
-                      ) : (
-                        <span style={{ 
-                          fontSize: '0.75rem', 
-                          fontWeight: 600, 
-                          color: '#7c3aed', 
-                          background: '#f3e8ff', 
-                          padding: '2px 8px', 
-                          borderRadius: '4px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 2
-                        }}>
-                          <ArrowUpRight size={11} /> Backlink Out
-                        </span>
-                      )}
-
-                      {/* NEW state badge */}
-                      {needsAction && (
-                        <span style={{ 
-                          fontSize: '0.7rem', 
-                          fontWeight: 700, 
-                          color: '#ffffff', 
-                          background: '#10b981', 
-                          padding: '2px 6px', 
-                          borderRadius: '4px' 
-                        }}>
-                          NEW
-                        </span>
-                      )}
+                  {/* Left Side: Avatar & Info & Mobile Timestamp */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', flex: 1, minWidth: 0, width: '100%' }}>
+                    {/* Avatar */}
+                    <div className="domain-avatar flex-shrink-0" style={{
+                      background: avatarStyle.bg,
+                      color: avatarStyle.text,
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      boxShadow: 'none',
+                      borderRadius: '50%',
+                      marginTop: 2
+                    }}>
+                      {getInitials(other.domain)}
                     </div>
 
-                    {/* Description/Last message */}
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: 1.4 }}>
-                      {other.description ? other.description : (
-                        t.messages && t.messages.length > 0 
-                          ? t.messages[0].messageText 
-                          : 'No message history yet'
-                      )}
+                    {/* Info */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
+                        <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{other.domain}</span>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>· {getOwnerName(other)}</span>
+                        
+                        {/* Backlink Direction Badges */}
+                        {incoming ? (
+                          <span style={{ 
+                            fontSize: '0.75rem', 
+                            fontWeight: 600, 
+                            color: '#0284c7', 
+                            background: '#e0f2fe', 
+                            padding: '2px 8px', 
+                            borderRadius: '4px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 2
+                          }}>
+                            <ArrowDownLeft size={11} /> Backlink In
+                          </span>
+                        ) : (
+                          <span style={{ 
+                            fontSize: '0.75rem', 
+                            fontWeight: 600, 
+                            color: '#7c3aed', 
+                            background: '#f3e8ff', 
+                            padding: '2px 8px', 
+                            borderRadius: '4px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 2
+                          }}>
+                            <ArrowUpRight size={11} /> Backlink Out
+                          </span>
+                        )}
+
+                        {/* NEW state badge */}
+                        {needsAction && (
+                          <span style={{ 
+                            fontSize: '0.7rem', 
+                            fontWeight: 700, 
+                            color: '#ffffff', 
+                            background: '#10b981', 
+                            padding: '2px 6px', 
+                            borderRadius: '4px' 
+                          }}>
+                            NEW
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Description/Last message */}
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: 1.4 }}>
+                        {other.description ? other.description : (
+                          t.messages && t.messages.length > 0 
+                            ? t.messages[0].messageText 
+                            : 'No message history yet'
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Timestamp (Mobile Only - Top Right) */}
+                    <div className="mobile-time">
+                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                        {formatRelativeTime(t.updatedAt)}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Right Side Actions and Timestamp */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
+                  {/* Right Side / Bottom: Actions & Desktop Timestamp */}
+                  <div className="thread-right">
                     
-                    {/* Action buttons for pending NEW request */}
+                    {/* Action buttons or Reject Countdown for pending NEW request */}
                     {pending && !isRejecting && (
-                      <div onClick={e => e.stopPropagation()}>
+                      <div onClick={e => e.stopPropagation()} className="thread-actions">
                         {((incoming && !t.receiverAccepted) || (!incoming && !t.giverAccepted)) ? (
-                          <div style={{ display: 'flex', gap: 8 }}>
-                            <button id={`approve-${t.id}`}
-                              className="btn"
-                              style={{
-                                background: '#10b981',
-                                color: '#ffffff',
-                                border: 'none',
-                                borderRadius: '4px',
-                                padding: '6px 16px',
-                                fontWeight: 600,
-                                fontSize: '0.8rem',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 6
-                              }}
-                              onClick={() => handleApprove(t.id)}
-                              disabled={actionLoading === t.id}>
-                              {actionLoading === t.id ? <Loader2 size={12} className="animate-spin" /> : '✓ Approve'}
-                            </button>
+                          <>
                             <button id={`reject-${t.id}`}
                               className="btn"
                               style={{
@@ -423,7 +410,26 @@ function InboxPageContent() {
                               disabled={actionLoading === t.id}>
                               ✕ Reject
                             </button>
-                          </div>
+                            <button id={`approve-${t.id}`}
+                              className="btn"
+                              style={{
+                                background: '#10b981',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '4px',
+                                padding: '6px 16px',
+                                fontWeight: 600,
+                                fontSize: '0.8rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 6
+                              }}
+                              onClick={() => handleApprove(t.id)}
+                              disabled={actionLoading === t.id}>
+                              {actionLoading === t.id ? <Loader2 size={12} className="animate-spin" /> : '✓ Approve'}
+                            </button>
+                          </>
                         ) : (
                           <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: '4px' }}>
                             <Loader2 size={12} className="animate-spin" /> Waiting for them to accept
@@ -463,10 +469,12 @@ function InboxPageContent() {
                       </div>
                     )}
 
-                    {/* Timestamp */}
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', minWidth: '45px', textAlign: 'right' }}>
-                      {formatRelativeTime(t.updatedAt)}
-                    </span>
+                    {/* Timestamp (Desktop Only - Far Right) */}
+                    <div className="desktop-time">
+                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                        {formatRelativeTime(t.updatedAt)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               );
