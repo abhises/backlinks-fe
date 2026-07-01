@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import { 
-  Globe, User, Users, Gift, Bell, CreditCard, 
-  HelpCircle, AlertTriangle, Check, Copy, UserPlus, 
+  Globe, User, Gift, Bell, CreditCard, 
+  HelpCircle, AlertTriangle, Check, Copy, 
   Mail, Shield, ArrowRight, HelpCircle as HelpIcon, Plus, Loader2, Sun, Moon
 } from 'lucide-react';
 
@@ -158,7 +158,6 @@ export default function SettingsPage() {
         {[
           { label: 'Website Profile', id: 'website-profile', icon: Globe },
           { label: 'Account', id: 'account', icon: User },
-          { label: 'Team Members', id: 'team', icon: Users },
           { label: 'Invite a Friend', id: 'invite', icon: Gift },
           { label: 'Notifications', id: 'notifications', icon: Bell },
           { label: 'Billing & Plans', id: 'billing', icon: CreditCard },
@@ -307,59 +306,7 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        {/* 3. Team */}
-        <section id="team" style={{ marginBottom: 48 }}>
-          <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
-            <Users size={18} color="var(--accent)" />
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Team Management</h2>
-          </div>
-          
-          {/* Invite form */}
-          <form onSubmit={handleInvite} style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 20, background: 'var(--bg-surface)', padding: 16, borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}>
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <input type="email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} className="input-field" style={{ height: 38 }} placeholder="colleague@domain.com" required />
-            </div>
-            <div>
-              <select value={inviteRole} onChange={e => setInviteRole(e.target.value as any)} className="input-field" style={{ height: 38, width: 120 }}>
-                <option value="EDITOR">Editor</option>
-                <option value="VIEWER">Viewer</option>
-              </select>
-            </div>
-            <button type="submit" className="btn btn-primary">
-              <UserPlus size={15} /> Invite Member
-            </button>
-          </form>
 
-          {/* Members Table */}
-          <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', overflow: 'hidden', background: 'var(--bg-surface)' }}>
-            {team.map(m => (
-              <div key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 34, height: 34, background: 'var(--bg-hover)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent)' }}>
-                    {m.avatar}
-                  </div>
-                  <div>
-                    <p style={{ fontWeight: 600, fontSize: '0.875rem' }}>{m.name}</p>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{m.email}</p>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  {m.role === 'OWNER' ? (
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', paddingRight: 10 }}>Owner</span>
-                  ) : (
-                    <>
-                      <select value={m.role} onChange={e => handleChangeRole(m.id, e.target.value as any)} className="input-field" style={{ height: 30, width: 100, fontSize: '0.75rem', padding: '2px 6px' }}>
-                        <option value="EDITOR">Editor</option>
-                        <option value="VIEWER">Viewer</option>
-                      </select>
-                      <button onClick={() => handleRemoveMember(m.id)} style={{ color: 'var(--red)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem' }}>Remove</button>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
 
         {/* 4. Invite a Friend */}
         <section id="invite" style={{ marginBottom: 48 }}>
