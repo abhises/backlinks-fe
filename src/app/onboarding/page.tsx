@@ -19,8 +19,9 @@ export default function OnboardingPage() {
       setError('Both fields are required.');
       return;
     }
-    if (!domain.toLowerCase().trim().endsWith('.com')) {
-      setError('Only .com domains are allowed.');
+    const cleanDomain = domain.toLowerCase().trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
+    if (!/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(cleanDomain)) {
+      setError('Please enter a valid domain (e.g., domain.com, domain.org).');
       return;
     }
     if (description.trim().split('.').filter(Boolean).length > 1 && description.trim().split('!').filter(Boolean).length > 1) {
