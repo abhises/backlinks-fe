@@ -93,7 +93,10 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
             { 
               label: 'FROM', value: lp.sourceUrl, isUrl: true, 
               tag: (
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.6rem', padding: '2px 6px', color: '#a855f7', background: '#f3e8ff', borderRadius: '4px', fontWeight: 700 }}>
+                <div 
+                  title={`${sourceDomain} gives a backlink to ${targetDomain}`}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.6rem', padding: '2px 6px', color: '#a855f7', background: '#f3e8ff', borderRadius: '4px', fontWeight: 700, cursor: 'help' }}
+                >
                   <ArrowUpRight size={10} /> BACKLINK OUT
                 </div>
               )
@@ -101,7 +104,10 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
             { 
               label: 'TO',   value: lp.targetUrl, isUrl: true, 
               tag: (
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.6rem', padding: '2px 6px', color: '#0284c7', background: '#e0f2fe', borderRadius: '4px', fontWeight: 700 }}>
+                <div 
+                  title={`${sourceDomain} gives a backlink to ${targetDomain}`}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.6rem', padding: '2px 6px', color: '#0284c7', background: '#e0f2fe', borderRadius: '4px', fontWeight: 700, cursor: 'help' }}
+                >
                   <ArrowDownLeft size={10} /> BACKLINK IN
                 </div>
               )
@@ -167,7 +173,10 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
             <span>FROM URL <span style={{ textTransform: 'none', fontWeight: 500 }}>(on {sourceDomain})</span></span>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.65rem', padding: '2px 8px', color: '#a855f7', background: '#f3e8ff', borderRadius: '4px', fontWeight: 700 }}>
+            <div 
+              title={`${sourceDomain} gives a backlink to ${targetDomain}`}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.65rem', padding: '2px 8px', color: '#a855f7', background: '#f3e8ff', borderRadius: '4px', fontWeight: 700, cursor: 'help' }}
+            >
               <ArrowUpRight size={12} /> BACKLINK OUT
             </div>
           </label>
@@ -180,7 +189,10 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
             <span>TO URL <span style={{ textTransform: 'none', fontWeight: 500 }}>(on {targetDomain})</span></span>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.65rem', padding: '2px 8px', color: '#0284c7', background: '#e0f2fe', borderRadius: '4px', fontWeight: 700 }}>
+            <div 
+              title={`${sourceDomain} gives a backlink to ${targetDomain}`}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.65rem', padding: '2px 8px', color: '#0284c7', background: '#e0f2fe', borderRadius: '4px', fontWeight: 700, cursor: 'help' }}
+            >
               <ArrowDownLeft size={12} /> BACKLINK IN
             </div>
           </label>

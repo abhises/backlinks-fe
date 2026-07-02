@@ -6,7 +6,7 @@ import api from '@/lib/api';
 import {
   ArrowLeft, Send, Link2, ExternalLink, Loader2,
   ArrowRight, Info, CheckCircle2, AlertCircle, Ban,
-  ArrowUpRight, ArrowDownLeft
+  ArrowUpRight, ArrowDownLeft, HelpCircle
 } from 'lucide-react';
 import AddLinkModal from '@/components/AddLinkModal';
 import { io } from 'socket.io-client';
@@ -96,6 +96,7 @@ export default function ThreadPage() {
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showLinkModal, setShowLinkModal] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
@@ -217,31 +218,37 @@ export default function ThreadPage() {
         {/* Backlink Direction Badge */}
         <div>
           {!isGiver ? (
-            <span style={{ 
-              fontSize: '0.75rem', 
-              fontWeight: 600, 
-              color: '#0284c7', 
-              background: '#e0f2fe', 
-              padding: '4px 10px', 
-              borderRadius: '4px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4
-            }}>
+            <span 
+              title={`${thread.giverWorkspace.domain} gives a backlink to ${thread.receiverWorkspace.domain}`}
+              style={{ 
+                fontSize: '0.75rem', 
+                fontWeight: 600, 
+                color: '#0284c7', 
+                background: '#e0f2fe', 
+                padding: '4px 10px', 
+                borderRadius: '4px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                cursor: 'help'
+              }}>
               <ArrowDownLeft size={14} /> Backlink In
             </span>
           ) : (
-            <span style={{ 
-              fontSize: '0.75rem', 
-              fontWeight: 600, 
-              color: '#7c3aed', 
-              background: '#f3e8ff', 
-              padding: '4px 10px', 
-              borderRadius: '4px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4
-            }}>
+            <span 
+              title={`${thread.giverWorkspace.domain} gives a backlink to ${thread.receiverWorkspace.domain}`}
+              style={{ 
+                fontSize: '0.75rem', 
+                fontWeight: 600, 
+                color: '#7c3aed', 
+                background: '#f3e8ff', 
+                padding: '4px 10px', 
+                borderRadius: '4px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                cursor: 'help'
+              }}>
               <ArrowUpRight size={14} /> Backlink Out
             </span>
           )}
@@ -252,7 +259,10 @@ export default function ThreadPage() {
       <div style={{ padding:'12px 32px', borderBottom:'1px solid var(--border)', display:'flex', alignItems:'center', background:'var(--bg-base)', flexShrink:0 }}>
         
         {/* Gives / Receives */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+        <div 
+          title={`${thread.giverWorkspace.domain} gives a backlink to ${thread.receiverWorkspace.domain}`}
+          style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, cursor: 'help' }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ 
               fontSize: '0.7rem', 
@@ -298,6 +308,30 @@ export default function ThreadPage() {
               {thread.receiverWorkspace.domain}
             </span>
           </div>
+
+          {/* Help Info Button */}
+          <button 
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setShowInfoModal(true); }}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--text-secondary)',
+              padding: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '50%',
+              transition: 'background 0.2s',
+              marginLeft: '4px'
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'none'}
+            title="How this connection works"
+          >
+            <HelpCircle size={16} />
+          </button>
         </div>
 
         {/* Action Button */}
@@ -333,6 +367,104 @@ export default function ThreadPage() {
             onClose={() => setShowLinkModal(false)}
             onSaved={() => { setShowLinkModal(false); load(); }}
           />
+        )}
+        {showInfoModal && (
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            background: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20
+          }} onClick={() => setShowInfoModal(false)}>
+            <div 
+              style={{
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                padding: '28px',
+                maxWidth: '500px',
+                width: '100%',
+                boxShadow: 'var(--shadow-xl)',
+                animation: 'fadeIn 0.2s ease-out'
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+                <div style={{ background: '#f3e8ff', color: '#a855f7', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <HelpCircle size={20} />
+                </div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Connection Details</h3>
+              </div>
+
+              {/* Explanation Diagram */}
+              <div style={{ background: 'var(--bg-base)', border: '1px solid var(--border)', borderRadius: '8px', padding: '16px', marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                  <div style={{ textAlign: 'center', flex: 1 }}>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#a855f7', background: '#f3e8ff', padding: '2px 6px', borderRadius: '4px', display: 'block', marginBottom: 4 }}>GIVER</span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', wordBreak: 'break-all' }}>{thread.giverWorkspace.domain}</span>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Gives backlink to</span>
+                    <div style={{ display: 'flex', alignItems: 'center', color: 'var(--accent)', marginTop: 4 }}>
+                      <span style={{ width: 30, height: 2, background: 'var(--border)' }}></span>
+                      <ArrowRight size={14} style={{ marginLeft: -4 }} />
+                    </div>
+                  </div>
+
+                  <div style={{ textAlign: 'center', flex: 1 }}>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#0284c7', background: '#e0f2fe', padding: '2px 6px', borderRadius: '4px', display: 'block', marginBottom: 4 }}>RECEIVER</span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', wordBreak: 'break-all' }}>{thread.receiverWorkspace.domain}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Text description */}
+              <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <p>
+                  <strong>{thread.giverWorkspace.domain}</strong> gives a backlink to <strong>{thread.receiverWorkspace.domain}</strong>.
+                </p>
+                {isGiver ? (
+                  <div style={{ background: 'rgba(168,85,247,0.05)', borderLeft: '3px solid #a855f7', padding: '10px 12px', borderRadius: '0 4px 4px 0' }}>
+                    <span style={{ fontWeight: 700, color: '#a855f7', display: 'block', fontSize: '0.8rem', marginBottom: 4, letterSpacing: '0.05em' }}>YOUR ACTION REQUIRED</span>
+                    As the <strong>Giver</strong>, you need to place a backlink on your site pointing to the Receiver's site. Click the <strong>Add link details</strong> button above to save the specific URL and anchor text once placed.
+                  </div>
+                ) : (
+                  <div style={{ background: 'rgba(2,132,199,0.05)', borderLeft: '3px solid #0284c7', padding: '10px 12px', borderRadius: '0 4px 4px 0' }}>
+                    <span style={{ fontWeight: 700, color: '#0284c7', display: 'block', fontSize: '0.8rem', marginBottom: 4, letterSpacing: '0.05em' }}>INCOMING BACKLINK</span>
+                    As the <strong>Receiver</strong>, you will receive a backlink from the Giver's site. You can view the placement details here as soon as they add them.
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button 
+                  onClick={() => setShowInfoModal(false)}
+                  style={{
+                    background: '#1a1a1a',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '8px 20px',
+                    fontWeight: 600,
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#333'}
+                  onMouseLeave={e => e.currentTarget.style.background = '#1a1a1a'}
+                >
+                  Got it
+                </button>
+              </div>
+            </div>
+          </div>
         )}
         <div style={{ padding:'20px 24px', display:'flex', flexDirection:'column', gap:12 }}>
           {messages.length === 0 && !showLinkModal && (

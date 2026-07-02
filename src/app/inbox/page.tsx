@@ -309,31 +309,37 @@ function InboxPageContent() {
                         
                         {/* Backlink Direction Badges */}
                         {incoming ? (
-                          <span style={{ 
-                            fontSize: '0.75rem', 
-                            fontWeight: 600, 
-                            color: '#0284c7', 
-                            background: '#e0f2fe', 
-                            padding: '2px 8px', 
-                            borderRadius: '4px',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 2
-                          }}>
+                          <span 
+                            title={`${t.giverWorkspace.domain} gives a backlink to ${t.receiverWorkspace.domain}`}
+                            style={{ 
+                              fontSize: '0.75rem', 
+                              fontWeight: 600, 
+                              color: '#0284c7', 
+                              background: '#e0f2fe', 
+                              padding: '2px 8px', 
+                              borderRadius: '4px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 2,
+                              cursor: 'help'
+                            }}>
                             <ArrowDownLeft size={11} /> Backlink In
                           </span>
                         ) : (
-                          <span style={{ 
-                            fontSize: '0.75rem', 
-                            fontWeight: 600, 
-                            color: '#7c3aed', 
-                            background: '#f3e8ff', 
-                            padding: '2px 8px', 
-                            borderRadius: '4px',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 2
-                          }}>
+                          <span 
+                            title={`${t.giverWorkspace.domain} gives a backlink to ${t.receiverWorkspace.domain}`}
+                            style={{ 
+                              fontSize: '0.75rem', 
+                              fontWeight: 600, 
+                              color: '#7c3aed', 
+                              background: '#f3e8ff', 
+                              padding: '2px 8px', 
+                              borderRadius: '4px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 2,
+                              cursor: 'help'
+                            }}>
                             <ArrowUpRight size={11} /> Backlink Out
                           </span>
                         )}
