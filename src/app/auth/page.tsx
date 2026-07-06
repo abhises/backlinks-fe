@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
 import Link from 'next/link';
+import api from '@/lib/api';
 import { Link2, Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, Sun, Moon, ArrowLeft } from 'lucide-react';
 
 export default function AuthPage() {
@@ -24,10 +25,11 @@ export default function AuthPage() {
 
   const ThemeIcon = theme === 'dark' ? Moon : Sun;
 
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [forgotSuccess, setForgotSuccess] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, register, loginWithGoogle, workspace } = useAuth();
@@ -87,8 +89,8 @@ export default function AuthPage() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const m = params.get('mode');
-      if (m === 'register' || m === 'login') {
-        setMode(m);
+      if (m === 'register' || m === 'login' || m === 'forgot') {
+        setMode(m as any);
       }
     }
   }, []);
@@ -97,7 +99,10 @@ export default function AuthPage() {
     e.preventDefault();
     setError(''); setLoading(true);
     try {
-      if (mode === 'login') {
+      if (mode === 'forgot') {
+        await api.post('/api/auth/forgot-password', { email });
+        setForgotSuccess(true);
+      } else if (mode === 'login') {
         const { user: loggedInUser, workspace: ws } = await login(email, password);
         if (loggedInUser?.role === 'ADMIN') {
           router.replace('/admin/dashboard');
@@ -151,10 +156,10 @@ export default function AuthPage() {
         </Link>
 
         <h1 style={{ fontSize:'1.5rem', fontWeight:800, marginBottom:4 }}>
-          {mode === 'login' ? 'Welcome back' : 'Create account'}
+          {mode === 'forgot' ? 'Reset password' : mode === 'login' ? 'Welcome back' : 'Create account'}
         </h1>
         <p style={{ color:'var(--text-secondary)', fontSize:'0.875rem', marginBottom:28 }}>
-          {mode === 'login' ? 'Sign in to your workspace' : "Grow your site's authority with real links"}
+          {mode === 'forgot' ? 'Enter your email to receive reset instructions' : mode === 'login' ? 'Sign in to your workspace' : "Grow your site's authority with real links"}
         </p>
 
         {error && (
@@ -163,7 +168,37 @@ export default function AuthPage() {
           </div>
         )}
 
-        {mode === 'register' ? (
+        {mode === 'forgot' ? (
+          forgotSuccess ? (
+            <div style={{ textAlign: 'center', padding: '12px 0' }}>
+              <div style={{ background: 'rgba(0, 184, 153, 0.1)', border: '1px solid rgba(0, 184, 153, 0.3)', borderRadius: 12, padding: 20, marginBottom: 24 }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--green)', marginBottom: 8 }}>Check your inbox! ✉️</h3>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                  If an account exists for <strong>{email}</strong>, we have sent a password reset link to your email.
+                </p>
+              </div>
+              <button onClick={() => { setMode('login'); setForgotSuccess(false); }} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+                Back to Sign In
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:16 }}>
+              <div className="input-group">
+                <label className="input-label">Email Address</label>
+                <div style={{ position:'relative' }}>
+                  <Mail size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
+                  <input id="auth-email" type="email" value={email} onChange={e=>setEmail(e.target.value)}
+                    className="input-field" style={{ paddingLeft:36 }} placeholder="jane@example.com" required />
+                </div>
+              </div>
+
+              <button id="auth-submit" type="submit" className="btn btn-primary" style={{ justifyContent:'center', marginTop:4 }} disabled={loading}>
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
+                {loading ? 'Sending link…' : 'Send Reset Link'}
+              </button>
+            </form>
+          )
+        ) : mode === 'register' ? (
           <>
             {/* Google Sign In Button FIRST for Register */}
             <div 
@@ -220,8 +255,14 @@ export default function AuthPage() {
               </div>
 
               <div className="input-group">
-                <label className="input-label">Password</label>
-                <div style={{ position:'relative' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <label className="input-label" style={{ marginBottom: 0 }}>Password</label>
+                  <button type="button" onClick={() => { setMode('forgot'); setError(''); setForgotSuccess(false); }}
+                    style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', padding: 0 }}>
+                    Forgot password?
+                  </button>
+                </div>
+                <div style={{ position:'relative', marginTop: 6 }}>
                   <Lock size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
                   <input id="auth-password" type={showPassword ? 'text' : 'password'} value={password} onChange={e=>setPassword(e.target.value)}
                     className="input-field" style={{ paddingLeft:36, paddingRight:36 }} placeholder="••••••••" required minLength={6} />
@@ -252,14 +293,23 @@ export default function AuthPage() {
           </>
         )}
 
-        <div className="divider" />
+        {mode !== 'forgot' && <div className="divider" />}
 
-        <p style={{ textAlign:'center', fontSize:'0.875rem', color:'var(--text-secondary)' }}>
-          {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-          <button onClick={() => { setMode(m => m==='login'?'register':'login'); setError(''); }}
-            style={{ color:'var(--accent)', fontWeight:600, background:'none', border:'none', cursor:'pointer' }}>
-            {mode === 'login' ? 'Sign up' : 'Sign in'}
-          </button>
+        <p style={{ textAlign:'center', fontSize:'0.875rem', color:'var(--text-secondary)', marginTop: mode === 'forgot' ? 24 : 0 }}>
+          {mode === 'forgot' ? (
+            <button onClick={() => { setMode('login'); setError(''); setForgotSuccess(false); }}
+              style={{ color:'var(--accent)', fontWeight:600, background:'none', border:'none', cursor:'pointer' }}>
+              ← Back to sign in
+            </button>
+          ) : (
+            <>
+              {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+              <button onClick={() => { setMode(m => m==='login'?'register':'login'); setError(''); }}
+                style={{ color:'var(--accent)', fontWeight:600, background:'none', border:'none', cursor:'pointer' }}>
+                {mode === 'login' ? 'Sign up' : 'Sign in'}
+              </button>
+            </>
+          )}
         </p>
       </div>
 
