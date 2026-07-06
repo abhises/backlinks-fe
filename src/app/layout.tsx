@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   title: "SERPsupport — Backlink Exchange Platform",
   description: "Safely coordinate and track backlink placements with website owners worldwide. Guest posts, niche edits, and more.",
   keywords: "backlink exchange, guest posts, niche edits, link building, SEO",
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
   openGraph: {
     title: "SERPsupport — Backlink Exchange Platform",
     description: "Safely coordinate and track backlink placements.",

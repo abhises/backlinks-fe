@@ -6,7 +6,7 @@ import api from '@/lib/api';
 import Link from 'next/link';
 import {
   Inbox, LayoutDashboard, Settings, LogOut, Sun, Moon, Palette,
-  Bell, Menu, X, ArrowDownLeft, ArrowUpRight, Sparkles, MessageCircle, Check, User
+  Bell, Menu, X, ArrowDownLeft, ArrowUpRight, Sparkles, MessageCircle, Check, User, Link2
 } from 'lucide-react';
 import { io } from 'socket.io-client';
 import GlobalSearch from './GlobalSearch';
@@ -323,9 +323,12 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
       <aside className="sidebar">
         {/* Logo and Bell */}
         <div style={{ padding: '12px 20px 12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
-            <div style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0' }}>SERPSupport</div>
-            <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', marginTop: '2px' }}>WEBSITE PORTAL</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Link2 size={26} color="var(--accent)" style={{ flexShrink: 0 }} />
+            <div>
+              <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.3rem', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0' }}>SERPsupport</div>
+              <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', marginTop: '2px' }}>WEBSITE PORTAL</div>
+            </div>
           </div>
           <div style={{ position: 'relative' }}>
             <button
@@ -471,7 +474,8 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
       >
         <div className="sidebar-logo" style={{ justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span className="logo-text">SERPsupport</span>
+            <Link2 size={24} color="var(--accent)" />
+            <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)' }}>SERPsupport</span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}

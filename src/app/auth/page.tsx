@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
 import Link from 'next/link';
-import { Link2, Mail, Lock, User, ArrowRight, Loader2, Sun, Moon, ArrowLeft } from 'lucide-react';
+import { Link2, Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, Sun, Moon, ArrowLeft } from 'lucide-react';
 
 export default function AuthPage() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
@@ -25,9 +25,9 @@ export default function AuthPage() {
   const ThemeIcon = theme === 'dark' ? Moon : Sun;
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, register, loginWithGoogle, workspace } = useAuth();
@@ -105,7 +105,7 @@ export default function AuthPage() {
           router.replace(ws ? '/inbox' : '/onboarding');
         }
       } else {
-        await register(name, email, password);
+        await register(email, password);
         router.replace('/onboarding');
       }
     } catch (err: any) {
@@ -146,15 +146,15 @@ export default function AuthPage() {
       <div className="auth-card animate-slide-up">
         {/* Logo */}
         <Link href="/" style={{ display:'flex', alignItems:'center', gap:10, marginBottom:32, textDecoration:'none' }}>
-          <div className="logo-icon" style={{ background: 'var(--accent)', boxShadow: 'none' }}><Link2 size={18} color="#fff" /></div>
-          <span className="font-serif" style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>SERPsupport</span>
+          <Link2 size={28} color="var(--accent)" />
+          <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.4rem', fontWeight: 600, color: 'var(--text-primary)' }}>SERPsupport</span>
         </Link>
 
         <h1 style={{ fontSize:'1.5rem', fontWeight:800, marginBottom:4 }}>
           {mode === 'login' ? 'Welcome back' : 'Create account'}
         </h1>
         <p style={{ color:'var(--text-secondary)', fontSize:'0.875rem', marginBottom:28 }}>
-          {mode === 'login' ? 'Sign in to your workspace' : 'Start your backlink exchange journey'}
+          {mode === 'login' ? 'Sign in to your workspace' : "Grow your site's authority with real links"}
         </p>
 
         {error && (
@@ -163,53 +163,94 @@ export default function AuthPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:16 }}>
-          {mode === 'register' && (
-            <div className="input-group">
-              <label className="input-label">Full Name</label>
-              <div style={{ position:'relative' }}>
-                <User size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
-                <input id="auth-name" type="text" value={name} onChange={e=>setName(e.target.value)}
-                  className="input-field" style={{ paddingLeft:36 }} placeholder="Jane Smith" required />
+        {mode === 'register' ? (
+          <>
+            {/* Google Sign In Button FIRST for Register */}
+            <div 
+              id="google-signin-btn" 
+              style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: 4, minHeight: 40 }}
+            />
+
+            <div style={{ display: 'flex', alignItems: 'center', margin: '16px 0 20px 0' }}>
+              <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
+              <span style={{ padding: '0 10px', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>or continue with email</span>
+              <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
+            </div>
+
+            <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:16 }}>
+              <div className="input-group">
+                <label className="input-label">Email Address</label>
+                <div style={{ position:'relative' }}>
+                  <Mail size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
+                  <input id="auth-email" type="email" value={email} onChange={e=>setEmail(e.target.value)}
+                    className="input-field" style={{ paddingLeft:36 }} placeholder="jane@example.com" required />
+                </div>
               </div>
+
+              <div className="input-group">
+                <label className="input-label">Password</label>
+                <div style={{ position:'relative' }}>
+                  <Lock size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
+                  <input id="auth-password" type={showPassword ? 'text' : 'password'} value={password} onChange={e=>setPassword(e.target.value)}
+                    className="input-field" style={{ paddingLeft:36, paddingRight:36 }} placeholder="••••••••" required minLength={6} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'var(--text-muted)', display:'flex', alignItems:'center', padding:0 }}>
+                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+              </div>
+
+              <button id="auth-submit" type="submit" className="btn btn-primary" style={{ justifyContent:'center', marginTop:4 }} disabled={loading}>
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
+                {loading ? 'Please wait…' : 'Start your 7 day free trial'}
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            {/* Email Form FIRST for Login */}
+            <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:16 }}>
+              <div className="input-group">
+                <label className="input-label">Email Address</label>
+                <div style={{ position:'relative' }}>
+                  <Mail size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
+                  <input id="auth-email" type="email" value={email} onChange={e=>setEmail(e.target.value)}
+                    className="input-field" style={{ paddingLeft:36 }} placeholder="jane@example.com" required />
+                </div>
+              </div>
+
+              <div className="input-group">
+                <label className="input-label">Password</label>
+                <div style={{ position:'relative' }}>
+                  <Lock size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
+                  <input id="auth-password" type={showPassword ? 'text' : 'password'} value={password} onChange={e=>setPassword(e.target.value)}
+                    className="input-field" style={{ paddingLeft:36, paddingRight:36 }} placeholder="••••••••" required minLength={6} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'var(--text-muted)', display:'flex', alignItems:'center', padding:0 }}>
+                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+              </div>
+
+              <button id="auth-submit" type="submit" className="btn btn-primary" style={{ justifyContent:'center', marginTop:4 }} disabled={loading}>
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
+                {loading ? 'Please wait…' : 'Sign In'}
+              </button>
+            </form>
+
+            <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0 12px 0' }}>
+              <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
+              <span style={{ padding: '0 10px', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>or</span>
+              <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
             </div>
-          )}
 
-          <div className="input-group">
-            <label className="input-label">Email Address</label>
-            <div style={{ position:'relative' }}>
-              <Mail size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
-              <input id="auth-email" type="email" value={email} onChange={e=>setEmail(e.target.value)}
-                className="input-field" style={{ paddingLeft:36 }} placeholder="jane@example.com" required />
-            </div>
-          </div>
-
-          <div className="input-group">
-            <label className="input-label">Password</label>
-            <div style={{ position:'relative' }}>
-              <Lock size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
-              <input id="auth-password" type="password" value={password} onChange={e=>setPassword(e.target.value)}
-                className="input-field" style={{ paddingLeft:36 }} placeholder="••••••••" required minLength={6} />
-            </div>
-          </div>
-
-          <button id="auth-submit" type="submit" className="btn btn-primary" style={{ justifyContent:'center', marginTop:4 }} disabled={loading}>
-            {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-            {loading ? 'Please wait…' : mode === 'login' ? 'Sign In' : 'Create Account'}
-          </button>
-        </form>
-
-        <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0 12px 0' }}>
-          <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
-          <span style={{ padding: '0 10px', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>or</span>
-          <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
-        </div>
-
-        {/* Google Sign In Button */}
-        <div 
-          id="google-signin-btn" 
-          style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: 12, minHeight: 40 }}
-        />
+            {/* Google Sign In Button BELOW for Login */}
+            <div 
+              id="google-signin-btn" 
+              style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: 12, minHeight: 40 }}
+            />
+          </>
+        )}
 
         <div className="divider" />
 

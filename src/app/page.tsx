@@ -242,7 +242,10 @@ export default function Home() {
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '40px', marginBottom: '60px' }}>
             <div>
-              <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.5rem', fontWeight: 600, marginBottom: '20px', color: '#fff' }}>SERPsupport</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '20px' }}>
+                <Link2 size={24} color="var(--accent)" />
+                <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.5rem', fontWeight: 600, color: '#fff', margin: 0 }}>SERPsupport</h3>
+              </div>
               <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1rem', lineHeight: 1.6, maxWidth: '350px' }}>
                 Boost your SEO by exchanging high-quality backlinks. Use our portal to connect with sites and improve rankings.
               </p>

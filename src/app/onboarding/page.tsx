@@ -46,14 +46,14 @@ export default function OnboardingPage() {
 
       <div className="auth-card animate-slide-up" style={{ maxWidth:520 }}>
         <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:28 }}>
-          <div className="logo-icon"><Link2 size={18} color="#fff" /></div>
-          <span className="logo-text">SERPsupport</span>
+          <Link2 size={28} color="var(--accent)" />
+          <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.4rem', fontWeight: 600, color: 'var(--text-primary)' }}>SERPsupport</span>
         </div>
 
         <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:6 }}>
           <Sparkles size={18} color="var(--accent)" />
           <h2 style={{ fontSize:'1.25rem', fontWeight:800 }}>
-            Set up your workspace
+            Set up your workspace screen
           </h2>
         </div>
         <p style={{ color:'var(--text-secondary)', fontSize:'0.875rem', marginBottom:28 }}>

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Shield, LayoutDashboard, Settings, Bell,
-  LogOut, Sun, Moon, Palette, Menu, X, Globe
+  LogOut, Sun, Moon, Palette, Menu, X, Globe, Link2
 } from 'lucide-react';
 
 const NAV = [
@@ -54,10 +54,13 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       {/* Sidebar */}
       <aside className="sidebar">
         <div className="sidebar-logo">
-          <div className="logo-icon" style={{ background: 'linear-gradient(135deg, var(--red), var(--amber))', boxShadow: '0 0 16px rgba(239, 68, 68, 0.25)' }}>
-            <Shield size={17} color="#fff" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Link2 size={26} color="var(--accent)" style={{ flexShrink: 0 }} />
+            <div>
+              <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.3rem', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0' }}>SERPsupport</div>
+              <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--red)', letterSpacing: '0.05em', marginTop: '2px', textTransform: 'uppercase' }}>ADMIN PANEL</div>
+            </div>
           </div>
-          <span className="logo-text">Admin Panel</span>
         </div>
 
         {/* Nav links */}
@@ -124,10 +127,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       >
         <div className="sidebar-logo" style={{ justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div className="logo-icon" style={{ background: 'linear-gradient(135deg, var(--red), var(--amber))' }}>
-              <Shield size={17} color="#fff" />
-            </div>
-            <span className="logo-text">Admin Panel</span>
+            <Link2 size={24} color="var(--accent)" />
+            <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-primary)' }}>SERPsupport <span style={{ fontSize: '0.8rem', color: 'var(--red)' }}>(Admin)</span></span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
