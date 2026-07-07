@@ -11,6 +11,7 @@ import {
 import { io } from 'socket.io-client';
 import GlobalSearch from './GlobalSearch';
 import Cookies from 'js-cookie';
+import { useLanguage } from '@/context/LanguageContext';
 
 type NotificationItem = {
   id: string;
@@ -75,15 +76,16 @@ const formatTimeAgo = (date: Date) => {
 };
 
 const NAV = [
-  { href: '/inbox', icon: Inbox, label: 'Inbox' },
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/how-it-works', icon: Sparkles, label: 'How it works' },
+  { href: '/inbox', icon: Inbox, label: 'Inbox', key: 'app.inbox' },
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', key: 'app.dashboard' },
+  { href: '/how-it-works', icon: Sparkles, label: 'How it works', key: 'app.howItWorks' },
 ];
 
 const THEMES = ['dark', 'light'] as const;
 type Theme = typeof THEMES[number];
 
 function AppShellContent({ children }: { children: React.ReactNode }) {
+  const { t } = useLanguage();
   const { user, workspace, logout, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -370,21 +372,21 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         {/* Theme Toggle */}
         <div style={{ margin: '2px 8px 12px 8px', display: 'flex', background: 'var(--bg-surface)', borderRadius: '6px', border: '1px solid var(--border)', padding: '4px' }}>
           <button onClick={() => changeTheme('light')} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px', background: theme === 'light' ? 'var(--bg-hover)' : 'transparent', border: 'none', borderRadius: '4px', cursor: 'pointer', color: theme === 'light' ? 'var(--text-primary)' : 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, transition: 'all 0.2s' }}>
-            <Sun size={14} /> Light
+            <Sun size={14} /> {t('app.light')}
           </button>
           <button onClick={() => changeTheme('dark')} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px', background: theme === 'dark' ? 'var(--bg-hover)' : 'transparent', border: 'none', borderRadius: '4px', cursor: 'pointer', color: theme === 'dark' ? 'var(--text-primary)' : 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, transition: 'all 0.2s' }}>
-            <Moon size={14} /> Dark
+            <Moon size={14} /> {t('app.dark')}
           </button>
         </div>
 
         {/* Nav links */}
-        {NAV.map(({ href, icon: Icon, label }) => {
+        {NAV.map(({ href, icon: Icon, label, key }) => {
           const active = isLinkActive(href);
           return (
             <Link key={href} href={href}
               className={`nav-item ${active ? 'active' : ''}`}>
               <Icon size={18} />
-              {label}
+              {t(key || '') || label}
             </Link>
           );
         })}
@@ -407,7 +409,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
             <div style={{ minWidth: 0, overflow: 'hidden' }}>
               <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{workspace?.domain || user.name}</div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                <Settings size={12} /> Settings · {user.name.split(' ')[0]}
+                <Settings size={12} /> {t('app.settings')} · {user.name.split(' ')[0]}
               </div>
             </div>
           </div>
@@ -448,7 +450,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
             }}
           >
             <LogOut size={14} />
-            Sign Out
+            {t('app.signOut')}
           </button>
         </div>
       </aside>
@@ -491,21 +493,21 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         {/* Theme Toggle */}
         <div style={{ margin: '2px 8px 12px 8px', display: 'flex', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '4px' }}>
           <button onClick={() => changeTheme('light')} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px', background: theme === 'light' ? 'rgba(255,255,255,0.1)' : 'transparent', border: 'none', borderRadius: '4px', cursor: 'pointer', color: theme === 'light' ? '#fff' : 'rgba(255,255,255,0.5)', fontSize: '0.75rem', fontWeight: 600, transition: 'all 0.2s' }}>
-            <Sun size={14} /> Light
+            <Sun size={14} /> {t('app.light')}
           </button>
           <button onClick={() => changeTheme('dark')} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px', background: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'transparent', border: 'none', borderRadius: '4px', cursor: 'pointer', color: theme === 'dark' ? '#fff' : 'rgba(255,255,255,0.5)', fontSize: '0.75rem', fontWeight: 600, transition: 'all 0.2s' }}>
-            <Moon size={14} /> Dark
+            <Moon size={14} /> {t('app.dark')}
           </button>
         </div>
 
-        {NAV.map(({ href, icon: Icon, label }) => {
+        {NAV.map(({ href, icon: Icon, label, key }) => {
           const active = isLinkActive(href);
           return (
             <Link key={href} href={href}
               className={`nav-item ${active ? 'active' : ''}`}
               onClick={() => setSidebarOpen(false)}>
               <Icon size={18} />
-              {label}
+              {t(key || '') || label}
             </Link>
           );
         })}
@@ -543,7 +545,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
             }}
           >
             <LogOut size={18} />
-            Sign Out
+            {t('app.signOut')}
           </button>
         </div>
       </aside>

@@ -7,6 +7,7 @@ import {
   HelpCircle, AlertTriangle, Check, Copy, 
   Mail, Shield, ArrowRight, HelpCircle as HelpIcon, Plus, Loader2, Sun, Moon
 } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 type TeamMember = {
   id: string;
@@ -29,6 +30,7 @@ const FAQS = [
 ];
 
 export default function SettingsPage() {
+  const { t } = useLanguage();
   const { workspace, user, setWorkspace } = useAuth();
   
   // Website profile state
@@ -196,8 +198,8 @@ export default function SettingsPage() {
         
         {/* Header */}
         <div style={{ padding: '24px 0 20px', borderBottom: '1px solid var(--border)', marginBottom: 32 }}>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Workspace Settings</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: 4 }}>Configure website specs, permissions, billing, and team collaboration options.</p>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>{t('settings.title')}</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: 4 }}>{t('settings.subtitle')}</p>
         </div>
 
         {/* 1. Website Profile */}
@@ -208,11 +210,11 @@ export default function SettingsPage() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 600 }}>
             <div className="input-group">
-              <label className="input-label">Website Name</label>
+              <label className="input-label">{t('settings.websiteName')}</label>
               <input type="text" value={siteName} onChange={e => setSiteName(e.target.value)} className="input-field" placeholder="My SEO Site" />
             </div>
             <div className="input-group">
-              <label className="input-label">Primary Domain</label>
+              <label className="input-label">{t('settings.websiteUrl')}</label>
               <input type="text" value={siteDomain} onChange={e => setSiteDomain(e.target.value)} className="input-field" placeholder="example.com" />
             </div>
             <div className="input-group">
@@ -237,11 +239,11 @@ export default function SettingsPage() {
                 style={{ width: 'fit-content' }}
               >
                 {saveLoading ? <Loader2 size={16} className="animate-spin" /> : null}
-                Save Website Changes
+                {saveLoading ? t('settings.saving') : t('settings.saveChanges')}
               </button>
               {saveSuccess && (
                 <span style={{ color: 'var(--green)', fontSize: '0.8125rem', fontWeight: 600 }}>
-                  ✓ Website profile updated!
+                  ✓ {t('settings.success')}
                 </span>
               )}
               {saveError && (

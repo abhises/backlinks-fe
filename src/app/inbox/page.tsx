@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import { Inbox, Loader2, MessageSquare, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useLanguage } from '@/context/LanguageContext';
 
 type Thread = {
   id: string;
@@ -66,6 +67,7 @@ const formatRelativeTime = (dateString: string) => {
 };
 
 function InboxPageContent() {
+  const { t: trans } = useLanguage();
   const { workspace } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -216,11 +218,11 @@ function InboxPageContent() {
   const countOut = threads.filter(t => t.giverWorkspace.id === workspace?.id && !checkNeedsAction(t) && t.status !== 'REJECTED').length;
 
   const filterOptions = [
-    { key: 'all', label: `All ${countAll}` },
+    { key: 'all', label: `${trans('inbox.filterAll')} ${countAll}` },
     { key: 'new', label: `New ${countNew}` },
-    { key: 'in', label: `Backlinks In ${countIn}` },
-    { key: 'out', label: `Backlinks Out ${countOut}` },
-    { key: 'rejected', label: `Rejected ${countRejected}/${rejectLimit}` },
+    { key: 'in', label: `${trans('inbox.backlinkIn')} ${countIn}` },
+    { key: 'out', label: `${trans('inbox.backlinkOut')} ${countOut}` },
+    { key: 'rejected', label: `${trans('inbox.filterRejected')} ${countRejected}/${rejectLimit}` },
   ];
 
   return (
@@ -228,7 +230,7 @@ function InboxPageContent() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 32px 8px 32px' }}>
         <h1 style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '2.25rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>
-          {filter === 'out' ? 'Backlinks Out' : filter === 'in' ? 'Backlinks In' : filter === 'rejected' ? 'Rejected Requests' : 'Inbox'}
+          {filter === 'out' ? trans('inbox.backlinkOut') : filter === 'in' ? trans('inbox.backlinkIn') : filter === 'rejected' ? trans('inbox.filterRejected') : trans('inbox.title')}
         </h1>
         <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{filteredThreads.length} threads</span>
       </div>
@@ -253,14 +255,14 @@ function InboxPageContent() {
         ) : threads.length === 0 ? (
           <div className="empty-state" style={{ padding: '80px 20px' }}>
             <div className="empty-state-icon" style={{ fontSize: '2.5rem', marginBottom: 12 }}><Inbox /></div>
-            <h3>No conversations yet</h3>
-            <p>Once you are matched, your active connections will appear here.</p>
+            <h3>{trans('inbox.noThreads')}</h3>
+            <p>{trans('inbox.noThreadsDesc')}</p>
           </div>
         ) : filteredThreads.length === 0 ? (
           <div className="empty-state" style={{ padding: '80px 20px' }}>
             <div className="empty-state-icon" style={{ fontSize: '2.5rem', marginBottom: 12 }}><Inbox /></div>
-            <h3>No matching conversations</h3>
-            <p>Try adjusting your search query or filters above.</p>
+            <h3>{trans('inbox.noThreads')}</h3>
+            <p>{trans('inbox.noThreadsDesc')}</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -323,7 +325,7 @@ function InboxPageContent() {
                               gap: 2,
                               cursor: 'help'
                             }}>
-                            <ArrowDownLeft size={11} /> Backlink In
+                            <ArrowDownLeft size={11} /> {trans('inbox.backlinkIn')}
                           </span>
                         ) : (
                           <span 
@@ -340,7 +342,7 @@ function InboxPageContent() {
                               gap: 2,
                               cursor: 'help'
                             }}>
-                            <ArrowUpRight size={11} /> Backlink Out
+                            <ArrowUpRight size={11} /> {trans('inbox.backlinkOut')}
                           </span>
                         )}
 

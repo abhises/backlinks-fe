@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import { ExternalLink, Loader2, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
+import { useLanguage } from '@/context/LanguageContext';
 
 type LinkRow = {
   id: string;
@@ -107,6 +108,7 @@ const StatusDropdown = ({ linkId, currentStatus, onStatusChange }: { linkId: str
 
 
 export default function LinksPage() {
+  const { t } = useLanguage();
   const { workspace } = useAuth();
   const [links, setLinks] = useState<LinkRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -166,9 +168,9 @@ export default function LinksPage() {
   };
 
   const typeFilters = [
-    { value: 'ALL', label: 'All' },
-    { value: 'RECEIVED', label: 'Backlinks In' },
-    { value: 'GIVEN', label: 'Backlinks Out' },
+    { value: 'ALL', label: t('inbox.filterAll') },
+    { value: 'RECEIVED', label: t('inbox.backlinkIn') },
+    { value: 'GIVEN', label: t('inbox.backlinkOut') },
   ];
 
   const statusFilters = [
@@ -184,10 +186,10 @@ export default function LinksPage() {
       {/* Page Header */}
       <div style={{ padding: '28px 32px 0 32px' }}>
         <h1 style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '2rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>
-          Dashboard
+          {t('dash.title')}
         </h1>
         <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '6px 0 0 0' }}>
-          An overview of every backlink placed across your site and partner sites.
+          {t('dash.subtitle')}
         </p>
       </div>
 
@@ -288,14 +290,14 @@ export default function LinksPage() {
         ) : links.length === 0 ? (
           <div className="empty-state" style={{ padding: '80px 20px' }}>
             <div className="empty-state-icon" style={{ fontSize: '2.5rem', marginBottom: 12 }}><ExternalLink /></div>
-            <h3>No placed links yet</h3>
-            <p>Once you complete an exchange thread and submit link details, they will appear here.</p>
+            <h3>{t('dash.noWebsites')}</h3>
+            <p>{t('dash.noWebsitesDesc')}</p>
           </div>
         ) : filteredLinks.length === 0 ? (
           <div className="empty-state" style={{ padding: '80px 20px' }}>
             <div className="empty-state-icon" style={{ fontSize: '2.5rem', marginBottom: 12 }}><ExternalLink /></div>
-            <h3>No matching links</h3>
-            <p>Adjust your filters or search above to view other records.</p>
+            <h3>{t('dash.noWebsites')}</h3>
+            <p>{t('dash.noWebsitesDesc')}</p>
           </div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>

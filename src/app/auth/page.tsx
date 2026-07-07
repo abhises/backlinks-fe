@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/context/LanguageContext';
 import Script from 'next/script';
 import Link from 'next/link';
 import api from '@/lib/api';
@@ -33,6 +34,7 @@ export default function AuthPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, register, loginWithGoogle, workspace } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const initGoogleSignIn = () => {
@@ -156,10 +158,10 @@ export default function AuthPage() {
         </Link>
 
         <h1 style={{ fontSize:'1.5rem', fontWeight:800, marginBottom:4 }}>
-          {mode === 'forgot' ? 'Reset password' : mode === 'login' ? 'Welcome back' : 'Create account'}
+          {mode === 'forgot' ? t('auth.resetPassword') : mode === 'login' ? t('auth.welcomeBack') : t('auth.createAccount')}
         </h1>
         <p style={{ color:'var(--text-secondary)', fontSize:'0.875rem', marginBottom:28 }}>
-          {mode === 'forgot' ? 'Enter your email to receive reset instructions' : mode === 'login' ? 'Sign in to your workspace' : "Grow your site's authority with real links"}
+          {mode === 'forgot' ? t('auth.resetDesc') : mode === 'login' ? t('auth.loginDesc') : t('auth.registerDesc')}
         </p>
 
         {error && (
@@ -172,19 +174,19 @@ export default function AuthPage() {
           forgotSuccess ? (
             <div style={{ textAlign: 'center', padding: '12px 0' }}>
               <div style={{ background: 'rgba(0, 184, 153, 0.1)', border: '1px solid rgba(0, 184, 153, 0.3)', borderRadius: 12, padding: 20, marginBottom: 24 }}>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--green)', marginBottom: 8 }}>Check your inbox! ✉️</h3>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--green)', marginBottom: 8 }}>{t('auth.checkInbox')}</h3>
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                  If an account exists for <strong>{email}</strong>, we have sent a password reset link to your email.
+                  {t('auth.checkInboxDesc')} <strong>{email}</strong>
                 </p>
               </div>
               <button onClick={() => { setMode('login'); setForgotSuccess(false); }} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
-                Back to Sign In
+                {t('auth.backToSignIn')}
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:16 }}>
               <div className="input-group">
-                <label className="input-label">Email Address</label>
+                <label className="input-label">{t('auth.email')}</label>
                 <div style={{ position:'relative' }}>
                   <Mail size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
                   <input id="auth-email" type="email" value={email} onChange={e=>setEmail(e.target.value)}
@@ -194,7 +196,7 @@ export default function AuthPage() {
 
               <button id="auth-submit" type="submit" className="btn btn-primary" style={{ justifyContent:'center', marginTop:4 }} disabled={loading}>
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-                {loading ? 'Sending link…' : 'Send Reset Link'}
+                {loading ? t('auth.sendingLink') : t('auth.sendResetLink')}
               </button>
             </form>
           )
@@ -208,13 +210,13 @@ export default function AuthPage() {
 
             <div style={{ display: 'flex', alignItems: 'center', margin: '16px 0 20px 0' }}>
               <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
-              <span style={{ padding: '0 10px', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>or continue with email</span>
+              <span style={{ padding: '0 10px', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>{t('auth.orContinue')}</span>
               <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
             </div>
 
             <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:16 }}>
               <div className="input-group">
-                <label className="input-label">Email Address</label>
+                <label className="input-label">{t('auth.email')}</label>
                 <div style={{ position:'relative' }}>
                   <Mail size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
                   <input id="auth-email" type="email" value={email} onChange={e=>setEmail(e.target.value)}
@@ -223,7 +225,7 @@ export default function AuthPage() {
               </div>
 
               <div className="input-group">
-                <label className="input-label">Password</label>
+                <label className="input-label">{t('auth.password')}</label>
                 <div style={{ position:'relative' }}>
                   <Lock size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
                   <input id="auth-password" type={showPassword ? 'text' : 'password'} value={password} onChange={e=>setPassword(e.target.value)}
@@ -237,7 +239,7 @@ export default function AuthPage() {
 
               <button id="auth-submit" type="submit" className="btn btn-primary" style={{ justifyContent:'center', marginTop:4 }} disabled={loading}>
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-                {loading ? 'Please wait…' : 'Start your 7 day free trial'}
+                {loading ? t('auth.pleaseWait') : t('auth.startTrial')}
               </button>
             </form>
           </>
@@ -246,7 +248,7 @@ export default function AuthPage() {
             {/* Email Form FIRST for Login */}
             <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:16 }}>
               <div className="input-group">
-                <label className="input-label">Email Address</label>
+                <label className="input-label">{t('auth.email')}</label>
                 <div style={{ position:'relative' }}>
                   <Mail size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
                   <input id="auth-email" type="email" value={email} onChange={e=>setEmail(e.target.value)}
@@ -256,10 +258,10 @@ export default function AuthPage() {
 
               <div className="input-group">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <label className="input-label" style={{ marginBottom: 0 }}>Password</label>
+                  <label className="input-label" style={{ marginBottom: 0 }}>{t('auth.password')}</label>
                   <button type="button" onClick={() => { setMode('forgot'); setError(''); setForgotSuccess(false); }}
                     style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', padding: 0 }}>
-                    Forgot password?
+                    {t('auth.forgotPassword')}
                   </button>
                 </div>
                 <div style={{ position:'relative', marginTop: 6 }}>
@@ -275,13 +277,13 @@ export default function AuthPage() {
 
               <button id="auth-submit" type="submit" className="btn btn-primary" style={{ justifyContent:'center', marginTop:4 }} disabled={loading}>
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-                {loading ? 'Please wait…' : 'Sign In'}
+                {loading ? t('auth.pleaseWait') : t('auth.signIn')}
               </button>
             </form>
 
             <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0 12px 0' }}>
               <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
-              <span style={{ padding: '0 10px', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>or</span>
+              <span style={{ padding: '0 10px', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>{t('auth.or')}</span>
               <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
             </div>
 
@@ -299,14 +301,14 @@ export default function AuthPage() {
           {mode === 'forgot' ? (
             <button onClick={() => { setMode('login'); setError(''); setForgotSuccess(false); }}
               style={{ color:'var(--accent)', fontWeight:600, background:'none', border:'none', cursor:'pointer' }}>
-              ← Back to sign in
+              ← {t('auth.backToSignIn')}
             </button>
           ) : (
             <>
-              {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+              {mode === 'login' ? t('auth.noAccount') : t('auth.hasAccount')}
               <button onClick={() => { setMode(m => m==='login'?'register':'login'); setError(''); }}
                 style={{ color:'var(--accent)', fontWeight:600, background:'none', border:'none', cursor:'pointer' }}>
-                {mode === 'login' ? 'Sign up' : 'Sign in'}
+                {mode === 'login' ? t('auth.signUp') : t('auth.signIn')}
               </button>
             </>
           )}

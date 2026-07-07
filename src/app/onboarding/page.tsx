@@ -4,8 +4,10 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Link2, Globe, Sparkles, Loader2 } from 'lucide-react';
 import api from '@/lib/api';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function OnboardingPage() {
+  const { t } = useLanguage();
   const { user, setWorkspace, logout } = useAuth();
   const router = useRouter();
   const [domain, setDomain] = useState('');
@@ -53,11 +55,11 @@ export default function OnboardingPage() {
         <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:6 }}>
           <Sparkles size={18} color="var(--accent)" />
           <h2 style={{ fontSize:'1.25rem', fontWeight:800 }}>
-            Set up your workspace screen
+            {t('onboard.title')}
           </h2>
         </div>
         <p style={{ color:'var(--text-secondary)', fontSize:'0.875rem', marginBottom:28 }}>
-          Hi {user?.name?.split(' ')[0] || 'there'}! Let's get your site profile set up.
+          {t('onboard.subtitle')}
         </p>
 
         {error && (
@@ -90,7 +92,7 @@ export default function OnboardingPage() {
               <button type="button" onClick={logout} className="btn btn-secondary" style={{ flex:1, justifyContent:'center' }}>Back</button>
               <button id="ob-submit" type="submit" className="btn btn-primary" style={{ flex:2, justifyContent:'center' }} disabled={loading}>
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
-                {loading ? 'Creating…' : 'Launch Workspace'}
+                {loading ? 'Creating…' : t('onboard.complete')}
               </button>
             </div>
           </div>
