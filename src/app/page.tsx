@@ -7,14 +7,17 @@ import {
   Menu, X, Users, PlayCircle, Check,
   Sun, Moon
 } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
+import Cookies from 'js-cookie';
 
 export default function Home() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
-    const saved = (localStorage.getItem('bl_theme') as 'light' | 'dark') || 'light';
+    const saved = (localStorage.getItem('bl_theme') as 'light' | 'dark') || 'dark';
     setTheme(saved);
     document.documentElement.setAttribute('data-theme', saved);
   }, []);
@@ -24,6 +27,7 @@ export default function Home() {
     setTheme(next);
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('bl_theme', next);
+    Cookies.set('bl_theme', next, { expires: 365, path: '/' });
   };
 
   const ThemeIcon = theme === 'dark' ? Moon : Sun;
@@ -56,10 +60,10 @@ export default function Home() {
 
           {/* Desktop nav links */}
           <nav className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-            <a href="#features" style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 500, fontSize: '1rem', transition: 'color 0.2s' }}>Features</a>
-            <a href="#how-it-works" style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 500, fontSize: '1rem', transition: 'color 0.2s' }}>How it works</a>
-            <a href="#importance" style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 500, fontSize: '1rem', transition: 'color 0.2s' }}>Importance</a>
-            <a href="#contact" style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 500, fontSize: '1rem', transition: 'color 0.2s' }}>Contact</a>
+            <a href="#features" style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 500, fontSize: '1rem', transition: 'color 0.2s' }}>{t('nav.features')}</a>
+            <a href="#how-it-works" style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 500, fontSize: '1rem', transition: 'color 0.2s' }}>{t('nav.howItWorks')}</a>
+            <a href="#importance" style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 500, fontSize: '1rem', transition: 'color 0.2s' }}>{t('nav.importance')}</a>
+            <a href="#contact" style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 500, fontSize: '1rem', transition: 'color 0.2s' }}>{t('nav.contact')}</a>
           </nav>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -75,15 +79,15 @@ export default function Home() {
             <span className="landing-nav-links" style={{ display: 'contents' }}>
               {user ? (
                 <Link href="/inbox" className="btn btn-primary" style={{ borderRadius: '4px', padding: '10px 24px', fontWeight: 700 }}>
-                  Dashboard <ArrowRight size={16} />
+                  {t('nav.dashboard')} <ArrowRight size={16} />
                 </Link>
               ) : (
                 <>
                   <Link href="/auth?mode=login" style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600, fontSize: '1rem' }}>
-                    Sign In
+                    {t('nav.signIn')}
                   </Link>
                   <Link href="/auth?mode=register" className="btn btn-primary" style={{ borderRadius: '4px', padding: '10px 24px', fontWeight: 700 }}>
-                    Sign Up
+                    {t('nav.signUp')}
                   </Link>
                 </>
               )}
@@ -117,9 +121,10 @@ export default function Home() {
               fontSize: '3.5rem', 
               fontWeight: 700,
               marginBottom: '24px',
-              lineHeight: 1.2
+              lineHeight: 1.2,
+              whiteSpace: 'pre-line'
             }}>
-              Building Links,<br />Made Easy
+              {t('hero.title')}
             </h1>
 
             <p style={{ 
@@ -129,7 +134,7 @@ export default function Home() {
               color: 'var(--text-hero)',
               opacity: 0.85
             }}>
-              SERPsupport is the ultimate platform for building connections between websites. Use our chat functionality to discuss the type of backlinks and outlinks. Easily approve or reject connections, ensuring high-quality links.
+              {t('hero.subtitle')}
             </p>
 
           </div>
@@ -155,10 +160,9 @@ export default function Home() {
       <section id="features" style={{ background: 'var(--bg-surface)', padding: '100px 24px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <h2 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>What Makes SERPsupport Different?</h2>
+            <h2 style={{ marginBottom: '20px', color: 'var(--text-primary)' }}>{t('features.title')}</h2>
             <p style={{ maxWidth: '800px', margin: '0 auto', color: 'var(--text-secondary)', fontSize: '1.125rem' }}>
-              SERPsupport offers a new way to build backlinks by connecting you directly with website owners through chat, allowing personalized and flexible link placements. 
-              Unlike traditional methods, the portal allows you to give and receive backlinks from different sites, avoiding direct link swaps. You have full control to approve or reject links, ensuring they are high-quality and relevant.
+              {t('features.desc')}
             </p>
           </div>
         </div>
@@ -174,7 +178,7 @@ export default function Home() {
             color: 'var(--text-primary)', 
             fontStyle: 'italic'
           }}>
-            “Say goodbye to outdated backlink methods and hello to smarter, more strategic link building with SERPsupport!”
+            {t('quote.text')}
           </h2>
         </div>
       </section>
@@ -182,16 +186,16 @@ export default function Home() {
       {/* How it works */}
       <section id="how-it-works" style={{ background: 'var(--bg-surface)', padding: '100px 24px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', marginBottom: '60px', color: 'var(--text-primary)' }}>How it works</h2>
+          <h2 style={{ textAlign: 'center', marginBottom: '60px', color: 'var(--text-primary)' }}>{t('how.title')}</h2>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px' }}>
             {[
-              { title: 'Sign up to SERPsupport', icon: <Users size={32} /> },
-              { title: 'Login and add your website', icon: <Globe size={32} /> },
-              { title: 'Approve/Reject website connections', icon: <ShieldCheck size={32} /> },
-              { title: 'When both sides approve, chat will start', icon: <PlayCircle size={32} /> },
-              { title: 'Discuss and agree on the link placement', icon: <Link2 size={32} /> },
-              { title: 'Monitor your backlinks', icon: <Check size={32} /> },
+              { title: t('how.step1'), icon: <Users size={32} /> },
+              { title: t('how.step2'), icon: <Globe size={32} /> },
+              { title: t('how.step3'), icon: <ShieldCheck size={32} /> },
+              { title: t('how.step4'), icon: <PlayCircle size={32} /> },
+              { title: t('how.step5'), icon: <Link2 size={32} /> },
+              { title: t('how.step6'), icon: <Check size={32} /> },
             ].map((step, idx) => (
               <div 
                 key={idx} 
@@ -227,12 +231,12 @@ export default function Home() {
       {/* The Importance of Backlinks */}
       <section id="importance" style={{ padding: '100px 24px', background: 'var(--bg-base)' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ marginBottom: '30px', color: 'var(--text-primary)' }}>The Importance of Backlinks</h2>
+          <h2 style={{ marginBottom: '30px', color: 'var(--text-primary)' }}>{t('importance.title')}</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.125rem', marginBottom: '20px' }}>
-            Backlinks are essential for SEO as they act as endorsements from other websites, signaling to search engines that your site is authoritative and relevant. Backlinks help improve search rankings, increase visibility, and drive more traffic to your website.
+            {t('importance.p1')}
           </p>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.125rem', marginBottom: '40px' }}>
-            By receiving backlinks from diverse sites, your content is perceived as valuable, boosting your domain authority and SERP placement. Additionally, backlinks enhance brand awareness by reaching a broader audience through referral traffic.
+            {t('importance.p2')}
           </p>
         </div>
       </section>
@@ -247,12 +251,12 @@ export default function Home() {
                 <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.5rem', fontWeight: 600, color: '#fff', margin: 0 }}>SERPsupport</h3>
               </div>
               <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1rem', lineHeight: 1.6, maxWidth: '350px' }}>
-                Boost your SEO by exchanging high-quality backlinks. Use our portal to connect with sites and improve rankings.
+                {t('footer.desc')}
               </p>
             </div>
 
             <div>
-              <h4 style={{ color: '#fff', marginBottom: '20px', fontSize: '1.125rem' }}>Contact</h4>
+              <h4 style={{ color: '#fff', marginBottom: '20px', fontSize: '1.125rem' }}>{t('footer.contact')}</h4>
               <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 info@serpsupport.com
               </p>
@@ -279,22 +283,22 @@ export default function Home() {
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center', fontSize: '1.25rem' }}>
-            <a href="#features" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600 }}>Features</a>
-            <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600 }}>How it works</a>
-            <a href="#importance" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600 }}>Importance</a>
-            <a href="#contact" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600 }}>Contact</a>
+            <a href="#features" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600 }}>{t('nav.features')}</a>
+            <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600 }}>{t('nav.howItWorks')}</a>
+            <a href="#importance" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600 }}>{t('nav.importance')}</a>
+            <a href="#contact" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600 }}>{t('nav.contact')}</a>
             
             <div style={{ width: '100%', height: 1, background: 'var(--border-subtle)', margin: '10px 0' }} />
             
             {user ? (
               <Link href="/inbox" className="btn btn-primary" onClick={() => setMobileMenuOpen(false)} style={{ width: '100%', justifyContent: 'center', padding: '14px', borderRadius: '4px', fontWeight: 700 }}>
-                Go to Dashboard
+                {t('nav.dashboard')}
               </Link>
             ) : (
               <>
-                <Link href="/auth?mode=login" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600 }}>Sign In</Link>
+                <Link href="/auth?mode=login" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600 }}>{t('nav.signIn')}</Link>
                 <Link href="/auth?mode=register" className="btn btn-primary" onClick={() => setMobileMenuOpen(false)} style={{ width: '100%', justifyContent: 'center', padding: '14px', borderRadius: '4px', fontWeight: 700 }}>
-                  Sign Up
+                  {t('nav.signUp')}
                 </Link>
               </>
             )}

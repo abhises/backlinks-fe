@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { io } from 'socket.io-client';
 import GlobalSearch from './GlobalSearch';
+import Cookies from 'js-cookie';
 
 type NotificationItem = {
   id: string;
@@ -305,6 +306,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
     setTheme(t);
     document.documentElement.setAttribute('data-theme', t);
     localStorage.setItem('bl_theme', t);
+    Cookies.set('bl_theme', t, { expires: 365, path: '/' });
   };
 
   const cycleTheme = () => {
@@ -366,7 +368,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         <GlobalSearch />
 
         {/* Theme Toggle */}
-        <div style={{ margin: '2px 8px 16px 8px', display: 'flex', background: 'var(--bg-surface)', borderRadius: '6px', border: '1px solid var(--border)', padding: '4px' }}>
+        <div style={{ margin: '2px 8px 12px 8px', display: 'flex', background: 'var(--bg-surface)', borderRadius: '6px', border: '1px solid var(--border)', padding: '4px' }}>
           <button onClick={() => changeTheme('light')} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px', background: theme === 'light' ? 'var(--bg-hover)' : 'transparent', border: 'none', borderRadius: '4px', cursor: 'pointer', color: theme === 'light' ? 'var(--text-primary)' : 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, transition: 'all 0.2s' }}>
             <Sun size={14} /> Light
           </button>
@@ -487,7 +489,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Theme Toggle */}
-        <div style={{ margin: '2px 8px 16px 8px', display: 'flex', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '4px' }}>
+        <div style={{ margin: '2px 8px 12px 8px', display: 'flex', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '4px' }}>
           <button onClick={() => changeTheme('light')} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px', background: theme === 'light' ? 'rgba(255,255,255,0.1)' : 'transparent', border: 'none', borderRadius: '4px', cursor: 'pointer', color: theme === 'light' ? '#fff' : 'rgba(255,255,255,0.5)', fontSize: '0.75rem', fontWeight: 600, transition: 'all 0.2s' }}>
             <Sun size={14} /> Light
           </button>
