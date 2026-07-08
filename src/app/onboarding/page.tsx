@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Link2, Globe, Sparkles, Loader2 } from 'lucide-react';
+import { Link2, Globe, Loader2 } from 'lucide-react';
 import api from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -32,7 +32,7 @@ export default function OnboardingPage() {
     }
     setError(''); setLoading(true);
     try {
-      const res = await api.post('/api/workspaces', { domain, websiteName: domain, description });
+      const res = await api.post('/api/workspaces', { domain: cleanDomain, websiteName: cleanDomain, description: description.trim() });
       setWorkspace(res.data.workspace);
       router.replace('/inbox');
     } catch (err: any) {
@@ -43,24 +43,47 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
       <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(var(--border) 1px, transparent 1px)', backgroundSize:'32px 32px', opacity:0.3, pointerEvents:'none' }} />
 
-      <div className="auth-card animate-slide-up" style={{ maxWidth:520 }}>
-        <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:28 }}>
-          <Link2 size={28} color="var(--accent)" />
-          <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.4rem', fontWeight: 600, color: 'var(--text-primary)' }}>SERPsupport</span>
+      <div className="auth-card animate-slide-up" style={{ 
+        maxWidth: 520, 
+        width: '100%', 
+        background: '#222524', 
+        border: '1px solid #323634', 
+        borderRadius: 16, 
+        padding: '36px 36px 32px 36px',
+        boxShadow: '0 24px 48px rgba(0, 0, 0, 0.4)'
+      }}>
+        {/* Top Header Row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ 
+              width: 40, 
+              height: 40, 
+              borderRadius: 10, 
+              background: '#419d78', 
+              color: '#ffffff', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <Link2 size={20} />
+            </div>
+            <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.25rem', fontWeight: 600, color: '#ffffff' }}>
+              SERPsupport
+            </span>
+          </div>
+          <span style={{ fontSize: '0.875rem', fontWeight: 500, color: '#8e9391' }}>
+            {t('onboard.step2')}
+          </span>
         </div>
 
-        <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:6 }}>
-          <Sparkles size={18} color="var(--accent)" />
-          <h2 style={{ fontSize:'1.25rem', fontWeight:800 }}>
-            {t('onboard.title')}
-          </h2>
-        </div>
-        <p style={{ color:'var(--text-secondary)', fontSize:'0.875rem', marginBottom:28 }}>
-          {t('onboard.subtitle')}
-        </p>
+        {/* Title */}
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#ffffff', marginBottom: 24, letterSpacing: '-0.01em', lineHeight: 1.25 }}>
+          {t('onboard.setupProfile')}
+        </h1>
 
         {error && (
           <div style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:8, padding:'10px 14px', marginBottom:20, fontSize:'0.875rem', color:'var(--red)' }}>
@@ -69,32 +92,137 @@ export default function OnboardingPage() {
         )}
 
         <form onSubmit={handleSubmit}>
-          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-            <div className="input-group">
-              <label className="input-label">Root Domain</label>
-              <div style={{ position:'relative' }}>
-                <Globe size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
-                <input id="ob-domain" type="text" value={domain} onChange={e=>setDomain(e.target.value)}
-                  className="input-field" style={{ paddingLeft:36 }} placeholder="fernway.io" required />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {/* Website Domain Input */}
+            <div>
+              <label htmlFor="ob-domain" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#c5c9c7', marginBottom: 8, display: 'block' }}>
+                {t('onboard.websiteDomain')}
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Globe size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#8e9391' }} />
+                <input
+                  id="ob-domain"
+                  type="text"
+                  value={domain}
+                  onChange={e => setDomain(e.target.value)}
+                  placeholder={t('onboard.domainPlaceholder')}
+                  required
+                  style={{
+                    width: '100%',
+                    height: 48,
+                    background: '#2c302e',
+                    border: '1px solid #383d3b',
+                    borderRadius: 8,
+                    paddingLeft: 42,
+                    paddingRight: 14,
+                    color: '#ffffff',
+                    fontSize: '0.95rem',
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={e => e.currentTarget.style.borderColor = '#419d78'}
+                  onBlur={e => e.currentTarget.style.borderColor = '#383d3b'}
+                />
               </div>
-              <p style={{ fontSize:'0.75rem', color:'var(--text-muted)' }}>No https:// or trailing slash needed</p>
-            </div>
-            
-            <div className="input-group">
-              <label className="input-label">One-sentence Description</label>
-              <textarea id="ob-desc" value={description} onChange={e=>setDescription(e.target.value)}
-                className="input-field" placeholder="Fernway is a productivity blog for remote software teams." required rows={2}
-                style={{ resize:'none', lineHeight:1.6 }} />
-              <p style={{ fontSize:'0.75rem', color:'var(--text-muted)' }}>Keep it to one sentence — partners will see this.</p>
             </div>
 
-            <div style={{ display:'flex', gap:10 }}>
-              <button type="button" onClick={logout} className="btn btn-secondary" style={{ flex:1, justifyContent:'center' }}>Back</button>
-              <button id="ob-submit" type="submit" className="btn btn-primary" style={{ flex:2, justifyContent:'center' }} disabled={loading}>
-                {loading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
-                {loading ? 'Creating…' : t('onboard.complete')}
-              </button>
+            {/* One-sentence Description Textarea */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <label htmlFor="ob-desc" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#c5c9c7' }}>
+                  {t('onboard.oneSentenceDesc')}
+                </label>
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#b48a56' }}>
+                  {description.length}/140
+                </span>
+              </div>
+              <textarea
+                id="ob-desc"
+                value={description}
+                maxLength={140}
+                onChange={e => setDescription(e.target.value)}
+                placeholder={t('onboard.descPlaceholder')}
+                required
+                rows={4}
+                style={{
+                  width: '100%',
+                  background: '#2c302e',
+                  border: '1px solid #383d3b',
+                  borderRadius: 8,
+                  padding: '14px',
+                  color: '#ffffff',
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                  resize: 'none',
+                  lineHeight: 1.5,
+                  minHeight: 110,
+                  transition: 'border-color 0.2s'
+                }}
+                onFocus={e => e.currentTarget.style.borderColor = '#419d78'}
+                onBlur={e => e.currentTarget.style.borderColor = '#383d3b'}
+              />
             </div>
+
+            {/* Launch Button */}
+            <button
+              id="ob-submit"
+              type="submit"
+              disabled={loading || !domain.trim() || !description.trim()}
+              style={{
+                width: '100%',
+                height: 42,
+                padding: '10px 16px',
+                background: '#419d78',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: 8,
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                letterSpacing: '0.03em',
+                textTransform: 'uppercase',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                cursor: (loading || !domain.trim() || !description.trim()) ? 'not-allowed' : 'pointer',
+                opacity: (loading || !domain.trim() || !description.trim()) ? 0.7 : 1,
+                transition: 'filter 0.2s, opacity 0.2s',
+                marginTop: 4
+              }}
+              onMouseEnter={e => {
+                if (!loading && domain.trim() && description.trim()) e.currentTarget.style.filter = 'brightness(1.1)';
+              }}
+              onMouseLeave={e => e.currentTarget.style.filter = 'none'}
+            >
+              {loading ? <Loader2 size={18} className="animate-spin" /> : null}
+              {loading ? 'LAUNCHING...' : t('onboard.launchNow')}
+            </button>
+
+            {/* Back Button */}
+            <button
+              type="button"
+              onClick={() => logout('/auth?mode=register')}
+              style={{
+                width: '100%',
+                background: 'none',
+                border: 'none',
+                color: '#c5c9c7',
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                padding: '6px 0',
+                marginTop: 4,
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = '#ffffff'}
+              onMouseLeave={e => e.currentTarget.style.color = '#c5c9c7'}
+            >
+              {t('onboard.back')}
+            </button>
           </div>
         </form>
       </div>

@@ -82,6 +82,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     'auth.backToSignIn': 'Back to sign in',
     'auth.checkInbox': 'Check your inbox! ✉️',
     'auth.checkInboxDesc': 'If an account exists, we have sent a password reset link to your email.',
+    'auth.step1': 'Step 1 of 2',
+
 
     // Inbox Page
     'inbox.title': 'Inbox',
@@ -124,6 +126,14 @@ export const translations: Record<Locale, Record<string, string>> = {
     'onboard.subtitle': "Let's set up your workspace so you can start exchanging links",
     'onboard.complete': 'Complete Setup',
     'onboard.step': 'Step 1 of 1',
+    'onboard.step2': 'Step 2 of 2',
+    'onboard.setupProfile': 'Set up your site profile',
+    'onboard.websiteDomain': 'Website domain',
+    'onboard.domainPlaceholder': 'example.com',
+    'onboard.oneSentenceDesc': 'One-sentence description',
+    'onboard.descPlaceholder': 'Description of your website here',
+    'onboard.launchNow': 'LAUNCH SERPSUPPORT NOW',
+    'onboard.back': '← Back',
   },
   fi: {
     // Language names
@@ -206,6 +216,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     'auth.backToSignIn': 'Takaisin kirjautumiseen',
     'auth.checkInbox': 'Tarkista sähköpostisi! ✉️',
     'auth.checkInboxDesc': 'Jos tili on olemassa, olemme lähettäneet salasanan palautuslinkin sähköpostiisi.',
+    'auth.step1': 'Vaihe 1 / 2',
+
 
     // Inbox Page
     'inbox.title': 'Saapuneet',
@@ -248,6 +260,14 @@ export const translations: Record<Locale, Record<string, string>> = {
     'onboard.subtitle': 'Määritetään työtilasi, jotta voit aloittaa linkkien vaihdon',
     'onboard.complete': 'Valmistele asennus',
     'onboard.step': 'Vaihe 1 / 1',
+    'onboard.step2': 'Vaihe 2 / 2',
+    'onboard.setupProfile': 'Määritä sivustosi profiili',
+    'onboard.websiteDomain': 'Verkkosivuston verkkotunnus',
+    'onboard.domainPlaceholder': 'esimerkki.fi',
+    'onboard.oneSentenceDesc': 'Yhden lauseen kuvaus',
+    'onboard.descPlaceholder': 'Kirjoita sivustosi kuvaus tähän',
+    'onboard.launchNow': 'KÄYNNISTÄ SERPSUPPORT NYT',
+    'onboard.back': '← Takaisin',
   },
   nl: {
     // Language names
@@ -330,6 +350,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     'auth.backToSignIn': 'Terug naar inloggen',
     'auth.checkInbox': 'Controleer uw inbox! ✉️',
     'auth.checkInboxDesc': 'Als er een account bestaat, hebben we een herstellink naar uw e-mail gestuurd.',
+    'auth.step1': 'Stap 1 van 2',
+
 
     // Inbox Page
     'inbox.title': 'Postvak IN',
@@ -372,5 +394,13 @@ export const translations: Record<Locale, Record<string, string>> = {
     'onboard.subtitle': 'Laten we uw werkruimte instellen zodat u links kunt uitwisselen',
     'onboard.complete': 'Installatie voltooien',
     'onboard.step': 'Stap 1 van 1',
+    'onboard.step2': 'Stap 2 van 2',
+    'onboard.setupProfile': 'Stel uw websiteprofiel in',
+    'onboard.websiteDomain': 'Website domein',
+    'onboard.domainPlaceholder': 'voorbeeld.nl',
+    'onboard.oneSentenceDesc': 'Korte omschrijving (één zin)',
+    'onboard.descPlaceholder': 'Schrijf hier een korte omschrijving van uw website',
+    'onboard.launchNow': 'START SERPSUPPORT NU',
+    'onboard.back': '← Terug',
   }
 };

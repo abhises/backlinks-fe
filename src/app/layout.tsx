@@ -5,41 +5,23 @@ import { AuthProvider } from "@/context/AuthContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { headers } from "next/headers";
 import { Locale } from "@/lib/translations";
+import { getLocalizedRouteMetadata, detectServerLocale } from "@/lib/metadata";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
-export const metadata: Metadata = {
-  title: "SERPsupport — Backlink Exchange Platform",
-  description: "Safely coordinate and track backlink placements with website owners worldwide. Guest posts, niche edits, and more.",
-  keywords: "backlink exchange, guest posts, niche edits, link building, SEO",
-  icons: {
-    icon: '/icon.svg',
-    shortcut: '/icon.svg',
-    apple: '/icon.svg',
-  },
-  openGraph: {
-    title: "SERPsupport — Backlink Exchange Platform",
-    description: "Safely coordinate and track backlink placements.",
-    type: "website",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return getLocalizedRouteMetadata('/');
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headersList = await headers();
-  const host = headersList.get('host') || '';
-  let initialLocale: Locale = 'en';
-  if (host.startsWith('fi.')) {
-    initialLocale = 'fi';
-  } else if (host.startsWith('nl.')) {
-    initialLocale = 'nl';
-  }
+  const initialLocale = await detectServerLocale();
 
   return (
-    <html lang="en" data-theme="dark" suppressHydrationWarning>
+    <html lang={initialLocale} data-theme="dark" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{

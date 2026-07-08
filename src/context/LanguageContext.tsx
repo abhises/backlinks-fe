@@ -33,21 +33,31 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode; initialLoca
       if (host.startsWith('fi.')) {
         setLocaleState('fi');
         Cookies.set('NEXT_LOCALE', 'fi', { expires: 365, path: '/' });
+        document.documentElement.lang = 'fi';
       } else if (host.startsWith('nl.')) {
         setLocaleState('nl');
         Cookies.set('NEXT_LOCALE', 'nl', { expires: 365, path: '/' });
+        document.documentElement.lang = 'nl';
       } else {
         setLocaleState('en');
         Cookies.set('NEXT_LOCALE', 'en', { expires: 365, path: '/' });
+        document.documentElement.lang = 'en';
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      document.documentElement.lang = locale;
+    }
+  }, [locale]);
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale);
     Cookies.set('NEXT_LOCALE', newLocale, { expires: 365, path: '/' });
 
     if (typeof window !== 'undefined') {
+      document.documentElement.lang = newLocale;
       const host = window.location.hostname;
       const port = window.location.port ? `:${window.location.port}` : '';
       const protocol = window.location.protocol;

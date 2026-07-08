@@ -151,13 +151,38 @@ export default function AuthPage() {
       </div>
 
       <div className="auth-card animate-slide-up">
-        {/* Logo */}
-        <Link href="/" style={{ display:'flex', alignItems:'center', gap:10, marginBottom:32, textDecoration:'none' }}>
-          <Link2 size={28} color="var(--accent)" />
-          <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.4rem', fontWeight: 600, color: 'var(--text-primary)' }}>SERPsupport</span>
-        </Link>
+        {/* Top Header Row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: mode === 'register' ? 28 : 32 }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: mode === 'register' ? 12 : 10, textDecoration: 'none' }}>
+            {mode === 'register' ? (
+              <div style={{ 
+                width: 40, 
+                height: 40, 
+                borderRadius: 10, 
+                background: '#419d78', 
+                color: '#ffffff', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
+                <Link2 size={20} />
+              </div>
+            ) : (
+              <Link2 size={28} color="var(--accent)" />
+            )}
+            <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: mode === 'register' ? '1.25rem' : '1.4rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+              SERPsupport
+            </span>
+          </Link>
+          {mode === 'register' && (
+            <span style={{ fontSize: '0.875rem', fontWeight: 500, color: '#8e9391' }}>
+              {t('auth.step1')}
+            </span>
+          )}
+        </div>
 
-        <h1 style={{ fontSize:'1.5rem', fontWeight:800, marginBottom:4 }}>
+        <h1 style={{ fontSize: mode === 'register' ? '1.75rem' : '1.5rem', fontWeight: mode === 'register' ? 700 : 800, marginBottom: 4, letterSpacing: mode === 'register' ? '-0.01em' : 'normal', lineHeight: 1.25 }}>
           {mode === 'forgot' ? t('auth.resetPassword') : mode === 'login' ? t('auth.welcomeBack') : t('auth.createAccount')}
         </h1>
         <p style={{ color:'var(--text-secondary)', fontSize:'0.875rem', marginBottom:28 }}>

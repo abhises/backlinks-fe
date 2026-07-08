@@ -26,7 +26,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<any>;
   register: (email: string, password: string, name?: string) => Promise<void>;
   loginWithGoogle: (credential: string) => Promise<any>;
-  logout: () => void;
+  logout: (redirectUrlOrEvent?: string | any) => void;
   setWorkspace: (ws: Workspace) => void;
   refreshWorkspace: () => Promise<any>;
 }
@@ -86,13 +86,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return await refreshWorkspace();
   };
 
-  const logout = () => {
+  const logout = (redirectUrlOrEvent?: string | any) => {
     localStorage.removeItem('bl_token');
     localStorage.removeItem('bl_user');
     setToken(null);
     setUser(null);
     setWorkspaceState(null);
-    window.location.href = '/';
+    const url = typeof redirectUrlOrEvent === 'string' ? redirectUrlOrEvent : '/';
+    window.location.href = url;
   };
 
   const setWorkspace = (ws: Workspace) => {
