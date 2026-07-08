@@ -4,9 +4,12 @@ import { X, Globe, Loader2, Search } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 
+import { useLanguage } from '@/context/LanguageContext';
+
 type Workspace = { id: string; domain: string; websiteName: string; description: string; niche?: string };
 
 export default function NewThreadModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const { t } = useLanguage();
   const { workspace } = useAuth();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [search, setSearch] = useState('');
@@ -41,19 +44,19 @@ export default function NewThreadModal({ onClose, onCreated }: { onClose: () => 
     <div className="overlay-backdrop" onClick={onClose}>
       <div className="overlay-panel" style={{ padding:28 }} onClick={e => e.stopPropagation()}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
-          <h3>New Connection Request</h3>
+          <h3>{t('threadModal.title')}</h3>
           <button onClick={onClose} className="btn btn-ghost btn-icon"><X size={18} /></button>
         </div>
 
         <p style={{ fontSize:'0.875rem', color:'var(--text-secondary)', marginBottom:16 }}>
-          You&apos;ll be listed as the <strong style={{ color:'var(--accent)' }}>Giver</strong> — the site hosting the link.
+          {t('threadModal.desc')}
         </p>
 
         {/* Search */}
         <div style={{ position:'relative', marginBottom:16 }}>
           <Search size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            className="input-field" style={{ paddingLeft:36 }} placeholder="Search by domain or name…" autoFocus />
+            className="input-field" style={{ paddingLeft:36 }} placeholder={t('threadModal.searchPlaceholder')} autoFocus />
         </div>
 
         {error && <p style={{ color:'var(--red)', fontSize:'0.875rem', marginBottom:12 }}>{error}</p>}
@@ -65,7 +68,7 @@ export default function NewThreadModal({ onClose, onCreated }: { onClose: () => 
               <Loader2 size={20} className="animate-spin" style={{ color:'var(--accent)' }} />
             </div>
           ) : filtered.length === 0 ? (
-            <p style={{ color:'var(--text-muted)', textAlign:'center', padding:24, fontSize:'0.875rem' }}>No sites found</p>
+            <p style={{ color:'var(--text-muted)', textAlign:'center', padding:24, fontSize:'0.875rem' }}>{t('threadModal.noSites')}</p>
           ) : filtered.map(w => (
             <div key={w.id}
               onClick={() => setSelected(w)}
@@ -93,10 +96,10 @@ export default function NewThreadModal({ onClose, onCreated }: { onClose: () => 
         </div>
 
         <div style={{ display:'flex', gap:10 }}>
-          <button onClick={onClose} className="btn btn-secondary" style={{ flex:1, justifyContent:'center' }}>Cancel</button>
+          <button onClick={onClose} className="btn btn-secondary" style={{ flex:1, justifyContent:'center' }}>{t('app.cancel')}</button>
           <button id="send-request-btn" onClick={handleSend} className="btn btn-primary" style={{ flex:2, justifyContent:'center' }} disabled={!selected || loading}>
             {loading ? <Loader2 size={15} className="animate-spin" /> : null}
-            {selected ? `Send to ${selected.domain}` : 'Select a site'}
+            {selected ? `${t('threadModal.sendTo')} ${selected.domain}` : t('threadModal.selectSite')}
           </button>
         </div>
       </div>

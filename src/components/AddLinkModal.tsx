@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { X, Link2, Loader2, AlertCircle, ExternalLink, Pencil, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import api from '@/lib/api';
 
+import { useLanguage } from '@/context/LanguageContext';
+
 type Thread = {
   id: string;
   giverWorkspace: { id: string; domain: string };
@@ -10,19 +12,20 @@ type Thread = {
   linkPlacement?: any;
 };
 
-const LINK_TYPES = [
-  { value:'GUEST_POST', label:'Guest Post' },
-  { value:'NICHE_EDIT', label:'Niche Edit' },
-  { value:'IMAGE',      label:'Image Link' },
-  { value:'OTHER',      label:'Other' },
-];
-
 export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, onClose, onSaved }: {
   thread: Thread; isGiver: boolean; hasLink: boolean; myWorkspace: any;
   onClose: () => void; onSaved: () => void;
 }) {
+  const { t } = useLanguage();
   const lp = thread.linkPlacement;
   const canEdit = !hasLink || isGiver;
+
+  const LINK_TYPES = [
+    { value:'GUEST_POST', label: t('linkModal.guestPost') },
+    { value:'NICHE_EDIT', label: t('linkModal.nicheEdit') },
+    { value:'IMAGE',      label: t('linkModal.imageLink') },
+    { value:'OTHER',      label: t('linkModal.other') },
+  ];
 
   // If no link exists, whoever opens the modal acts as the giver for this submission.
   const sourceDomain = hasLink ? thread.giverWorkspace.domain : myWorkspace.domain;
@@ -37,7 +40,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
   const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(!hasLink);
 
-  const linkTypeLabel = LINK_TYPES.find(lt => lt.value === (lp?.linkType || linkType))?.label || 'Guest Post';
+  const linkTypeLabel = LINK_TYPES.find(lt => lt.value === (lp?.linkType || linkType))?.label || t('linkModal.guestPost');
 
   const handleClear = async () => {
     if (!isGiver) return;
@@ -51,7 +54,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canEdit) { setError('Only the user who placed the link can edit it.'); return; }
+    if (!canEdit) { setError(t('linkModal.readOnlyDesc')); return; }
     setError(''); setLoading(true);
     try {
       await api.post('/api/links', { threadId: thread.id, sourceUrl, targetUrl, anchorText, linkType });
@@ -69,18 +72,18 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
         <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <Link2 size={14} style={{ color: 'var(--text-muted)' }} />
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>LINK DETAILS</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{t('linkModal.title')}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             {isGiver && (
               <>
                 <button onClick={() => setIsEditing(true)}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                  Edit
+                  {t('linkModal.edit')}
                 </button>
                 <button onClick={handleClear}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600, color: '#ef4444' }}>
-                  Clear
+                  {t('linkModal.clear')}
                 </button>
               </>
             )}
@@ -91,28 +94,28 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
         <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
           {[
             { 
-              label: 'FROM', value: lp.sourceUrl, isUrl: true, 
+              label: t('linkModal.from'), value: lp.sourceUrl, isUrl: true, 
               tag: (
                 <div 
                   title={`${sourceDomain} gives a backlink to ${targetDomain}`}
                   style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.6rem', padding: '2px 6px', color: '#a855f7', background: '#f3e8ff', borderRadius: '4px', fontWeight: 700, cursor: 'help' }}
                 >
-                  <ArrowUpRight size={10} /> BACKLINK OUT
+                  <ArrowUpRight size={10} /> {t('linkModal.backlinkOut')}
                 </div>
               )
             },
             { 
-              label: 'TO',   value: lp.targetUrl, isUrl: true, 
+              label: t('linkModal.to'),   value: lp.targetUrl, isUrl: true, 
               tag: (
                 <div 
                   title={`${sourceDomain} gives a backlink to ${targetDomain}`}
                   style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.6rem', padding: '2px 6px', color: '#0284c7', background: '#e0f2fe', borderRadius: '4px', fontWeight: 700, cursor: 'help' }}
                 >
-                  <ArrowDownLeft size={10} /> BACKLINK IN
+                  <ArrowDownLeft size={10} /> {t('linkModal.backlinkIn')}
                 </div>
               )
             },
-            { label: 'ANCHOR', value: `"${lp.anchorText}"`, isUrl: false },
+            { label: t('linkModal.anchor'), value: `"${lp.anchorText}"`, isUrl: false },
           ].map(({ label, value, isUrl, tag }: any) => (
             <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <div style={{ minWidth: 120, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -132,7 +135,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
           ))}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <div style={{ minWidth: 120 }}>
-              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em' }}>TYPE</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em' }}>{t('linkModal.type')}</span>
             </div>
             <span style={{
               fontSize: '0.78rem', fontWeight: 600,
@@ -151,7 +154,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
       <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <Link2 size={14} style={{ color: 'var(--text-muted)' }} />
-          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>LINK DETAILS</span>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{t('linkModal.title')}</span>
         </div>
         <button onClick={hasLink ? () => setIsEditing(false) : onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex' }}><X size={16} /></button>
       </div>
@@ -159,7 +162,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
       {!canEdit && (
         <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', fontSize: '0.875rem', color: 'var(--amber)', display: 'flex', gap: 8, alignItems: 'flex-start', background: 'rgba(245,158,11,0.05)' }}>
           <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
-          <span>The user who placed the link must fill in the technical details. You can view but not edit.</span>
+          <span>{t('linkModal.readOnlyDesc')}</span>
         </div>
       )}
 
@@ -172,12 +175,12 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
       <form onSubmit={handleSave} style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 20 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
-            <span>FROM URL <span style={{ textTransform: 'none', fontWeight: 500 }}>(on {sourceDomain})</span></span>
+            <span>{t('linkModal.fromUrl')} <span style={{ textTransform: 'none', fontWeight: 500 }}>(on {sourceDomain})</span></span>
             <div 
               title={`${sourceDomain} gives a backlink to ${targetDomain}`}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.65rem', padding: '2px 8px', color: '#a855f7', background: '#f3e8ff', borderRadius: '4px', fontWeight: 700, cursor: 'help' }}
             >
-              <ArrowUpRight size={12} /> BACKLINK OUT
+              <ArrowUpRight size={12} /> {t('linkModal.backlinkOut')}
             </div>
           </label>
           <input id="link-source" type="url" value={sourceUrl} onChange={e => setSourceUrl(e.target.value)}
@@ -188,12 +191,12 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
-            <span>TO URL <span style={{ textTransform: 'none', fontWeight: 500 }}>(on {targetDomain})</span></span>
+            <span>{t('linkModal.toUrl')} <span style={{ textTransform: 'none', fontWeight: 500 }}>(on {targetDomain})</span></span>
             <div 
               title={`${sourceDomain} gives a backlink to ${targetDomain}`}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.65rem', padding: '2px 8px', color: '#0284c7', background: '#e0f2fe', borderRadius: '4px', fontWeight: 700, cursor: 'help' }}
             >
-              <ArrowDownLeft size={12} /> BACKLINK IN
+              <ArrowDownLeft size={12} /> {t('linkModal.backlinkIn')}
             </div>
           </label>
           <input id="link-target" type="url" value={targetUrl} onChange={e => setTargetUrl(e.target.value)}
@@ -204,7 +207,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
-            ANCHOR TEXT
+            {t('linkModal.anchorText')}
           </label>
           <input id="link-anchor" type="text" value={anchorText} onChange={e => setAnchorText(e.target.value)}
             style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-base)', fontSize: '0.875rem', outline: 'none', color: 'var(--text-primary)' }}
@@ -214,7 +217,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
-            LINK TYPE
+            {t('linkModal.linkType')}
           </label>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {LINK_TYPES.map(lt => {
@@ -264,7 +267,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
             onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
             onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
           >
-            Back to chat
+            {t('linkModal.back')}
           </button>
           
           {canEdit && (
@@ -285,7 +288,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
               disabled={loading}
             >
               {loading ? <Loader2 size={16} className="animate-spin" /> : <span style={{ fontSize: '1rem', lineHeight: 1 }}>✓</span>}
-              {loading ? 'Saving…' : 'Save details'}
+              {loading ? t('linkModal.saving') : t('linkModal.save')}
             </button>
           )}
         </div>

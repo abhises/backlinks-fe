@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { X, Globe, Clock, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 type Workspace = {
   id: string;
@@ -67,6 +68,7 @@ const getCountryEmoji = (countryName?: string) => {
 };
 
 export default function GlobalSearch() {
+  const { t } = useLanguage();
   const { workspace } = useAuth();
   const router = useRouter();
   const [query, setQuery] = useState('');
@@ -122,18 +124,18 @@ export default function GlobalSearch() {
 
   const q = query.toLowerCase();
 
-  threads.forEach(t => {
-    const other = t.giverWorkspace.id === workspace?.id ? t.receiverWorkspace : t.giverWorkspace;
+  threads.forEach(thr => {
+    const other = thr.giverWorkspace.id === workspace?.id ? thr.receiverWorkspace : thr.giverWorkspace;
     
     const partnerMatch = other.domain.toLowerCase().includes(q) || other.websiteName.toLowerCase().includes(q);
     if (partnerMatch && !partnersMap.has(other.id)) {
       partnersMap.set(other.id, other);
     }
 
-    const messageText = t.messages?.[0]?.messageText || 'No messages yet';
+    const messageText = thr.messages?.[0]?.messageText || t('inbox.noMessages');
     if (partnerMatch || messageText.toLowerCase().includes(q)) {
       matchingThreads.push({
-        id: t.id,
+        id: thr.id,
         text: messageText.length > 30 ? messageText.substring(0, 30) + '...' : messageText,
         domain: other.domain,
         ws: other
@@ -165,7 +167,7 @@ export default function GlobalSearch() {
         <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.8rem', opacity: 0.6 }}>🔍</span>
         <input 
           type="text" 
-          placeholder="Search..." 
+          placeholder={t('app.searchPlaceholder')} 
           value={query}
           onChange={e => handleSearchChange(e.target.value)}
           onFocus={() => setIsFocused(true)}
@@ -192,13 +194,13 @@ export default function GlobalSearch() {
         }}>
           {partners.length === 0 && displayedThreads.length === 0 && (
             <div style={{ padding: '16px', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              No results found
+              {t('app.noResults')}
             </div>
           )}
 
           {partners.length > 0 && (
             <div style={{ padding: '8px 0' }}>
-              <div style={{ padding: '4px 16px', fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>PARTNERS</div>
+              <div style={{ padding: '4px 16px', fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{t('app.partners')}</div>
               {partners.map(p => {
                 const avatarStyle = getAvatarColor(p.domain);
                 const contact = getContactName(p.domain);
@@ -212,7 +214,7 @@ export default function GlobalSearch() {
                     </div>
                     <div>
                       <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{p.domain}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{contact} · {p.niche || 'General'}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{contact} · {p.niche || t('app.general')}</div>
                     </div>
                   </div>
                 );
@@ -222,20 +224,20 @@ export default function GlobalSearch() {
 
           {displayedThreads.length > 0 && (
             <div style={{ padding: '8px 0', borderTop: partners.length > 0 ? '1px solid var(--border)' : 'none' }}>
-              <div style={{ padding: '4px 16px', fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>THREADS</div>
-              {displayedThreads.map(t => {
-                const avatarStyle = getAvatarColor(t.domain);
+              <div style={{ padding: '4px 16px', fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{t('app.threads')}</div>
+              {displayedThreads.map(item => {
+                const avatarStyle = getAvatarColor(item.domain);
                 return (
-                  <div key={t.id} onClick={() => handleThreadClick(t.id)} style={{
+                  <div key={item.id} onClick={() => handleThreadClick(item.id)} style={{
                     padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '12px',
                     cursor: 'pointer', transition: 'background 0.15s'
                   }} onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                     <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: avatarStyle.bg, color: avatarStyle.text, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 600, flexShrink: 0 }}>
-                      {getInitials(t.domain)}
+                      {getInitials(item.domain)}
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{t.text}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t.domain}</div>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{item.text}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{item.domain}</div>
                     </div>
                   </div>
                 );
@@ -286,24 +288,24 @@ export default function GlobalSearch() {
               </div>
 
               <p style={{ fontSize: '0.95rem', color: 'var(--text-primary)', lineHeight: 1.5, marginBottom: '24px', fontStyle: 'italic' }}>
-                {selectedPartner.description || 'No description provided.'}
+                {selectedPartner.description || t('app.noDescription')}
               </p>
 
               <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
                 <div style={{ flex: 1, padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-base)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.05em', marginBottom: '8px' }}>
-                    <Globe size={12} /> NICHE
+                    <Globe size={12} /> {t('dash.niche')}
                   </div>
                   <div style={{ fontSize: '1.1rem', fontWeight: 500, color: 'var(--text-primary)', fontFamily: '"Lora", "Georgia", serif' }}>
-                    {selectedPartner.niche || 'General'}
+                    {selectedPartner.niche || t('app.general')}
                   </div>
                 </div>
                 <div style={{ flex: 1, padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-base)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.05em', marginBottom: '8px' }}>
-                    <Clock size={12} /> AVG RESPONSE
+                    <Clock size={12} /> {t('app.avgResponse')}
                   </div>
                   <div style={{ fontSize: '1.1rem', fontWeight: 500, color: 'var(--text-primary)', fontFamily: '"Lora", "Georgia", serif' }}>
-                    ~6 hours
+                    {t('app.sixHours')}
                   </div>
                 </div>
               </div>
@@ -311,12 +313,12 @@ export default function GlobalSearch() {
             
             <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-hover)' }}>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                In SERPSupport since {new Date(selectedPartner.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                {t('app.inSerpSupportSince')} {new Date(selectedPartner.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
               </div>
               <a href={`https://${selectedPartner.domain}`} target="_blank" rel="noopener noreferrer" style={{
                 display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', textDecoration: 'none'
               }}>
-                Visit site <ExternalLink size={14} />
+                {t('app.visitSite')} <ExternalLink size={14} />
               </a>
             </div>
           </div>
