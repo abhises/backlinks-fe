@@ -19,7 +19,7 @@ type LinkRow = {
   thread?: { id: string; stage: string };
 };
 
-const StatusDropdown = ({ linkId, currentStatus, onStatusChange }: { linkId: string; currentStatus: string; onStatusChange: (id: string, status: string) => void }) => {
+const StatusDropdown = ({ linkId, currentStatus, onStatusChange, t }: { linkId: string; currentStatus: string; onStatusChange: (id: string, status: string) => void; t: any }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -34,10 +34,10 @@ const StatusDropdown = ({ linkId, currentStatus, onStatusChange }: { linkId: str
   }, []);
 
   const getStatusStyles = (status: string) => {
-    if (status === 'LIVE') return { bg: '#ecfdf5', text: '#047857', border: '#a7f3d0', dot: '#10b981', label: 'Live' };
-    if (status === 'REMOVED') return { bg: '#fff1f2', text: '#be123c', border: '#fecdd3', dot: '#f43f5e', label: 'Removed' };
-    if (status === 'DEPARTED') return { bg: '#f5f5f4', text: '#78716c', border: '#e7e5e4', dot: '#a8a29e', label: 'Departed' };
-    return { bg: '#f5f5f4', text: '#78716c', border: '#e7e5e4', dot: '#a8a29e', label: 'Unknown' };
+    if (status === 'LIVE') return { bg: '#ecfdf5', text: '#047857', border: '#a7f3d0', dot: '#10b981', label: t('dash.live') };
+    if (status === 'REMOVED') return { bg: '#fff1f2', text: '#be123c', border: '#fecdd3', dot: '#f43f5e', label: t('dash.removed') };
+    if (status === 'DEPARTED') return { bg: '#f5f5f4', text: '#78716c', border: '#e7e5e4', dot: '#a8a29e', label: t('dash.departed') };
+    return { bg: '#f5f5f4', text: '#78716c', border: '#e7e5e4', dot: '#a8a29e', label: t('dash.unknown') };
   };
 
   const sStyles = getStatusStyles(currentStatus);
@@ -174,10 +174,10 @@ export default function LinksPage() {
   ];
 
   const statusFilters = [
-    { value: 'ALL', label: 'All', dot: null },
-    { value: 'LIVE', label: 'Live', dot: '#22c55e' },
-    { value: 'REMOVED', label: 'Removed', dot: '#ef4444' },
-    { value: 'DEPARTED', label: 'Departed', dot: '#374151' },
+    { value: 'ALL', label: t('inbox.filterAll'), dot: null },
+    { value: 'LIVE', label: t('dash.live'), dot: '#22c55e' },
+    { value: 'REMOVED', label: t('dash.removed'), dot: '#ef4444' },
+    { value: 'DEPARTED', label: t('dash.departed'), dot: '#374151' },
   ];
 
   return (
@@ -203,7 +203,7 @@ export default function LinksPage() {
         flexWrap: 'wrap'
       }}>
         {/* TYPE label */}
-        <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.06em', color: 'var(--text-muted)', marginRight: 4 }}>TYPE</span>
+        <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.06em', color: 'var(--text-muted)', marginRight: 4 }}>{t('dash.filterType')}</span>
 
         {typeFilters.map(({ value, label }) => {
           const isActive = directionFilter === value;
@@ -236,7 +236,7 @@ export default function LinksPage() {
         <span style={{ width: 1, height: 18, background: 'var(--border)', margin: '0 8px', display: 'inline-block' }} />
 
         {/* STATUS label */}
-        <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.06em', color: 'var(--text-muted)', marginRight: 4 }}>STATUS</span>
+        <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.06em', color: 'var(--text-muted)', marginRight: 4 }}>{t('dash.filterStatus')}</span>
 
         {statusFilters.map(({ value, label, dot }) => {
           const isActive = statusFilter === value;
@@ -277,7 +277,7 @@ export default function LinksPage() {
 
         {/* Link count — far right */}
         <div style={{ marginLeft: 'auto', fontSize: '0.825rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-          {filteredLinks.length} link{filteredLinks.length !== 1 ? 's' : ''}
+          {filteredLinks.length} {t('dash.linksCount')}
         </div>
       </div>
 
@@ -303,8 +303,8 @@ export default function LinksPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['FROM URL', 'TO URL', 'ANCHOR TEXT', 'DATE PLACED', 'CHAT', 'STATUS'].map(h => (
-                  <th key={h} style={{
+                {[t('dash.hFrom'), t('dash.hTo'), t('dash.hAnchor'), t('dash.hDate'), t('dash.hChat'), t('dash.hStatus')].map((h, index) => (
+                  <th key={index} style={{
                     padding: '12px 16px',
                     textAlign: 'left',
                     fontSize: '0.72rem',
@@ -363,7 +363,7 @@ export default function LinksPage() {
                           onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
                           onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}
                         >
-                          Show Chat
+                          {t('dash.showChat')}
                         </Link>
                       ) : (
                         <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>—</span>
@@ -375,7 +375,7 @@ export default function LinksPage() {
                       {updating === link.id ? (
                         <Loader2 size={14} className="animate-spin" style={{ color: 'var(--accent)' }} />
                       ) : (
-                        <StatusDropdown linkId={link.id} currentStatus={link.status} onStatusChange={handleStatusChange} />
+                        <StatusDropdown linkId={link.id} currentStatus={link.status} onStatusChange={handleStatusChange} t={t} />
                       )}
                     </td>
                   </tr>

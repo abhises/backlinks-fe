@@ -1,40 +1,44 @@
+'use client';
 import React from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function HowItWorksPage() {
+  const { t } = useLanguage();
+
   const steps = [
     {
       num: 1,
-      title: 'Get matched',
-      desc: 'We pair your site with relevant partners in the SERPsupport network.'
+      title: t('hiw.step1Title'),
+      desc: t('hiw.step1Desc')
     },
     {
       num: 2,
-      title: 'Approve or reject',
-      desc: "Review each new request and decide if it's a fit for your site."
+      title: t('hiw.step2Title'),
+      desc: t('hiw.step2Desc')
     },
     {
       num: 3,
-      title: 'Chat & agree',
-      desc: 'Discuss the placement, target page, and anchor text directly.'
+      title: t('hiw.step3Title'),
+      desc: t('hiw.step3Desc')
     },
     {
       num: 4,
-      title: 'Place the link',
-      desc: 'Once both sides agree, the backlink goes live and the deal is closed.'
+      title: t('hiw.step4Title'),
+      desc: t('hiw.step4Desc')
     },
     {
       num: 5,
-      title: 'Track your link profile',
-      desc: "Use the Dashboard to monitor every backlink in and out — see what's live and what's been removed."
+      title: t('hiw.step5Title'),
+      desc: t('hiw.step5Desc')
     }
   ];
 
   return (
     <div style={{ padding: '32px 40px', width: '100%' }}>
       <div>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '12px' }}>How it works</h1>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '12px' }}>{t('hiw.title')}</h1>
         <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '40px' }}>
-          A quick walkthrough of how SERPsupport connects your site with the right partners.
+          {t('hiw.subtitle')}
         </p>
       </div>
 

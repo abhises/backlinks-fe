@@ -23,15 +23,15 @@ const INITIAL_TEAM: TeamMember[] = [
   { id: '3', name: 'David Lee', email: 'david@serpsupport.com', role: 'VIEWER', avatar: 'DL' },
 ];
 
-const FAQS = [
-  { q: 'How does backlink exchange work?', a: 'You submit backlink requests with other website owners in the directory. Once accepted, you agree on who gives a link and who receives one, fill in placement details, and place the links. We check status dynamically.' },
-  { q: 'Is it safe for SEO?', a: 'Yes, because SERPsupport focuses on high-quality, relevant niche edits and guest posts. We recommend natural anchor text and keeping placements highly contextually relevant.' },
-  { q: 'Can I add multiple websites?', a: 'Currently each workspace is tied to one primary domain. You can create or switch workspaces to manage multiple websites.' }
-];
-
 export default function SettingsPage() {
   const { t } = useLanguage();
   const { workspace, user, setWorkspace } = useAuth();
+  
+  const FAQS = [
+    { q: t('settings.faq1Q'), a: t('settings.faq1A') },
+    { q: t('settings.faq2Q'), a: t('settings.faq2A') },
+    { q: t('settings.faq3Q'), a: t('settings.faq3A') }
+  ];
   
   // Website profile state
   const [siteName, setSiteName] = useState(workspace?.websiteName || '');
@@ -66,7 +66,7 @@ export default function SettingsPage() {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err: any) {
-      setSaveError(err.response?.data?.error || 'Failed to update website profile');
+      setSaveError(err.response?.data?.error || t('settings.failedUpdate'));
     } finally {
       setSaveLoading(false);
     }
@@ -156,15 +156,15 @@ export default function SettingsPage() {
     <div className="settings-layout">
       {/* Settings Sub-Sidebar Navigation */}
       <aside className="settings-sidebar">
-        <h2>Settings</h2>
+        <h2>{t('settings.title')}</h2>
         {[
-          { label: 'Website Profile', id: 'website-profile', icon: Globe },
-          { label: 'Account', id: 'account', icon: User },
-          { label: 'Invite a Friend', id: 'invite', icon: Gift },
-          { label: 'Notifications', id: 'notifications', icon: Bell },
-          { label: 'Billing & Plans', id: 'billing', icon: CreditCard },
-          { label: 'Help & FAQ', id: 'help', icon: HelpCircle },
-          { label: 'Danger Zone', id: 'danger', icon: AlertTriangle, color: 'var(--red)' }
+          { label: t('settings.navProfile'), id: 'website-profile', icon: Globe },
+          { label: t('settings.navAccount'), id: 'account', icon: User },
+          { label: t('settings.navInvite'), id: 'invite', icon: Gift },
+          { label: t('settings.navNotifications'), id: 'notifications', icon: Bell },
+          { label: t('settings.navBilling'), id: 'billing', icon: CreditCard },
+          { label: t('settings.navHelp'), id: 'help', icon: HelpCircle },
+          { label: t('settings.navDanger'), id: 'danger', icon: AlertTriangle, color: 'var(--red)' }
         ].map(s => (
           <a key={s.id} href={`#${s.id}`} className="settings-nav-item" style={{ color: s.color || 'var(--text-secondary)' }}>
             <s.icon size={16} />
@@ -206,7 +206,7 @@ export default function SettingsPage() {
         <section id="website-profile" style={{ marginBottom: 48 }}>
           <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
             <Globe size={18} color="var(--accent)" />
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Website Profile</h2>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('settings.hProfile')}</h2>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 600 }}>
             <div className="input-group">
@@ -218,18 +218,18 @@ export default function SettingsPage() {
               <input type="text" value={siteDomain} onChange={e => setSiteDomain(e.target.value)} className="input-field" placeholder="example.com" />
             </div>
             <div className="input-group">
-              <label className="input-label">Category / Niche</label>
+              <label className="input-label">{t('settings.profileCategory')}</label>
               <select value={category} onChange={e => setCategory(e.target.value)} className="input-field" style={{ height: 38 }}>
-                <option value="Tech & Software">Tech & Software</option>
-                <option value="Health & Medical">Health & Medical</option>
-                <option value="Business & Finance">Business & Finance</option>
-                <option value="Travel & Leisure">Travel & Leisure</option>
-                <option value="Other">Other Category</option>
+                <option value="Tech & Software">{t('settings.catTech')}</option>
+                <option value="Health & Medical">{t('settings.catHealth')}</option>
+                <option value="Business & Finance">{t('settings.catBusiness')}</option>
+                <option value="Travel & Leisure">{t('settings.catTravel')}</option>
+                <option value="Other">{t('settings.catOther')}</option>
               </select>
             </div>
             <div className="input-group">
-              <label className="input-label">Description (for directory discovery)</label>
-              <textarea value={description} onChange={e => setDescription(e.target.value)} className="input-field" style={{ height: 90, padding: '10px 12px', resize: 'vertical' }} placeholder="Tell other partners what your site is about..." />
+              <label className="input-label">{t('settings.profileDescLabel')}</label>
+              <textarea value={description} onChange={e => setDescription(e.target.value)} className="input-field" style={{ height: 90, padding: '10px 12px', resize: 'vertical' }} placeholder={t('settings.profileDescPlaceholder')} />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <button 
@@ -259,52 +259,52 @@ export default function SettingsPage() {
         <section id="account" style={{ marginBottom: 48 }}>
           <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
             <User size={18} color="var(--accent)" />
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Account Details</h2>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('settings.hAccount')}</h2>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 600 }}>
             <div className="input-group">
-              <label className="input-label">Your Name</label>
+              <label className="input-label">{t('settings.yourName')}</label>
               <input type="text" value={accountName} onChange={e => setAccountName(e.target.value)} className="input-field" placeholder="Full Name" />
             </div>
             <div className="input-group">
-              <label className="input-label">Email Address</label>
+              <label className="input-label">{t('settings.emailAddress')}</label>
               <input type="email" value={accountEmail} onChange={e => setAccountEmail(e.target.value)} className="input-field" placeholder="email@example.com" />
             </div>
 
             <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20, marginTop: 10 }}>
-              <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 12 }}>Appearance</h3>
+              <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 12 }}>{t('settings.appearance')}</h3>
               <div style={{ display: 'flex', gap: 12 }}>
                 <button
                   onClick={() => changeTheme('light')}
                   className={`btn ${theme === 'light' ? 'btn-outline' : 'btn-primary'}`}
                   style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 40 }}
                 >
-                  <Sun size={16} /> Light Mode
+                  <Sun size={16} /> {t('settings.lightMode')}
                 </button>
                 <button
                   onClick={() => changeTheme('dark')}
                   className={`btn ${theme === 'dark' ? 'btn-outline' : 'btn-primary'}`}
                   style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 40 }}
                 >
-                  <Moon size={16} /> Dark Mode
+                  <Moon size={16} /> {t('settings.darkMode')}
                 </button>
               </div>
             </div>
 
             <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20, marginTop: 10 }}>
-              <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 12 }}>Change Password</h3>
+              <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 12 }}>{t('settings.changePassword')}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div className="input-group">
-                  <label className="input-label">New Password</label>
+                  <label className="input-label">{t('settings.newPassword')}</label>
                   <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="input-field" placeholder="••••••••" />
                 </div>
                 <div className="input-group">
-                  <label className="input-label">Confirm New Password</label>
+                  <label className="input-label">{t('settings.confirmPassword')}</label>
                   <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="input-field" placeholder="••••••••" />
                 </div>
               </div>
             </div>
-            <button className="btn btn-primary" style={{ width: 'fit-content', marginTop: 8 }}>Update Profile</button>
+            <button className="btn btn-primary" style={{ width: 'fit-content', marginTop: 8 }}>{t('settings.updateProfile')}</button>
           </div>
         </section>
 
@@ -314,19 +314,19 @@ export default function SettingsPage() {
         <section id="invite" style={{ marginBottom: 48 }}>
           <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
             <Gift size={18} color="var(--accent)" />
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Invite a Friend</h2>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('settings.hInvite')}</h2>
           </div>
           <div style={{ background: 'linear-gradient(135deg, var(--bg-surface), var(--border-subtle))', padding: '24px 32px', borderRadius: 'var(--radius)', border: '1px solid var(--border)', maxWidth: 640 }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: 8 }}>Get 3 Months Free</h3>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: 8 }}>{t('settings.inviteTitle')}</h3>
             <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: 20, lineHeight: 1.5 }}>
-              Share your referral link with other website owners. When they place their first backlink through SERPsupport, you both get 3 months of premium features for free.
+              {t('settings.inviteDesc')}
             </p>
             
             <div style={{ display: 'flex', gap: 10 }}>
               <input type="text" value={referralLink} readOnly className="input-field" style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.8125rem' }} />
               <button onClick={copyReferral} className={`btn ${copiedRef ? 'btn-success' : 'btn-secondary'}`} style={{ minWidth: 100 }}>
                 {copiedRef ? <Check size={15} /> : <Copy size={15} />}
-                {copiedRef ? 'Copied' : 'Copy'}
+                {copiedRef ? t('settings.copiedBtn') : t('settings.copyBtn')}
               </button>
             </div>
           </div>
@@ -336,13 +336,13 @@ export default function SettingsPage() {
         <section id="notifications" style={{ marginBottom: 48 }}>
           <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
             <Bell size={18} color="var(--accent)" />
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Notifications</h2>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('settings.hNotifications')}</h2>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {[
-              { title: 'New connection requests', desc: 'Email me when another workspace invites me to place backlinks.', val: notifNewRequest, set: setNotifNewRequest },
-              { title: 'New chat messages', desc: 'Notify me when I receive messages in active coordinate threads.', val: notifMessages, set: setNotifMessages },
-              { title: 'Backlink status alerts', desc: 'Get instant alerts when a live backlink drops or changes status.', val: notifStatusUpdate, set: setNotifStatusUpdate }
+              { title: t('settings.notifConnTitle'), desc: t('settings.notifConnDesc'), val: notifNewRequest, set: setNotifNewRequest },
+              { title: t('settings.notifMsgTitle'), desc: t('settings.notifMsgDesc'), val: notifMessages, set: setNotifMessages },
+              { title: t('settings.notifStatusTitle'), desc: t('settings.notifStatusDesc'), val: notifStatusUpdate, set: setNotifStatusUpdate }
             ].map((n, idx) => (
               <label key={idx} style={{ display: 'flex', gap: 12, padding: '14px 16px', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', cursor: 'pointer', selectText: 'none' } as any}>
                 <input type="checkbox" checked={n.val} onChange={e => n.set(e.target.checked)} style={{ width: 18, height: 18, marginTop: 2, accentColor: 'var(--accent)' }} />
@@ -359,41 +359,41 @@ export default function SettingsPage() {
         <section id="billing" style={{ marginBottom: 48 }}>
           <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
             <CreditCard size={18} color="var(--accent)" />
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Billing & Plans</h2>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('settings.hBilling')}</h2>
           </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20, marginBottom: 30 }}>
             {/* Current Plan */}
             <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: 24, borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
-                <span className="pill pill-live" style={{ fontSize: '0.7rem', fontWeight: 700 }}>ACTIVE PLAN</span>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: 12 }}>Growth SEO</h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: 4 }}>Ideal for growing sites managing up to 30 backlinks.</p>
+                <span className="pill pill-live" style={{ fontSize: '0.7rem', fontWeight: 700 }}>{t('settings.activePlan')}</span>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: 12 }}>{t('settings.planName')}</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: 4 }}>{t('settings.planDesc')}</p>
               </div>
               <div style={{ marginTop: 20 }}>
                 <p style={{ fontSize: '1.25rem', fontWeight: 800 }}>$29<span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>/mo</span></p>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>Next invoice: June 15, 2026</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>{t('settings.nextInvoice')}</p>
               </div>
             </div>
 
             {/* Payment Method */}
             <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: 24, borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
-                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)' }}>PAYMENT METHOD</span>
+                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)' }}>{t('settings.paymentMethod')}</span>
                 <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  💳 Visa ending in 4242
+                  {t('settings.cardInfo')}
                 </h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: 4 }}>Expires 12/2028</p>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: 4 }}>{t('settings.cardExpires')}</p>
               </div>
-              <button className="btn btn-secondary btn-sm" style={{ width: 'fit-content', marginTop: 20 }}>Update Card</button>
+              <button className="btn btn-secondary btn-sm" style={{ width: 'fit-content', marginTop: 20 }}>{t('settings.updateCard')}</button>
             </div>
           </div>
 
-          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 12 }}>Invoices</h3>
+          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 12 }}>{t('settings.invoices')}</h3>
           <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', overflow: 'hidden', background: 'var(--bg-surface)', fontSize: '0.8125rem' }}>
             {[
-              { id: 'INV-0912', date: 'May 15, 2026', amount: '$29.00', status: 'Paid' },
-              { id: 'INV-0877', date: 'Apr 15, 2026', amount: '$29.00', status: 'Paid' }
+              { id: 'INV-0912', date: 'May 15, 2026', amount: '$29.00', status: t('settings.paid') },
+              { id: 'INV-0877', date: 'Apr 15, 2026', amount: '$29.00', status: t('settings.paid') }
             ].map(inv => (
               <div key={inv.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
                 <div>
@@ -413,7 +413,7 @@ export default function SettingsPage() {
         <section id="help" style={{ marginBottom: 48 }}>
           <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
             <HelpCircle size={18} color="var(--accent)" />
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Help & FAQ</h2>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('settings.hHelp')}</h2>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 30 }}>
@@ -429,14 +429,14 @@ export default function SettingsPage() {
           </div>
 
           <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: 20, borderRadius: 'var(--radius)' }}>
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 6 }}>Still need help?</h3>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 16 }}>Submit a support ticket and our team will get back to you within 24 hours.</p>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 6 }}>{t('settings.stillNeedHelp')}</h3>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 16 }}>{t('settings.ticketDesc')}</p>
             <form onSubmit={handleSupportSubmit}>
-              <textarea value={supportMsg} onChange={e => setSupportMsg(e.target.value)} className="input-field" style={{ height: 80, padding: '10px 12px', marginBottom: 12, fontSize: '0.8125rem' }} placeholder="Explain what went wrong or ask a question..." required />
-              <button type="submit" className="btn btn-secondary btn-sm">Submit Ticket</button>
+              <textarea value={supportMsg} onChange={e => setSupportMsg(e.target.value)} className="input-field" style={{ height: 80, padding: '10px 12px', marginBottom: 12, fontSize: '0.8125rem' }} placeholder={t('settings.ticketPlaceholder')} required />
+              <button type="submit" className="btn btn-secondary btn-sm">{t('settings.submitTicket')}</button>
             </form>
             {supportSuccess && (
-              <p style={{ color: 'var(--green)', fontSize: '0.75rem', fontWeight: 600, marginTop: 10 }}>Ticket submitted successfully!</p>
+              <p style={{ color: 'var(--green)', fontSize: '0.75rem', fontWeight: 600, marginTop: 10 }}>{t('settings.ticketSuccess')}</p>
             )}
           </div>
         </section>
@@ -445,24 +445,24 @@ export default function SettingsPage() {
         <section id="danger">
           <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
             <AlertTriangle size={18} color="var(--red)" />
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--red)' }}>Danger Zone</h2>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--red)' }}>{t('settings.hDanger')}</h2>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, background: 'rgba(220, 38, 38, 0.05)', border: '1px dashed var(--red)', padding: 24, borderRadius: 'var(--radius)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
               <div>
-                <h3 style={{ fontSize: '0.875rem', fontWeight: 700 }}>Delete Workspace</h3>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>Permanently delete this website workspace and all of its backlink threads.</p>
+                <h3 style={{ fontSize: '0.875rem', fontWeight: 700 }}>{t('settings.deleteWorkspace')}</h3>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>{t('settings.deleteWorkspaceDesc')}</p>
               </div>
-              <button className="btn btn-danger btn-sm">Delete Workspace</button>
+              <button className="btn btn-danger btn-sm">{t('settings.deleteWorkspace')}</button>
             </div>
             
             <div style={{ borderTop: '1px solid rgba(220, 38, 38, 0.1)', paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
               <div>
-                <h3 style={{ fontSize: '0.875rem', fontWeight: 700 }}>Delete Account</h3>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>Delete your personal profile. Workspaces you created will be orphaned.</p>
+                <h3 style={{ fontSize: '0.875rem', fontWeight: 700 }}>{t('settings.deleteAccount')}</h3>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>{t('settings.deleteAccountDesc')}</p>
               </div>
-              <button className="btn btn-danger btn-sm">Delete Account</button>
+              <button className="btn btn-danger btn-sm">{t('settings.deleteAccount')}</button>
             </div>
           </div>
         </section>
