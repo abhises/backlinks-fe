@@ -331,7 +331,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
             <Link2 size={26} color="var(--accent)" style={{ flexShrink: 0 }} />
             <div>
               <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.3rem', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0' }}>SERPsupport</div>
-              <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', marginTop: '2px' }}>WEBSITE PORTAL</div>
+              <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', marginTop: '2px' }}>{t('app.portal')}</div>
             </div>
           </div>
           <div style={{ position: 'relative' }}>

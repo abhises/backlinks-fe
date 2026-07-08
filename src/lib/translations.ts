@@ -58,6 +58,14 @@ export const translations: Record<Locale, Record<string, string>> = {
     'app.search': 'Search backlinks, websites, domains...',
     'app.notifications': 'Notifications',
     'app.noNotifications': 'No notifications',
+    'app.portal': 'WEBSITE PORTAL',
+    'app.adminPanel': 'ADMIN PANEL',
+    'app.adminSystem': 'Admin System',
+    'admin.dashboard': 'Dashboard',
+    'admin.users': 'Users',
+    'admin.backlinks': 'Backlinks',
+    'admin.notifications': 'Notifications',
+    'admin.settings': 'Settings',
 
     // Auth Page
     'auth.resetPassword': 'Reset password',
@@ -192,6 +200,14 @@ export const translations: Record<Locale, Record<string, string>> = {
     'app.search': 'Etsi paluulinkkejä, sivustoja, verkkotunnuksia...',
     'app.notifications': 'Ilmoitukset',
     'app.noNotifications': 'Ei ilmoituksia',
+    'app.portal': 'SIVUSTO-PORTAALI',
+    'app.adminPanel': 'HALLINTAPANEELI',
+    'app.adminSystem': 'Hallintajärjestelmä',
+    'admin.dashboard': 'Kojelauta',
+    'admin.users': 'Käyttäjät',
+    'admin.backlinks': 'Paluulinkit',
+    'admin.notifications': 'Ilmoitukset',
+    'admin.settings': 'Asetukset',
 
     // Auth Page
     'auth.resetPassword': 'Palauta salasana',
@@ -326,6 +342,14 @@ export const translations: Record<Locale, Record<string, string>> = {
     'app.search': 'Zoek backlinks, websites, domeinen...',
     'app.notifications': 'Meldingen',
     'app.noNotifications': 'Geen meldingen',
+    'app.portal': 'WEBSITE PORTAAL',
+    'app.adminPanel': 'ADMINBEHEER',
+    'app.adminSystem': 'Admin Systeem',
+    'admin.dashboard': 'Dashboard',
+    'admin.users': 'Gebruikers',
+    'admin.backlinks': 'Backlinks',
+    'admin.notifications': 'Meldingen',
+    'admin.settings': 'Instellingen',
 
     // Auth Page
     'auth.resetPassword': 'Wachtwoord herstellen',

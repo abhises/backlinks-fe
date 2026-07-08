@@ -7,20 +7,23 @@ import {
   Shield, LayoutDashboard, Settings, Bell,
   LogOut, Sun, Moon, Palette, Menu, X, Globe, Link2
 } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 const NAV = [
-  { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/admin/users', icon: Shield, label: 'Users' },
-  { href: '/admin/backlinks', icon: Globe, label: 'Backlinks' },
-  { href: '/admin/notifications', icon: Bell, label: 'Notifications' },
-  { href: '/admin/settings', icon: Settings, label: 'Settings' },
+  { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard', key: 'admin.dashboard' },
+  { href: '/admin/users', icon: Shield, label: 'Users', key: 'admin.users' },
+  { href: '/admin/backlinks', icon: Globe, label: 'Backlinks', key: 'admin.backlinks' },
+  { href: '/admin/notifications', icon: Bell, label: 'Notifications', key: 'admin.notifications' },
+  { href: '/admin/settings', icon: Settings, label: 'Settings', key: 'admin.settings' },
 ];
 
 const THEMES = ['dark', 'light', 'color'] as const;
 type Theme = typeof THEMES[number];
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
+  const { t } = useLanguage();
   const { user, logout, loading } = useAuth();
+
   const router = useRouter();
   const pathname = usePathname();
   const [theme, setTheme] = useState<Theme>('dark');
@@ -58,17 +61,17 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             <Link2 size={26} color="var(--accent)" style={{ flexShrink: 0 }} />
             <div>
               <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: '1.3rem', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0' }}>SERPsupport</div>
-              <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--red)', letterSpacing: '0.05em', marginTop: '2px', textTransform: 'uppercase' }}>ADMIN PANEL</div>
+              <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--red)', letterSpacing: '0.05em', marginTop: '2px', textTransform: 'uppercase' }}>{t('app.adminPanel')}</div>
             </div>
           </div>
         </div>
 
         {/* Nav links */}
-        {NAV.map(({ href, icon: Icon, label }) => (
+        {NAV.map(({ href, icon: Icon, label, key }) => (
           <Link key={href} href={href}
             className={`nav-item ${pathname.startsWith(href) ? 'active' : ''}`}>
             <Icon size={18} />
-            {label}
+            {t(key || '') || label}
           </Link>
         ))}
 
@@ -100,7 +103,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           }}
         >
           <LogOut size={18} />
-          Sign Out
+          {t('app.signOut')}
         </button>
       </aside>
 
@@ -139,12 +142,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           </button>
         </div>
 
-        {NAV.map(({ href, icon: Icon, label }) => (
+        {NAV.map(({ href, icon: Icon, label, key }) => (
           <Link key={href} href={href}
             className={`nav-item ${pathname.startsWith(href) ? 'active' : ''}`}
             onClick={() => setSidebarOpen(false)}>
             <Icon size={18} />
-            {label}
+            {t(key || '') || label}
           </Link>
         ))}
 
@@ -170,7 +173,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           }}
         >
           <LogOut size={18} />
-          Sign Out
+          {t('app.signOut')}
         </button>
       </aside>
 
@@ -198,10 +201,10 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             >
               <Menu size={18} />
             </button>
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Admin System</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{t('app.adminSystem')}</span>
             <span style={{ color: 'var(--text-muted)' }}>/</span>
             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', textTransform: 'capitalize' }}>
-              {pathname?.split('/')[2] ? pathname.split('/')[2].charAt(0).toUpperCase() + pathname.split('/')[2].slice(1) : 'Dashboard'}
+              {pathname?.split('/')[2] ? (t(`admin.${pathname.split('/')[2]}`) || pathname.split('/')[2].charAt(0).toUpperCase() + pathname.split('/')[2].slice(1)) : t('admin.dashboard')}
             </span>
           </div>
 
