@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
+import { useLanguage } from '@/context/LanguageContext';
 import { Bell, Send, Loader2, Clock } from 'lucide-react';
 
 type AdminNotification = {
@@ -11,6 +12,7 @@ type AdminNotification = {
 };
 
 export default function AdminNotifications() {
+  const { t } = useLanguage();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
@@ -44,7 +46,7 @@ export default function AdminNotifications() {
 
     try {
       const res = await api.post('/api/admin/notifications', { title, description });
-      setSuccess('Notification broadcasted to all users successfully!');
+      setSuccess(t('adminNotifs.success'));
       setTitle('');
       setDescription('');
       
@@ -53,7 +55,7 @@ export default function AdminNotifications() {
         setHistory(prev => [res.data.notification, ...prev]);
       }
     } catch (err: any) {
-      setError(err?.response?.data?.error || 'Failed to broadcast notification');
+      setError(err?.response?.data?.error || t('adminNotifs.failedBroadcast'));
     } finally {
       setLoading(false);
     }
@@ -63,8 +65,8 @@ export default function AdminNotifications() {
     <div className="notifications-container">
       <div className="page-header" style={{ padding: 0, border: 'none', marginBottom: 32 }}>
         <div className="page-header-left">
-          <h1 className="page-title">Broadcast Notification</h1>
-          <p className="page-sub">Send a system-wide alert to all users.</p>
+          <h1 className="page-title">{t('adminNotifs.title')}</h1>
+          <p className="page-sub">{t('adminNotifs.sub')}</p>
         </div>
       </div>
 
@@ -75,8 +77,8 @@ export default function AdminNotifications() {
             <Bell size={20} color="var(--blue)" />
           </div>
           <div>
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>New Announcement</h2>
-            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>This will trigger a real-time alert for all online users.</p>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('adminNotifs.newAnnouncement')}</h2>
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{t('adminNotifs.announcementDesc')}</p>
           </div>
         </div>
 
@@ -94,24 +96,24 @@ export default function AdminNotifications() {
 
         <form onSubmit={handleBroadcast} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div className="input-group">
-            <label className="input-label">Notification Title</label>
+            <label className="input-label">{t('adminNotifs.formTitle')}</label>
             <input 
               type="text" 
               value={title} 
               onChange={e => setTitle(e.target.value)} 
               className="input-field" 
-              placeholder="e.g. Scheduled Maintenance" 
+              placeholder={t('adminNotifs.formTitlePlaceholder')} 
               required 
             />
           </div>
 
           <div className="input-group">
-            <label className="input-label">Message / Description</label>
+            <label className="input-label">{t('adminNotifs.formDesc')}</label>
             <textarea 
               value={description} 
               onChange={e => setDescription(e.target.value)} 
               className="input-field" 
-              placeholder="Enter the notification details here..." 
+              placeholder={t('adminNotifs.formDescPlaceholder')} 
               required 
               rows={4}
               style={{ resize: 'vertical', lineHeight: 1.5 }} 
@@ -138,13 +140,13 @@ export default function AdminNotifications() {
             disabled={loading || !title || !description}
           >
             {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-            {loading ? 'Broadcasting...' : 'Send Broadcast'}
+            {loading ? t('adminNotifs.broadcasting') : t('adminNotifs.sendBroadcast')}
           </button>
         </form>
       </div>
 
       <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <h2 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: 24 }}>Broadcast History</h2>
+        <h2 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: 24 }}>{t('adminNotifs.historyTitle')}</h2>
         
         {loadingHistory ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
@@ -153,8 +155,8 @@ export default function AdminNotifications() {
         ) : history.length === 0 ? (
           <div className="empty-state" style={{ padding: '40px 0', border: 'none', background: 'transparent' }}>
             <div className="empty-state-icon" style={{ background: 'var(--bg-hover)' }}><Clock color="var(--text-muted)" /></div>
-            <h3>No broadcasts yet</h3>
-            <p>You haven't sent any global notifications.</p>
+            <h3>{t('adminNotifs.noBroadcasts')}</h3>
+            <p>{t('adminNotifs.noBroadcastsDesc')}</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

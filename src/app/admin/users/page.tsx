@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
+import { useLanguage } from '@/context/LanguageContext';
 import { Loader2, User, Edit2, Trash2, Check, X, AlertTriangle, Search } from 'lucide-react';
 
 type UserData = {
@@ -20,6 +21,7 @@ type UserData = {
 };
 
 export default function AdminUsers() {
+  const { t } = useLanguage();
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -52,7 +54,7 @@ export default function AdminUsers() {
       const res = await api.get('/api/admin/users');
       setUsers(res.data.users);
     } catch (err: any) {
-      setError(err?.response?.data?.error || 'Failed to load users');
+      setError(err?.response?.data?.error || t('adminUsers.failedLoad'));
     } finally {
       setLoading(false);
     }
@@ -70,9 +72,9 @@ export default function AdminUsers() {
       const res = await api.put(`/api/admin/users/${id}`, editForm);
       setUsers(users.map(u => u.id === id ? { ...u, ...res.data.user } : u));
       setEditingId(null);
-      setToastMessage({ type: 'success', text: 'User updated successfully' });
+      setToastMessage({ type: 'success', text: t('adminUsers.userUpdated') });
     } catch (err: any) {
-      setToastMessage({ type: 'error', text: err?.response?.data?.error || 'Failed to update user' });
+      setToastMessage({ type: 'error', text: err?.response?.data?.error || t('adminUsers.failedUpdate') });
     } finally {
       setSaving(false);
     }
@@ -84,10 +86,10 @@ export default function AdminUsers() {
     try {
       await api.delete(`/api/admin/users/${deleteModalId}`);
       setUsers(users.filter(u => u.id !== deleteModalId));
-      setToastMessage({ type: 'success', text: 'User deleted successfully' });
+      setToastMessage({ type: 'success', text: t('adminUsers.userDeleted') });
       setDeleteModalId(null);
     } catch (err: any) {
-      setToastMessage({ type: 'error', text: err?.response?.data?.error || 'Failed to delete user' });
+      setToastMessage({ type: 'error', text: err?.response?.data?.error || t('adminUsers.failedDelete') });
     } finally {
       setDeleting(false);
     }
@@ -145,10 +147,10 @@ export default function AdminUsers() {
               <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: 12, borderRadius: '50%' }}>
                 <AlertTriangle color="var(--red)" size={24} />
               </div>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Confirm Deletion</h2>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>{t('adminUsers.confirmDeleteTitle')}</h2>
             </div>
             <p style={{ color: 'var(--text-secondary)', marginBottom: 24, lineHeight: 1.5 }}>
-              Are you sure you want to delete this user? This action cannot be undone and will permanently remove their data from the platform.
+              {t('adminUsers.confirmDeleteDesc')}
             </p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
               <button 
@@ -156,7 +158,7 @@ export default function AdminUsers() {
                 onClick={() => setDeleteModalId(null)}
                 disabled={deleting}
               >
-                Cancel
+                {t('app.cancel')}
               </button>
               <button 
                 className="btn btn-primary" 
@@ -165,7 +167,7 @@ export default function AdminUsers() {
                 disabled={deleting}
               >
                 {deleting ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-                {deleting ? 'Deleting...' : 'Delete User'}
+                {deleting ? t('adminUsers.deleting') : t('adminUsers.deleteUser')}
               </button>
             </div>
           </div>
@@ -174,14 +176,14 @@ export default function AdminUsers() {
 
       <div style={{ padding: '28px 32px 0 32px', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '2rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>Users</h1>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '6px 0 0 0' }}>View and manage platform users.</p>
+          <h1 style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '2rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>{t('adminUsers.title')}</h1>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '6px 0 0 0' }}>{t('adminUsers.sub')}</p>
         </div>
         <div style={{ position: 'relative' }}>
           <Search size={18} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search users..."
+            placeholder={t('adminUsers.search')}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -208,7 +210,7 @@ export default function AdminUsers() {
           <div className="empty-state" style={{ padding: '40px 0', border: 'none', background: 'transparent', flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <div style={{ textAlign: 'center' }}>
               <div className="empty-state-icon" style={{ background: 'var(--bg-hover)', display: 'inline-flex', padding: 20, borderRadius: '50%', marginBottom: 16 }}><User color="var(--text-muted)" size={48} /></div>
-              <h3>{searchQuery ? 'No users match your search' : 'No users found'}</h3>
+              <h3>{searchQuery ? t('adminUsers.noMatch') : t('adminUsers.noUsers')}</h3>
             </div>
           </div>
         ) : (
@@ -216,10 +218,10 @@ export default function AdminUsers() {
             <table style={{ width: '100%', minWidth: '900px', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {['NAME', 'EMAIL', 'ROLE', 'WORKSPACE', 'REJECTED IN/OUT', 'JOINED', 'ACTIONS'].map(h => (
-                    <th key={h} style={{
+                  {[t('adminUsers.hName'), t('adminUsers.hEmail'), t('adminUsers.hRole'), t('adminUsers.hWorkspace'), t('adminUsers.hRejected'), t('adminUsers.hJoined'), t('adminUsers.hActions')].map((h, idx) => (
+                    <th key={idx} style={{
                       padding: '12px 16px',
-                      textAlign: h === 'ACTIONS' ? 'right' : 'left',
+                      textAlign: idx === 6 ? 'right' : 'left',
                       fontSize: '0.72rem',
                       fontWeight: 700,
                       letterSpacing: '0.06em',
@@ -251,8 +253,8 @@ export default function AdminUsers() {
                       <td style={{ padding: '16px', fontSize: '0.875rem' }}>
                         {isEditing ? (
                           <select className="input-field" value={editForm.role} onChange={e => setEditForm({...editForm, role: e.target.value})} style={{ padding: '6px 10px', height: 32 }}>
-                            <option value="CLIENT">CLIENT</option>
-                            <option value="ADMIN">ADMIN</option>
+                            <option value="CLIENT">{t('adminUsers.clientRole')}</option>
+                            <option value="ADMIN">{t('adminUsers.adminRole')}</option>
                           </select>
                         ) : (
                           <span style={{ 
@@ -260,7 +262,7 @@ export default function AdminUsers() {
                             background: isAdmin ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.1)',
                             color: isAdmin ? 'var(--red)' : 'var(--blue)'
                           }}>
-                            {u.role}
+                            {u.role === 'ADMIN' ? t('adminUsers.adminRole') : t('adminUsers.clientRole')}
                           </span>
                         )}
                       </td>
@@ -271,7 +273,7 @@ export default function AdminUsers() {
                             <span style={{ fontSize: '0.75rem' }}>{u.teamMemberships[0].workspace.websiteName}</span>
                           </div>
                         ) : (
-                          <span style={{ color: 'var(--text-muted)' }}>No workspace</span>
+                          <span style={{ color: 'var(--text-muted)' }}>{t('adminUsers.noWorkspace')}</span>
                         )}
                       </td>
                       <td style={{ padding: '16px', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
@@ -288,10 +290,10 @@ export default function AdminUsers() {
                         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                           {isEditing ? (
                             <>
-                              <button onClick={() => handleSave(u.id)} disabled={saving} style={{ width: 32, height: 32, padding: 0, background: '#1a1a1a', color: 'white', border: 'none', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} title="Save">
+                              <button onClick={() => handleSave(u.id)} disabled={saving} style={{ width: 32, height: 32, padding: 0, background: '#1a1a1a', color: 'white', border: 'none', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} title={t('app.save')}>
                                 {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                               </button>
-                              <button onClick={() => setEditingId(null)} className="btn btn-secondary btn-icon" style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Cancel">
+                              <button onClick={() => setEditingId(null)} className="btn btn-secondary btn-icon" style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} title={t('app.cancel')}>
                                 <X size={14} />
                               </button>
                             </>
@@ -302,7 +304,7 @@ export default function AdminUsers() {
                                 className="btn btn-secondary btn-icon" 
                                 style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: isAdmin ? 0.3 : 1, cursor: isAdmin ? 'not-allowed' : 'pointer' }} 
                                 disabled={isAdmin}
-                                title={isAdmin ? "Cannot edit an Admin" : "Edit"}
+                                title={isAdmin ? t('adminUsers.cannotEditAdmin') : t('app.edit')}
                               >
                                 <Edit2 size={14} />
                               </button>
@@ -311,7 +313,7 @@ export default function AdminUsers() {
                                 className="btn btn-ghost btn-icon" 
                                 style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--red)', opacity: isAdmin ? 0.3 : 1, cursor: isAdmin ? 'not-allowed' : 'pointer' }} 
                                 disabled={isAdmin}
-                                title={isAdmin ? "Cannot delete an Admin" : "Delete"}
+                                title={isAdmin ? t('adminUsers.cannotDeleteAdmin') : t('app.delete')}
                               >
                                 <Trash2 size={14} />
                               </button>
@@ -329,7 +331,7 @@ export default function AdminUsers() {
         {!loading && filteredUsers.length > 0 && (
           <div style={{ padding: '24px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)' }}>
-              Showing {(currentPage - 1) * rowsPerPage + 1} to {Math.min(currentPage * rowsPerPage, filteredUsers.length)} of {filteredUsers.length} users
+              {t('inbox.showing')} {(currentPage - 1) * rowsPerPage + 1} - {Math.min(currentPage * rowsPerPage, filteredUsers.length)} / {filteredUsers.length}
             </span>
             <div style={{ display: 'flex', gap: 8 }}>
               <button
@@ -337,14 +339,14 @@ export default function AdminUsers() {
                 disabled={currentPage === 1}
                 className="btn btn-secondary btn-sm"
               >
-                Previous
+                {t('app.previous')}
               </button>
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
                 className="btn btn-secondary btn-sm"
               >
-                Next
+                {t('app.next')}
               </button>
             </div>
           </div>

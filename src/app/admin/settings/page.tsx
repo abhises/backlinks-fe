@@ -1,9 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
+import { useLanguage } from '@/context/LanguageContext';
 import { Loader2, Settings2, Clock, Check, Save, Sliders, Users, Hourglass } from 'lucide-react';
 
 export default function AdminSettings() {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [cronExpression, setCronExpression] = useState('0 0 * * 1');
@@ -43,7 +45,7 @@ export default function AdminSettings() {
         }
       }
     } catch (err) {
-      setToastMessage({ type: 'error', text: 'Failed to load settings.' });
+      setToastMessage({ type: 'error', text: t('adminSettings.failedLoad') });
     } finally {
       setLoading(false);
     }
@@ -60,9 +62,9 @@ export default function AdminSettings() {
         answerTimeoutDays: Number(answerTimeoutDays),
         placementTimeoutDays: Number(placementTimeoutDays)
       });
-      setToastMessage({ type: 'success', text: 'Settings saved. Matcher CRON updated.' });
+      setToastMessage({ type: 'success', text: t('adminSettings.saved') });
     } catch (err: any) {
-      setToastMessage({ type: 'error', text: err?.response?.data?.error || 'Failed to save settings.' });
+      setToastMessage({ type: 'error', text: err?.response?.data?.error || t('adminSettings.failedSave') });
     } finally {
       setSaving(false);
     }
@@ -72,10 +74,10 @@ export default function AdminSettings() {
     setTriggering(true);
     try {
       await api.post('/api/admin/trigger-matching');
-      setToastMessage({ type: 'success', text: 'Matchmaking triggered successfully.' });
+      setToastMessage({ type: 'success', text: t('adminSettings.triggered') });
       setShowModal(false);
     } catch (err: any) {
-      setToastMessage({ type: 'error', text: 'Failed to trigger match.' });
+      setToastMessage({ type: 'error', text: t('adminSettings.failedTrigger') });
     } finally {
       setTriggering(false);
     }
@@ -98,12 +100,12 @@ export default function AdminSettings() {
 
       {/* Settings Sub-Sidebar Navigation */}
       <aside className="settings-sidebar">
-        <h2>Admin Settings</h2>
+        <h2>{t('adminSettings.title')}</h2>
         {[
-          { label: 'Matchmaking Schedule', id: 'schedule', icon: Clock },
-          { label: 'User Limits', id: 'limits', icon: Users },
-          { label: 'Timeout Configs', id: 'timeouts', icon: Hourglass },
-          { label: 'Manual Trigger', id: 'manual-trigger', icon: Sliders }
+          { label: t('adminSettings.hSchedule'), id: 'schedule', icon: Clock },
+          { label: t('adminSettings.hLimits'), id: 'limits', icon: Users },
+          { label: t('adminSettings.hTimeouts'), id: 'timeouts', icon: Hourglass },
+          { label: t('adminSettings.hManual'), id: 'manual-trigger', icon: Sliders }
         ].map(s => (
           <a key={s.id} href={`#${s.id}`} className="settings-nav-item" style={{ color: 'var(--text-secondary)' }}>
             <s.icon size={16} />
@@ -137,8 +139,8 @@ export default function AdminSettings() {
         
         {/* Header */}
         <div style={{ padding: '24px 0 20px', borderBottom: '1px solid var(--border)', marginBottom: 32 }}>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Platform Settings</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: 4 }}>Configure automated system behaviors and matchmaking logic.</p>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>{t('adminSettings.title')}</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: 4 }}>{t('adminSettings.sub')}</p>
         </div>
 
         {loading ? (
@@ -152,26 +154,26 @@ export default function AdminSettings() {
             <section id="schedule">
               <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
                 <Clock size={18} color="var(--accent)" />
-                <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Matchmaking Schedule</h2>
+                <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('adminSettings.hSchedule')}</h2>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 600 }}>
                 <div className="input-group">
-                  <label className="input-label" style={{ fontWeight: 600 }}>Matchmaking Frequency</label>
+                  <label className="input-label" style={{ fontWeight: 600 }}>{t('adminSettings.scheduleLabel')}</label>
                   <select 
                     value={cronExpression} 
                     onChange={e => setCronExpression(e.target.value)} 
                     className="input-field" 
                     required 
                   >
-                    <option value="*/10 * * * *">Every 10 Minutes (For Testing)</option>
-                    <option value="0 * * * *">Every Hour</option>
-                    <option value="0 0 * * *">Every Day at Midnight</option>
-                    <option value="0 0 * * 1">Every Week (Monday at Midnight)</option>
-                    <option value="0 0 1 * *">Every Month (1st of the month)</option>
-                    <option value={cronExpression} hidden>Custom Schedule</option>
+                    <option value="*/10 * * * *">{t('adminSettings.optEvery10')}</option>
+                    <option value="0 * * * *">{t('adminSettings.optEveryHour')}</option>
+                    <option value="0 0 * * *">{t('adminSettings.optEveryDay')}</option>
+                    <option value="0 0 * * 1">{t('adminSettings.optEveryWeek')}</option>
+                    <option value="0 0 1 * *">{t('adminSettings.optEveryMonth')}</option>
+                    <option value={cronExpression} hidden>{t('adminSettings.optCustom')}</option>
                   </select>
                   <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                    Select how often the system should automatically pair users together.
+                    {t('adminSettings.scheduleDesc')}
                   </p>
                 </div>
               </div>
@@ -181,11 +183,11 @@ export default function AdminSettings() {
             <section id="limits">
               <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
                 <Users size={18} color="var(--accent)" />
-                <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>User Limits</h2>
+                <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('adminSettings.hLimits')}</h2>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 600 }}>
                 <div className="input-group">
-                  <label className="input-label" style={{ fontWeight: 600 }}>Matches Per User (Give/Receive)</label>
+                  <label className="input-label" style={{ fontWeight: 600 }}>{t('adminSettings.limitsMatchLabel')}</label>
                   <input 
                     type="number" 
                     value={matchAmount} 
@@ -196,12 +198,12 @@ export default function AdminSettings() {
                     required 
                   />
                   <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                    The number of giving and receiving matches each user will receive per run. (e.g. 2 means 2 giving, 2 receiving).
+                    {t('adminSettings.limitsMatchDesc')}
                   </p>
                 </div>
 
                 <div className="input-group">
-                  <label className="input-label" style={{ fontWeight: 600 }}>Maximum Allowed Rejections</label>
+                  <label className="input-label" style={{ fontWeight: 600 }}>{t('adminSettings.limitsRejectLabel')}</label>
                   <input 
                     type="number" 
                     value={rejectLimit} 
@@ -212,7 +214,7 @@ export default function AdminSettings() {
                     required 
                   />
                   <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                    The maximum number of connections a user is allowed to reject. Once reached, they can no longer reject new connections.
+                    {t('adminSettings.limitsRejectDesc')}
                   </p>
                 </div>
               </div>
@@ -222,11 +224,11 @@ export default function AdminSettings() {
             <section id="timeouts">
               <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
                 <Hourglass size={18} color="var(--accent)" />
-                <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Timeout Configurations</h2>
+                <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('adminSettings.hTimeouts')}</h2>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 600 }}>
                 <div className="input-group">
-                  <label className="input-label" style={{ fontWeight: 600 }}>Answer Timeout (Days)</label>
+                  <label className="input-label" style={{ fontWeight: 600 }}>{t('adminSettings.timeoutAnswerLabel')}</label>
                   <input 
                     type="number" 
                     value={answerTimeoutDays} 
@@ -236,12 +238,12 @@ export default function AdminSettings() {
                     required 
                   />
                   <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                    Number of days a user has to accept or reject a match before it expires.
+                    {t('adminSettings.timeoutAnswerDesc')}
                   </p>
                 </div>
 
                 <div className="input-group">
-                  <label className="input-label" style={{ fontWeight: 600 }}>Link Placement Timeout (Days)</label>
+                  <label className="input-label" style={{ fontWeight: 600 }}>{t('adminSettings.timeoutPlacementLabel')}</label>
                   <input 
                     type="number" 
                     value={placementTimeoutDays} 
@@ -251,7 +253,7 @@ export default function AdminSettings() {
                     required 
                   />
                   <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                    Number of days a user has to add the link details after accepting a match.
+                    {t('adminSettings.timeoutPlacementDesc')}
                   </p>
                 </div>
               </div>
@@ -267,7 +269,7 @@ export default function AdminSettings() {
                 disabled={saving}
               >
                 {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                {saving ? 'Saving...' : 'Save Configuration'}
+                {saving ? t('adminSettings.saving') : t('adminSettings.save')}
               </button>
             </div>
 
@@ -275,14 +277,14 @@ export default function AdminSettings() {
             <section id="manual-trigger" style={{ marginTop: 24 }}>
               <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
                 <Sliders size={18} color="var(--accent)" />
-                <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Manual Trigger</h2>
+                <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('adminSettings.hManual')}</h2>
               </div>
               <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: 20, borderRadius: 'var(--radius)', maxWidth: 600 }}>
-                <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 6 }}>Force Matchmaking Now</h3>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 16 }}>Manually trigger the matchmaking algorithm to run immediately outside of the scheduled CRON.</p>
+                <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 6 }}>{t('adminSettings.manualSub')}</h3>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 16 }}>{t('adminSettings.manualDesc')}</p>
                 <button type="button" onClick={() => setShowModal(true)} className="btn btn-secondary">
                   <Settings2 size={16} />
-                  Force Run Matchmaking Now
+                  {t('adminSettings.forceBtn')}
                 </button>
               </div>
             </section>
@@ -300,9 +302,9 @@ export default function AdminSettings() {
             boxShadow: 'var(--shadow-xl)', border: '1px solid var(--border)',
             animation: 'modalIn 0.2s ease-out'
           }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: 12 }}>Confirm Manual Run</h2>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: 12 }}>{t('adminSettings.confirmModalTitle')}</h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.5, marginBottom: 24 }}>
-              Are you sure you want to trigger the matchmaking algorithm right now? This will immediately scan all workspaces and dispatch new \`NEW\` backlink connections to users based on your Match Amount settings.
+              {t('adminSettings.confirmModalDesc')}
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
               <button 
@@ -310,7 +312,7 @@ export default function AdminSettings() {
                 className="btn btn-secondary"
                 disabled={triggering}
               >
-                Cancel
+                {t('app.cancel')}
               </button>
               <button 
                 onClick={confirmTrigger} 
@@ -323,7 +325,7 @@ export default function AdminSettings() {
                 disabled={triggering}
               >
                 {triggering ? <Loader2 size={16} className="animate-spin" /> : <Settings2 size={16} />}
-                {triggering ? 'Running...' : 'Run Algorithm'}
+                {triggering ? t('adminSettings.running') : t('adminSettings.runBtn')}
               </button>
             </div>
           </div>

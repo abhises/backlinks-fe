@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
+import { useLanguage } from '@/context/LanguageContext';
 import { Loader2, Link2, Edit2, Trash2, Check, X, AlertTriangle } from 'lucide-react';
 
 type BacklinkData = {
@@ -20,6 +21,7 @@ type BacklinkData = {
 };
 
 export default function AdminBacklinks() {
+  const { t } = useLanguage();
   const [backlinks, setBacklinks] = useState<BacklinkData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -49,7 +51,7 @@ export default function AdminBacklinks() {
       const res = await api.get('/api/admin/backlinks');
       setBacklinks(res.data.backlinks);
     } catch (err: any) {
-      setError(err?.response?.data?.error || 'Failed to load backlinks');
+      setError(err?.response?.data?.error || t('adminBacklinks.failedLoad'));
     } finally {
       setLoading(false);
     }
@@ -72,9 +74,9 @@ export default function AdminBacklinks() {
       const res = await api.put(`/api/admin/backlinks/${id}`, editForm);
       setBacklinks(backlinks.map(l => l.id === id ? { ...l, ...res.data.backlink } : l));
       setEditingId(null);
-      setToastMessage({ type: 'success', text: 'Backlink updated successfully' });
+      setToastMessage({ type: 'success', text: t('adminBacklinks.updated') });
     } catch (err: any) {
-      setToastMessage({ type: 'error', text: err?.response?.data?.error || 'Failed to update backlink' });
+      setToastMessage({ type: 'error', text: err?.response?.data?.error || t('adminBacklinks.failedUpdate') });
     } finally {
       setSaving(false);
     }
@@ -86,10 +88,10 @@ export default function AdminBacklinks() {
     try {
       await api.delete(`/api/admin/backlinks/${deleteModalId}`);
       setBacklinks(backlinks.filter(l => l.id !== deleteModalId));
-      setToastMessage({ type: 'success', text: 'Backlink deleted successfully' });
+      setToastMessage({ type: 'success', text: t('adminBacklinks.deleted') });
       setDeleteModalId(null);
     } catch (err: any) {
-      setToastMessage({ type: 'error', text: err?.response?.data?.error || 'Failed to delete backlink' });
+      setToastMessage({ type: 'error', text: err?.response?.data?.error || t('adminBacklinks.failedDelete') });
     } finally {
       setDeleting(false);
     }
@@ -133,10 +135,10 @@ export default function AdminBacklinks() {
               <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: 12, borderRadius: '50%' }}>
                 <AlertTriangle color="var(--red)" size={24} />
               </div>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Confirm Deletion</h2>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>{t('adminBacklinks.confirmDeleteTitle')}</h2>
             </div>
             <p style={{ color: 'var(--text-secondary)', marginBottom: 24, lineHeight: 1.5 }}>
-              Are you sure you want to delete this backlink placement record? This action cannot be undone.
+              {t('adminBacklinks.confirmDeleteDesc')}
             </p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
               <button 
@@ -144,7 +146,7 @@ export default function AdminBacklinks() {
                 onClick={() => setDeleteModalId(null)}
                 disabled={deleting}
               >
-                Cancel
+                {t('app.cancel')}
               </button>
               <button 
                 className="btn btn-primary" 
@@ -153,7 +155,7 @@ export default function AdminBacklinks() {
                 disabled={deleting}
               >
                 {deleting ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-                {deleting ? 'Deleting...' : 'Delete Backlink'}
+                {deleting ? t('adminBacklinks.deleting') : t('adminBacklinks.deleteBtn')}
               </button>
             </div>
           </div>
@@ -162,8 +164,8 @@ export default function AdminBacklinks() {
 
       <div style={{ padding: '28px 32px 0 32px', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '2rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>Backlinks</h1>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '6px 0 0 0' }}>View and manage all platform link placements.</p>
+          <h1 style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '2rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>{t('adminBacklinks.title')}</h1>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '6px 0 0 0' }}>{t('adminBacklinks.sub')}</p>
         </div>
       </div>
 
@@ -181,17 +183,17 @@ export default function AdminBacklinks() {
         ) : backlinks.length === 0 ? (
           <div className="empty-state" style={{ padding: '40px 0', border: 'none', background: 'transparent' }}>
             <div className="empty-state-icon" style={{ background: 'var(--bg-hover)' }}><Link2 color="var(--text-muted)" /></div>
-            <h3>No backlinks found</h3>
+            <h3>{t('adminBacklinks.noMatch')}</h3>
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', minWidth: '1200px', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {['SOURCE DOMAIN', 'TARGET DOMAIN', 'SOURCE URL', 'TARGET URL', 'ANCHOR TEXT', 'TYPE', 'STATUS', 'DATE PLACED', 'ACTIONS'].map(h => (
-                    <th key={h} style={{
+                  {[t('adminBacklinks.hSourceDomain'), t('adminBacklinks.hTargetDomain'), t('adminBacklinks.hSourceUrl'), t('adminBacklinks.hTargetUrl'), t('adminBacklinks.hAnchor'), t('adminBacklinks.hType'), t('adminBacklinks.hStatus'), t('adminBacklinks.hDate'), t('adminBacklinks.hActions')].map((h, idx) => (
+                    <th key={idx} style={{
                       padding: '12px 16px',
-                      textAlign: h === 'ACTIONS' ? 'right' : 'left',
+                      textAlign: idx === 8 ? 'right' : 'left',
                       fontSize: '0.72rem',
                       fontWeight: 700,
                       letterSpacing: '0.06em',
@@ -241,26 +243,26 @@ export default function AdminBacklinks() {
                       <td style={{ padding: '16px', fontSize: '0.875rem' }}>
                         {isEditing ? (
                           <select className="input-field" value={editForm.linkType} onChange={e => setEditForm({...editForm, linkType: e.target.value})} style={{ padding: '6px 10px', height: 32 }}>
-                            <option value="GUEST_POST">GUEST POST</option>
-                            <option value="NICHE_EDIT">NICHE EDIT</option>
-                            <option value="IMAGE">IMAGE</option>
-                            <option value="OTHER">OTHER</option>
+                            <option value="GUEST_POST">{t('adminBacklinks.guestPost')}</option>
+                            <option value="NICHE_EDIT">{t('adminBacklinks.nicheEdit')}</option>
+                            <option value="IMAGE">{t('adminBacklinks.imageLink')}</option>
+                            <option value="OTHER">{t('adminBacklinks.other')}</option>
                           </select>
                         ) : (
                           <span style={{ 
                             padding: '4px 8px', borderRadius: 4, fontSize: '0.75rem', fontWeight: 600,
                             background: 'var(--bg-hover)', color: 'var(--text-secondary)'
                           }}>
-                            {link.linkType.replace('_', ' ')}
+                            {link.linkType === 'GUEST_POST' ? t('adminBacklinks.guestPost') : link.linkType === 'NICHE_EDIT' ? t('adminBacklinks.nicheEdit') : link.linkType === 'IMAGE' ? t('adminBacklinks.imageLink') : link.linkType === 'OTHER' ? t('adminBacklinks.other') : link.linkType.replace('_', ' ')}
                           </span>
                         )}
                       </td>
                       <td style={{ padding: '16px', fontSize: '0.875rem' }}>
                         {isEditing ? (
                           <select className="input-field" value={editForm.status} onChange={e => setEditForm({...editForm, status: e.target.value})} style={{ padding: '6px 10px', height: 32 }}>
-                            <option value="LIVE">LIVE</option>
-                            <option value="REMOVED">REMOVED</option>
-                            <option value="DEPARTED">DEPARTED</option>
+                            <option value="LIVE">{t('adminBacklinks.live')}</option>
+                            <option value="REMOVED">{t('adminBacklinks.removed')}</option>
+                            <option value="DEPARTED">{t('adminBacklinks.departed')}</option>
                           </select>
                         ) : (
                           <span style={{ 
@@ -268,7 +270,7 @@ export default function AdminBacklinks() {
                             background: link.status === 'LIVE' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                             color: link.status === 'LIVE' ? 'var(--green)' : 'var(--red)'
                           }}>
-                            {link.status}
+                            {link.status === 'LIVE' ? t('adminBacklinks.live') : link.status === 'REMOVED' ? t('adminBacklinks.removed') : link.status === 'DEPARTED' ? t('adminBacklinks.departed') : link.status}
                           </span>
                         )}
                       </td>
@@ -279,19 +281,19 @@ export default function AdminBacklinks() {
                         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                           {isEditing ? (
                             <>
-                              <button onClick={() => handleSave(link.id)} disabled={saving} style={{ width: 32, height: 32, padding: 0, background: '#1a1a1a', color: 'white', border: 'none', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} title="Save">
+                              <button onClick={() => handleSave(link.id)} disabled={saving} style={{ width: 32, height: 32, padding: 0, background: '#1a1a1a', color: 'white', border: 'none', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} title={t('app.save')}>
                                 {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                               </button>
-                              <button onClick={() => setEditingId(null)} className="btn btn-secondary btn-icon" style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Cancel">
+                              <button onClick={() => setEditingId(null)} className="btn btn-secondary btn-icon" style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} title={t('app.cancel')}>
                                 <X size={14} />
                               </button>
                             </>
                           ) : (
                             <>
-                              <button onClick={() => handleEditClick(link)} className="btn btn-secondary btn-icon" style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit">
+                              <button onClick={() => handleEditClick(link)} className="btn btn-secondary btn-icon" style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} title={t('app.edit')}>
                                 <Edit2 size={14} />
                               </button>
-                              <button onClick={() => setDeleteModalId(link.id)} className="btn btn-ghost btn-icon" style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--red)' }} title="Delete">
+                              <button onClick={() => setDeleteModalId(link.id)} className="btn btn-ghost btn-icon" style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--red)' }} title={t('app.delete')}>
                                 <Trash2 size={14} />
                               </button>
                             </>
