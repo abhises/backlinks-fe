@@ -32,6 +32,7 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [forgotSuccess, setForgotSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [domainSuggest, setDomainSuggest] = useState<{ targetDomain: string; requiredLanguage: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const { login, register, loginWithGoogle, workspace } = useAuth();
   const { t } = useLanguage();
@@ -62,6 +63,7 @@ export default function AuthPage() {
     // Define the global callback
     (window as any).handleGoogleResponse = async (response: any) => {
       setError('');
+      setDomainSuggest(null);
       setLoading(true);
       try {
         const { user: loggedInUser, workspace: ws } = await loginWithGoogle(response.credential);
@@ -71,6 +73,14 @@ export default function AuthPage() {
           router.replace(ws ? '/inbox' : '/onboarding');
         }
       } catch (err: any) {
+        if (err?.response?.status === 403 && err?.response?.data?.targetDomain) {
+          setDomainSuggest({
+            targetDomain: err.response.data.targetDomain,
+            requiredLanguage: err.response.data.requiredLanguage || 'en',
+          });
+        } else {
+          setDomainSuggest(null);
+        }
         setError(err?.response?.data?.error || 'Google sign in failed');
       } finally {
         setLoading(false);
@@ -99,7 +109,7 @@ export default function AuthPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(''); setLoading(true);
+    setError(''); setDomainSuggest(null); setLoading(true);
     try {
       if (mode === 'forgot') {
         await api.post('/api/auth/forgot-password', { email });
@@ -116,6 +126,14 @@ export default function AuthPage() {
         router.replace('/onboarding');
       }
     } catch (err: any) {
+      if (err?.response?.status === 403 && err?.response?.data?.targetDomain) {
+        setDomainSuggest({
+          targetDomain: err.response.data.targetDomain,
+          requiredLanguage: err.response.data.requiredLanguage || 'en',
+        });
+      } else {
+        setDomainSuggest(null);
+      }
       setError(err?.response?.data?.error || 'Something went wrong');
     } finally {
       setLoading(false);
@@ -190,8 +208,28 @@ export default function AuthPage() {
         </p>
 
         {error && (
-          <div style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:8, padding:'10px 14px', marginBottom:20, fontSize:'0.875rem', color:'var(--red)' }}>
-            {error}
+          <div style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:8, padding:'12px 14px', marginBottom:20, fontSize:'0.875rem', color:'var(--red)' }}>
+            <div style={{ marginBottom: domainSuggest ? 10 : 0 }}>{error}</div>
+            {domainSuggest && (
+              <a 
+                href={domainSuggest.targetDomain} 
+                className="btn btn-primary" 
+                style={{ 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  gap: 8, 
+                  marginTop: 6, 
+                  width: '100%', 
+                  textDecoration: 'none',
+                  background: 'var(--red)',
+                  color: '#fff',
+                  fontWeight: 600
+                }}
+              >
+                Switch to {domainSuggest.requiredLanguage.toUpperCase()} Subdomain <ArrowRight size={16} />
+              </a>
+            )}
           </div>
         )}
 

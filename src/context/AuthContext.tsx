@@ -71,7 +71,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refreshWorkspace]);
 
   const login = async (email: string, password: string) => {
-    const res = await api.post('/api/auth/login', { email, password });
+    const language = getSubdomainLanguage();
+    const res = await api.post('/api/auth/login', { email, password, language });
     const { token: t, user: u } = res.data;
     localStorage.setItem('bl_token', t);
     setToken(t);
