@@ -81,7 +81,8 @@ export default function AuthPage() {
         } else {
           setDomainSuggest(null);
         }
-        setError(err?.response?.data?.error || 'Google sign in failed');
+        const errorMsg = err?.response?.data?.error || (err?.response?.status === 409 ? 'Email address already exists' : 'Google sign in failed');
+        setError(errorMsg);
       } finally {
         setLoading(false);
       }
@@ -134,7 +135,8 @@ export default function AuthPage() {
       } else {
         setDomainSuggest(null);
       }
-      setError(err?.response?.data?.error || 'Something went wrong');
+      const errorMsg = err?.response?.data?.error || (err?.response?.status === 409 ? 'Email address already exists' : 'Something went wrong');
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
