@@ -9,6 +9,7 @@ type UserData = {
   name: string;
   email: string;
   role: string;
+  language?: string;
   createdAt: string;
   teamMemberships: {
     workspace: {
@@ -27,7 +28,7 @@ export default function AdminUsers() {
   const [error, setError] = useState('');
   
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ name: '', email: '', role: '' });
+  const [editForm, setEditForm] = useState({ name: '', email: '', role: '', language: 'en' });
   const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -61,9 +62,8 @@ export default function AdminUsers() {
   };
 
   const handleEditClick = (user: UserData) => {
-    if (user.role === 'ADMIN') return;
     setEditingId(user.id);
-    setEditForm({ name: user.name, email: user.email, role: user.role });
+    setEditForm({ name: user.name, email: user.email, role: user.role, language: user.language || 'en' });
   };
 
   const handleSave = async (id: string) => {
@@ -218,10 +218,10 @@ export default function AdminUsers() {
             <table style={{ width: '100%', minWidth: '900px', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                  {[t('adminUsers.hName'), t('adminUsers.hEmail'), t('adminUsers.hRole'), t('adminUsers.hWorkspace'), t('adminUsers.hRejected'), t('adminUsers.hJoined'), t('adminUsers.hActions')].map((h, idx) => (
+                  {[t('adminUsers.hName'), t('adminUsers.hEmail'), t('adminUsers.hRole'), t('adminUsers.hLanguage') || 'LANG', t('adminUsers.hWorkspace'), t('adminUsers.hRejected'), t('adminUsers.hJoined'), t('adminUsers.hActions')].map((h, idx) => (
                     <th key={idx} style={{
                       padding: '12px 16px',
-                      textAlign: idx === 6 ? 'right' : 'left',
+                      textAlign: idx === 7 ? 'right' : 'left',
                       fontSize: '0.72rem',
                       fontWeight: 700,
                       letterSpacing: '0.06em',
@@ -266,6 +266,22 @@ export default function AdminUsers() {
                           </span>
                         )}
                       </td>
+                      <td style={{ padding: '16px', fontSize: '0.875rem' }}>
+                        {isEditing ? (
+                          <select className="input-field" value={editForm.language} onChange={e => setEditForm({...editForm, language: e.target.value})} style={{ padding: '6px 10px', height: 32 }}>
+                            <option value="en">EN</option>
+                            <option value="nl">NL</option>
+                            <option value="fi">FI</option>
+                          </select>
+                        ) : (
+                          <span style={{ 
+                            padding: '4px 8px', borderRadius: 4, fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase',
+                            background: 'rgba(16, 185, 129, 0.1)', color: 'var(--green)'
+                          }}>
+                            {u.language || 'en'}
+                          </span>
+                        )}
+                      </td>
                       <td style={{ padding: '16px', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                         {u.teamMemberships.length > 0 ? (
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -302,9 +318,8 @@ export default function AdminUsers() {
                               <button 
                                 onClick={() => handleEditClick(u)} 
                                 className="btn btn-secondary btn-icon" 
-                                style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: isAdmin ? 0.3 : 1, cursor: isAdmin ? 'not-allowed' : 'pointer' }} 
-                                disabled={isAdmin}
-                                title={isAdmin ? t('adminUsers.cannotEditAdmin') : t('app.edit')}
+                                style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} 
+                                title={t('app.edit')}
                               >
                                 <Edit2 size={14} />
                               </button>

@@ -7,7 +7,17 @@ interface User {
   name: string;
   email: string;
   role: string;
+  language?: string;
 }
+
+const getSubdomainLanguage = () => {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host.startsWith('fi.')) return 'fi';
+    if (host.startsWith('nl.')) return 'nl';
+  }
+  return 'en';
+};
 
 interface Workspace {
   id: string;
@@ -70,7 +80,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const register = async (email: string, password: string, name?: string) => {
-    const res = await api.post('/api/auth/register', { name: name || email.split('@')[0], email, password });
+    const language = getSubdomainLanguage();
+    const res = await api.post('/api/auth/register', { name: name || email.split('@')[0], email, password, language });
     const { token: t, user: u } = res.data;
     localStorage.setItem('bl_token', t);
     setToken(t);
@@ -78,7 +89,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const loginWithGoogle = async (credential: string) => {
-    const res = await api.post('/api/auth/google', { credential });
+    const language = getSubdomainLanguage();
+    const res = await api.post('/api/auth/google', { credential, language });
     const { token: t, user: u } = res.data;
     localStorage.setItem('bl_token', t);
     setToken(t);
