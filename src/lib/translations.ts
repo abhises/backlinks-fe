@@ -90,7 +90,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'auth.backToSignIn': 'Back to sign in',
     'auth.checkInbox': 'Check your inbox! ✉️',
     'auth.checkInboxDesc': 'If an account exists, we have sent a password reset link to your email.',
-    'auth.step1': 'Step 1 of 2',
+    'auth.step1': 'Step 1 of 3',
 
 
     // Inbox Page
@@ -241,7 +241,12 @@ export const translations: Record<Locale, Record<string, string>> = {
     'onboard.subtitle': "Let's set up your workspace so you can start exchanging links",
     'onboard.complete': 'Complete Setup',
     'onboard.step': 'Step 1 of 1',
-    'onboard.step2': 'Step 2 of 2',
+    'onboard.step2': 'Step 3 of 3',
+    'onboard.step2Indicator': 'Step 2 of 3',
+    'onboard.step3Indicator': 'Step 3 of 3',
+    'onboard.step2Title': 'Select your region & language',
+    'onboard.step2Desc': 'Choose your preferred language portal for your SERPsupport account.',
+    'onboard.continue': 'Continue',
     'onboard.setupProfile': 'Set up your site profile',
     'onboard.websiteDomain': 'Website domain',
     'onboard.domainPlaceholder': 'example.com',
@@ -541,7 +546,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'auth.backToSignIn': 'Takaisin kirjautumiseen',
     'auth.checkInbox': 'Tarkista sähköpostisi! ✉️',
     'auth.checkInboxDesc': 'Jos tili on olemassa, olemme lähettäneet salasanan palautuslinkin sähköpostiisi.',
-    'auth.step1': 'Vaihe 1 / 2',
+    'auth.step1': 'Vaihe 1 / 3',
 
 
     // Inbox Page
@@ -692,7 +697,12 @@ export const translations: Record<Locale, Record<string, string>> = {
     'onboard.subtitle': 'Määritetään työtilasi, jotta voit aloittaa linkkien vaihdon',
     'onboard.complete': 'Valmistele asennus',
     'onboard.step': 'Vaihe 1 / 1',
-    'onboard.step2': 'Vaihe 2 / 2',
+    'onboard.step2': 'Vaihe 3 / 3',
+    'onboard.step2Indicator': 'Vaihe 2 / 3',
+    'onboard.step3Indicator': 'Vaihe 3 / 3',
+    'onboard.step2Title': 'Valitse alueesi ja kielesi',
+    'onboard.step2Desc': 'Valitse haluamasi kieliportaali SERPsupport-tilillesi.',
+    'onboard.continue': 'Jatka',
     'onboard.setupProfile': 'Määritä sivustosi profiili',
     'onboard.websiteDomain': 'Verkkosivuston verkkotunnus',
     'onboard.domainPlaceholder': 'esimerkki.fi',
@@ -992,7 +1002,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'auth.backToSignIn': 'Terug naar inloggen',
     'auth.checkInbox': 'Controleer uw inbox! ✉️',
     'auth.checkInboxDesc': 'Als er een account bestaat, hebben we een herstellink naar uw e-mail gestuurd.',
-    'auth.step1': 'Stap 1 van 2',
+    'auth.step1': 'Stap 1 van 3',
 
 
     // Inbox Page
@@ -1143,7 +1153,12 @@ export const translations: Record<Locale, Record<string, string>> = {
     'onboard.subtitle': 'Laten we uw werkruimte instellen zodat u links kunt uitwisselen',
     'onboard.complete': 'Installatie voltooien',
     'onboard.step': 'Stap 1 van 1',
-    'onboard.step2': 'Stap 2 van 2',
+    'onboard.step2': 'Stap 3 van 3',
+    'onboard.step2Indicator': 'Stap 2 van 3',
+    'onboard.step3Indicator': 'Stap 3 van 3',
+    'onboard.step2Title': 'Selecteer uw regio en taal',
+    'onboard.step2Desc': 'Kies uw voorkeurstaalportaal voor uw SERPsupport-account.',
+    'onboard.continue': 'Doorgaan',
     'onboard.setupProfile': 'Stel uw websiteprofiel in',
     'onboard.websiteDomain': 'Website domein',
     'onboard.domainPlaceholder': 'voorbeeld.nl',

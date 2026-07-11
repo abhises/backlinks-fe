@@ -39,6 +39,7 @@ interface AuthContextType {
   logout: (redirectUrlOrEvent?: string | any) => void;
   setWorkspace: (ws: Workspace) => void;
   refreshWorkspace: () => Promise<any>;
+  updateUserLanguage: (lang: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -99,6 +100,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return await refreshWorkspace();
   };
 
+  const updateUserLanguage = async (lang: string) => {
+    const res = await api.patch('/api/auth/language', { language: lang });
+    const { token: t, user: u } = res.data;
+    localStorage.setItem('bl_token', t);
+    setToken(t);
+    setUser(u);
+  };
+
   const logout = (redirectUrlOrEvent?: string | any) => {
     localStorage.removeItem('bl_token');
     localStorage.removeItem('bl_user');
@@ -114,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, workspace, token, loading, login, register, loginWithGoogle, logout, setWorkspace, refreshWorkspace }}>
+    <AuthContext.Provider value={{ user, workspace, token, loading, login, register, loginWithGoogle, logout, setWorkspace, refreshWorkspace, updateUserLanguage }}>
       {children}
     </AuthContext.Provider>
   );

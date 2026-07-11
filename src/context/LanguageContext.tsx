@@ -5,7 +5,7 @@ import { Locale, translations } from '@/lib/translations';
 
 interface LanguageContextType {
   locale: Locale;
-  setLocale: (locale: Locale) => void;
+  setLocale: (locale: Locale, redirectPath?: string) => void;
   t: (key: string) => string;
 }
 
@@ -52,7 +52,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode; initialLoca
     }
   }, [locale]);
 
-  const setLocale = (newLocale: Locale) => {
+  const setLocale = (newLocale: Locale, redirectPath?: string) => {
     setLocaleState(newLocale);
     Cookies.set('NEXT_LOCALE', newLocale, { expires: 365, path: '/' });
 
@@ -85,19 +85,26 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode; initialLoca
         } else {
           targetHostname = 'www.serpsupport.com';
         }
+      } else if (redirectPath) {
+        window.location.href = redirectPath;
+        return;
       } else {
         // For other environments without subdomain DNS, just reload to apply cookie
         window.location.reload();
         return;
       }
 
+      const targetPath = redirectPath || window.location.pathname;
+
       if (host !== targetHostname) {
         const urlParams = new URLSearchParams(window.location.search);
         urlParams.set('bl_theme', currentTheme);
         const searchStr = `?${urlParams.toString()}`;
-        const newUrl = `${protocol}//${targetHostname}${port}${window.location.pathname}${searchStr}`;
+        const newUrl = `${protocol}//${targetHostname}${port}${targetPath}${searchStr}`;
         window.location.href = newUrl;
         return;
+      } else if (redirectPath) {
+        window.location.href = redirectPath;
       } else {
         window.location.reload();
       }

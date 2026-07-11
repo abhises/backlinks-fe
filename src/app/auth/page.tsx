@@ -70,7 +70,7 @@ export default function AuthPage() {
         if (loggedInUser?.role === 'ADMIN') {
           router.replace('/admin/dashboard');
         } else {
-          router.replace(ws ? '/inbox' : '/onboarding');
+          router.replace(ws ? '/inbox' : '/onboarding/language');
         }
       } catch (err: any) {
         if (err?.response?.status === 403 && err?.response?.data?.targetDomain) {
@@ -120,11 +120,11 @@ export default function AuthPage() {
         if (loggedInUser?.role === 'ADMIN') {
           router.replace('/admin/dashboard');
         } else {
-          router.replace(ws ? '/inbox' : '/onboarding');
+          router.replace(ws ? '/inbox' : '/onboarding/language');
         }
       } else {
         await register(email, password);
-        router.replace('/onboarding');
+        router.replace('/onboarding/language');
       }
     } catch (err: any) {
       if (err?.response?.status === 403 && err?.response?.data?.targetDomain) {

@@ -76,7 +76,7 @@ export default function OnboardingPage() {
             </span>
           </div>
           <span style={{ fontSize: '0.875rem', fontWeight: 500, color: '#8e9391' }}>
-            {t('onboard.step2')}
+            {t('onboard.step3Indicator') || t('onboard.step2')}
           </span>
         </div>
 
@@ -201,7 +201,7 @@ export default function OnboardingPage() {
             {/* Back Button */}
             <button
               type="button"
-              onClick={() => logout('/auth?mode=register')}
+              onClick={() => router.push('/onboarding/language')}
               style={{
                 width: '100%',
                 background: 'none',
