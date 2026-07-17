@@ -34,7 +34,8 @@ export default function AuthPage() {
   const [error, setError] = useState('');
   const [domainSuggest, setDomainSuggest] = useState<{ targetDomain: string; requiredLanguage: string } | null>(null);
   const [loading, setLoading] = useState(false);
-  const { login, register, loginWithGoogle, workspace } = useAuth();
+  const [redirecting, setRedirecting] = useState(false);
+  const { login, register, loginWithGoogle, workspace, loading: authLoading } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
 
@@ -75,6 +76,7 @@ export default function AuthPage() {
       setLoading(true);
       try {
         const { user: loggedInUser, workspace: ws } = await loginWithGoogle(response.credential);
+        setRedirecting(true);
         if (loggedInUser?.role === 'ADMIN') {
           router.replace('/admin/dashboard');
         } else {
@@ -125,6 +127,7 @@ export default function AuthPage() {
         setForgotSuccess(true);
       } else if (mode === 'login') {
         const { user: loggedInUser, workspace: ws } = await login(email, password);
+        setRedirecting(true);
         if (loggedInUser?.role === 'ADMIN') {
           router.replace('/admin/dashboard');
         } else {
@@ -132,6 +135,7 @@ export default function AuthPage() {
         }
       } else {
         await register(email, password);
+        setRedirecting(true);
         router.replace('/onboarding/language');
       }
     } catch (err: any) {
@@ -149,6 +153,30 @@ export default function AuthPage() {
       setLoading(false);
     }
   };
+
+  if (redirecting || authLoading) {
+    return (
+      <div className="auth-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', position: 'relative' }}>
+        {/* background grid */}
+        <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(var(--border) 1px, transparent 1px)', backgroundSize:'32px 32px', opacity:0.3, pointerEvents:'none' }} />
+        <div style={{ zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+          <div style={{ 
+            width: 56, 
+            height: 56, 
+            borderRadius: '50%', 
+            background: 'var(--card-bg)', 
+            border: '1px solid var(--border)', 
+            boxShadow: '0 8px 30px rgba(0,0,0,0.12)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center' 
+          }}>
+            <Loader2 size={28} className="animate-spin" style={{ color: 'var(--accent)' }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-page">
