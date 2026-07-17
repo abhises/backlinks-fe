@@ -40,12 +40,20 @@ export default function AuthPage() {
 
   const initGoogleSignIn = () => {
     if (typeof window !== 'undefined' && (window as any).google) {
-      (window as any).google.accounts.id.initialize({
-        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1036829497479-placeholder.apps.googleusercontent.com',
-        callback: (window as any).handleGoogleResponse,
-      });
+      if (!(window as any)._gsiInitialized) {
+        (window as any).google.accounts.id.initialize({
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1036829497479-placeholder.apps.googleusercontent.com',
+          callback: (res: any) => {
+            if (typeof (window as any).handleGoogleResponse === 'function') {
+              (window as any).handleGoogleResponse(res);
+            }
+          },
+        });
+        (window as any)._gsiInitialized = true;
+      }
       const btnParent = document.getElementById('google-signin-btn');
       if (btnParent) {
+        btnParent.innerHTML = '';
         (window as any).google.accounts.id.renderButton(
           btnParent,
           { 
