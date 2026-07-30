@@ -140,7 +140,9 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
               link = '/inbox';
             } else if (notifType === 'new_thread') {
               title = data.title || n.title || t('notif.newThreadTitle');
-              body = data.body || n.body || t('notif.newThreadBody');
+              body = data.body || n.body || (data.otherDomain
+                ? t(data.direction === 'give' ? 'notif.newThreadBodyGive' : 'notif.newThreadBodyReceive').replace('{domain}', data.otherDomain)
+                : t('notif.newThreadBody'));
               link = '/inbox';
             } else if (notifType === 'connection_accepted') {
               title = data.title || t('notif.acceptedTitle');
@@ -152,12 +154,18 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
               link = `/inbox/${data.threadId || ''}`;
             } else if (notifType === 'link_placed') {
               title = data.title || t('notif.linkPlacedTitle');
-              body = data.body || t('notif.linkPlacedBody');
+              body = data.body || (data.giverDomain
+                ? t('notif.linkPlacedBodyWithDomain').replace('{domain}', data.giverDomain)
+                : t('notif.linkPlacedBody'));
               link = `/dashboard`;
             } else if (notifType === 'admin_broadcast') {
               title = data.title || n.title || t('notif.systemAnnouncementTitle');
               body = data.body || data.description || data.messageText || n.body || '';
               link = '/inbox';
+            } else if (notifType === 'no_matches') {
+              title = data.title || t('notif.noMatchesTitle');
+              body = data.body || t('notif.noMatchesBody');
+              link = '/dashboard';
             } else if (notifType === 'system') {
               title = data.title || n.title || t('notif.systemAlertTitle');
               body = data.body || n.body || '';
@@ -206,7 +214,9 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         link = '/inbox';
       } else if (data.type === 'new_thread') {
         title = data.title || t('notif.newThreadTitle');
-        body = data.body || t('notif.newThreadBody');
+        body = data.body || (data.otherDomain
+          ? t(data.direction === 'give' ? 'notif.newThreadBodyGive' : 'notif.newThreadBodyReceive').replace('{domain}', data.otherDomain)
+          : t('notif.newThreadBody'));
         link = '/inbox';
       } else if (data.type === 'connection_accepted') {
         title = data.title || t('notif.acceptedTitle');
@@ -218,12 +228,18 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         link = `/inbox/${data.threadId || ''}`;
       } else if (data.type === 'link_placed') {
         title = data.title || t('notif.linkPlacedTitle');
-        body = data.body || t('notif.linkPlacedBody');
+        body = data.body || (data.giverDomain
+          ? t('notif.linkPlacedBodyWithDomain').replace('{domain}', data.giverDomain)
+          : t('notif.linkPlacedBody'));
         link = `/dashboard`;
       } else if (data.type === 'admin_broadcast') {
         title = data.title || t('notif.systemAnnouncementTitle');
         body = data.body || data.description || data.messageText || '';
         link = '/inbox';
+      } else if (data.type === 'no_matches') {
+        title = data.title || t('notif.noMatchesTitle');
+        body = data.body || t('notif.noMatchesBody');
+        link = '/dashboard';
       } else if (data.type === 'system') {
         title = data.title || t('notif.systemAlertTitle');
         body = data.body || '';
