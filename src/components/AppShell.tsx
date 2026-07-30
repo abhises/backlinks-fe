@@ -60,19 +60,20 @@ const playNotificationSound = () => {
   }
 };
 
-const formatTimeAgo = (date: Date) => {
+const formatTimeAgo = (date: Date, trans: (key: string) => string) => {
+  const fill = (key: string, n: number) => trans(key).replace('{n}', String(n));
   const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
   let interval = seconds / 31536000;
-  if (interval > 1) return Math.floor(interval) + "y ago";
+  if (interval > 1) return fill('time.yearsAgo', Math.floor(interval));
   interval = seconds / 2592000;
-  if (interval > 1) return Math.floor(interval) + "mo ago";
+  if (interval > 1) return fill('time.monthsAgo', Math.floor(interval));
   interval = seconds / 86400;
-  if (interval > 1) return Math.floor(interval) + "d ago";
+  if (interval > 1) return fill('time.daysAgo', Math.floor(interval));
   interval = seconds / 3600;
-  if (interval > 1) return Math.floor(interval) + "h ago";
+  if (interval > 1) return fill('time.hoursAgo', Math.floor(interval));
   interval = seconds / 60;
-  if (interval > 1) return Math.floor(interval) + "m ago";
-  return Math.floor(seconds) + "s ago";
+  if (interval > 1) return fill('time.minutesAgo', Math.floor(interval));
+  return fill('time.secondsAgo', Math.floor(seconds));
 };
 
 const NAV = [
@@ -120,7 +121,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
     api.get('/api/notifications').then(res => {
       const persisted = res.data.notifications.map((n: any) => {
-        let title = n.title || 'Notification';
+        let title = n.title || t('notif.default');
         let body = n.body || '';
         let link = n.link || '/inbox';
         try {
@@ -128,42 +129,42 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
             // Sometimes it's already an object if the backend parsed it, or JSON.parse is needed
             const data = typeof n.payload === 'string' ? JSON.parse(n.payload) : n.payload;
             const notifType = data.type || n.type;
-            
+
             if (notifType === 'new_message') {
-              title = data.title || `New message from ${data.senderWorkspaceDomain || 'User'}`;
+              title = data.title || t('notif.newMessageFrom').replace('{name}', data.senderWorkspaceDomain || t('notif.unknownUser'));
               body = data.messageText ? (data.messageText.length > 45 ? data.messageText.slice(0, 45) + '...' : data.messageText) : (data.body || n.body);
               link = `/inbox/${data.threadId || ''}`;
             } else if (notifType === 'new_connection') {
-              title = data.title || 'New BACKLINK IN Received 📥';
-              body = data.body || `${data.senderWorkspaceName || 'Someone'} sent you a backlink request.`;
+              title = data.title || t('notif.newConnectionTitle');
+              body = data.body || t('notif.newConnectionBody').replace('{name}', data.senderWorkspaceName || t('notif.someone'));
               link = '/inbox';
             } else if (notifType === 'new_thread') {
-              title = data.title || n.title || 'New Connection Match!';
-              body = data.body || n.body || 'You have a new connection in your inbox.';
+              title = data.title || n.title || t('notif.newThreadTitle');
+              body = data.body || n.body || t('notif.newThreadBody');
               link = '/inbox';
             } else if (notifType === 'connection_accepted') {
-              title = data.title || 'Request Accepted ✅';
-              body = data.body || `${data.receiverWorkspaceName || 'They'} accepted your request!`;
+              title = data.title || t('notif.acceptedTitle');
+              body = data.body || t('notif.acceptedBody').replace('{name}', data.receiverWorkspaceName || t('notif.they'));
               link = `/inbox/${data.threadId || ''}`;
             } else if (notifType === 'connection_rejected') {
-              title = data.title || 'Request Rejected';
-              body = data.body || `${data.receiverWorkspaceName || 'They'} declined your request.`;
+              title = data.title || t('notif.rejectedTitle');
+              body = data.body || t('notif.rejectedBody').replace('{name}', data.receiverWorkspaceName || t('notif.they'));
               link = `/inbox/${data.threadId || ''}`;
             } else if (notifType === 'link_placed') {
-              title = data.title || 'Link Placed! 🎉';
-              body = data.body || `The giver has added the backlink details. Check your Dashboard!`;
+              title = data.title || t('notif.linkPlacedTitle');
+              body = data.body || t('notif.linkPlacedBody');
               link = `/dashboard`;
             } else if (notifType === 'admin_broadcast') {
-              title = data.title || n.title || 'System Announcement';
+              title = data.title || n.title || t('notif.systemAnnouncementTitle');
               body = data.body || data.description || data.messageText || n.body || '';
               link = '/inbox';
             } else if (notifType === 'system') {
-              title = data.title || n.title || 'System Alert';
+              title = data.title || n.title || t('notif.systemAlertTitle');
               body = data.body || n.body || '';
               link = '/dashboard';
             } else {
               // Fallback for unknown types so the user at least sees what it is
-              title = data.title || n.title || (notifType ? `Alert: ${notifType}` : 'Notification');
+              title = data.title || n.title || (notifType ? t('notif.alertType').replace('{type}', notifType) : t('notif.default'));
               body = data.body || data.messageText || data.description || n.body || (typeof data === 'object' ? JSON.stringify(data) : String(data));
             }
           }
@@ -191,44 +192,44 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
     socket.on('notification', (data: any) => {
       playNotificationSound();
 
-      let title = data.title || 'Notification';
+      let title = data.title || t('notif.default');
       let body = data.body || '';
       let link = data.link || '/inbox';
 
       if (data.type === 'new_message') {
-        title = data.title || `New message from ${data.senderWorkspaceDomain || 'User'}`;
+        title = data.title || t('notif.newMessageFrom').replace('{name}', data.senderWorkspaceDomain || t('notif.unknownUser'));
         body = data.messageText ? (data.messageText.length > 45 ? data.messageText.slice(0, 45) + '...' : data.messageText) : (data.body || '');
         link = `/inbox/${data.threadId || ''}`;
       } else if (data.type === 'new_connection') {
-        title = data.title || 'New BACKLINK IN Received 📥';
-        body = data.body || `${data.senderWorkspaceName || 'Someone'} sent you a backlink request.`;
+        title = data.title || t('notif.newConnectionTitle');
+        body = data.body || t('notif.newConnectionBody').replace('{name}', data.senderWorkspaceName || t('notif.someone'));
         link = '/inbox';
       } else if (data.type === 'new_thread') {
-        title = data.title || 'New Connection Match!';
-        body = data.body || 'You have a new connection in your inbox.';
+        title = data.title || t('notif.newThreadTitle');
+        body = data.body || t('notif.newThreadBody');
         link = '/inbox';
       } else if (data.type === 'connection_accepted') {
-        title = data.title || 'Request Accepted ✅';
-        body = data.body || `${data.receiverWorkspaceName || 'They'} accepted your request!`;
+        title = data.title || t('notif.acceptedTitle');
+        body = data.body || t('notif.acceptedBody').replace('{name}', data.receiverWorkspaceName || t('notif.they'));
         link = `/inbox/${data.threadId || ''}`;
       } else if (data.type === 'connection_rejected') {
-        title = data.title || 'Request Rejected';
-        body = data.body || `${data.receiverWorkspaceName || 'They'} declined your request.`;
+        title = data.title || t('notif.rejectedTitle');
+        body = data.body || t('notif.rejectedBody').replace('{name}', data.receiverWorkspaceName || t('notif.they'));
         link = `/inbox/${data.threadId || ''}`;
       } else if (data.type === 'link_placed') {
-        title = data.title || 'Link Placed! 🎉';
-        body = data.body || `The giver has added the backlink details. Check your Dashboard!`;
+        title = data.title || t('notif.linkPlacedTitle');
+        body = data.body || t('notif.linkPlacedBody');
         link = `/dashboard`;
       } else if (data.type === 'admin_broadcast') {
-        title = data.title || 'System Announcement';
+        title = data.title || t('notif.systemAnnouncementTitle');
         body = data.body || data.description || data.messageText || '';
         link = '/inbox';
       } else if (data.type === 'system') {
-        title = data.title || 'System Alert';
+        title = data.title || t('notif.systemAlertTitle');
         body = data.body || '';
         link = '/dashboard';
       } else {
-        title = data.title || (data.type ? `Alert: ${data.type}` : 'Notification');
+        title = data.title || (data.type ? t('notif.alertType').replace('{type}', data.type) : t('notif.default'));
         body = data.body || data.messageText || data.description || (typeof data === 'object' ? JSON.stringify(data) : String(data));
       }
 
@@ -614,7 +615,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
               {/* Header */}
               <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <h2 style={{ fontSize: '1.4rem', fontWeight: 600, fontFamily: '"Lora", "Georgia", serif', color: 'var(--text-primary)', margin: 0 }}>Notifications</h2>
+                  <h2 style={{ fontSize: '1.4rem', fontWeight: 600, fontFamily: '"Lora", "Georgia", serif', color: 'var(--text-primary)', margin: 0 }}>{t('app.notifications')}</h2>
                   {notifications.filter(n => !n.read).length > 0 && (
                     <span style={{ background: 'var(--red)', color: 'white', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600 }}>
                       {notifications.filter(n => !n.read).length}
@@ -623,7 +624,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                   {notifications.some(n => !n.read) && (
-                    <button onClick={markAllRead} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.85rem', cursor: 'pointer' }}>Mark all read</button>
+                    <button onClick={markAllRead} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.85rem', cursor: 'pointer' }}>{t('notif.markAllRead')}</button>
                   )}
                   <button onClick={() => setShowDropdown(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}>
                     <X size={20} />
@@ -635,7 +636,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
               <div style={{ flex: 1, overflowY: 'auto' }}>
                 {notifications.length === 0 ? (
                   <div style={{ padding: '40px 24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                    No notifications yet.
+                    {t('notif.noneYet')}
                   </div>
                 ) : (
                   notifications.map(n => {
@@ -671,7 +672,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
                         <div style={{ paddingTop: '2px' }}>
                           <div style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '4px', lineHeight: 1.4 }}>{n.title}</div>
                           {n.body && <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px', lineHeight: 1.4 }}>{n.body}</div>}
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{formatTimeAgo(n.timestamp)}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{formatTimeAgo(n.timestamp, t)}</div>
                         </div>
                       </div>
                     );
