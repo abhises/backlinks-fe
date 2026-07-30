@@ -42,7 +42,12 @@ const getOwnerName = (workspace: any) => {
 };
 
 
-const formatRelativeTime = (dateString: string) => {
+const formatRelativeTime = (dateString: string, trans: (key: string) => string) => {
+  const fill = (key: string, n: number, h?: number) => {
+    let str = trans(key).replace('{n}', String(n));
+    if (h !== undefined) str = str.replace('{h}', String(h));
+    return str;
+  };
   try {
     const now = new Date();
     const past = new Date(dateString);
@@ -52,17 +57,17 @@ const formatRelativeTime = (dateString: string) => {
     const diffHour = Math.floor(diffMin / 60);
     const diffDay = Math.floor(diffHour / 24);
 
-    if (diffSec < 60) return 'Just now';
-    if (diffMin < 60) return `${diffMin}m ago`;
-    if (diffHour < 24) return `${diffHour}h ago`;
-    
+    if (diffSec < 60) return trans('time.justNow');
+    if (diffMin < 60) return fill('time.minutesAgo', diffMin);
+    if (diffHour < 24) return fill('time.hoursAgo', diffHour);
+
     const remHours = diffHour % 24;
     if (remHours > 0) {
-      return `${diffDay}d ${remHours}h ago`;
+      return fill('time.daysHoursAgo', diffDay, remHours);
     }
-    return `${diffDay}d ago`;
+    return fill('time.daysAgo', diffDay);
   } catch {
-    return '1d ago';
+    return fill('time.daysAgo', 1);
   }
 };
 
@@ -219,7 +224,7 @@ function InboxPageContent() {
 
   const filterOptions = [
     { key: 'all', label: `${trans('inbox.filterAll')} ${countAll}` },
-    { key: 'new', label: `New ${countNew}` },
+    { key: 'new', label: `${trans('inbox.filterNew')} ${countNew}` },
     { key: 'in', label: `${trans('inbox.backlinkIn')} ${countIn}` },
     { key: 'out', label: `${trans('inbox.backlinkOut')} ${countOut}` },
     { key: 'rejected', label: `${trans('inbox.filterRejected')} ${countRejected}/${rejectLimit}` },
@@ -232,7 +237,7 @@ function InboxPageContent() {
         <h1 style={{ fontFamily: '"Lora", "Georgia", serif', fontSize: '2.25rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>
           {filter === 'out' ? trans('inbox.backlinkOut') : filter === 'in' ? trans('inbox.backlinkIn') : filter === 'rejected' ? trans('inbox.filterRejected') : trans('inbox.title')}
         </h1>
-        <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{filteredThreads.length} threads</span>
+        <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{filteredThreads.length} {trans('inbox.threadsLabel')}</span>
       </div>
 
       {/* Filter Chips */}
@@ -356,7 +361,7 @@ function InboxPageContent() {
                             padding: '2px 6px', 
                             borderRadius: '4px' 
                           }}>
-                            NEW
+                            {trans('inbox.newBadge')}
                           </span>
                         )}
                       </div>
@@ -366,7 +371,7 @@ function InboxPageContent() {
                         {other.description ? other.description : (
                           t.messages && t.messages.length > 0 
                             ? t.messages[0].messageText 
-                            : 'No message history yet'
+                            : trans('inbox.noMessageHistory')
                         )}
                       </div>
                     </div>
@@ -374,7 +379,7 @@ function InboxPageContent() {
                     {/* Timestamp (Mobile Only - Top Right) */}
                     <div className="mobile-time">
                       <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                        {formatRelativeTime(t.updatedAt)}
+                        {formatRelativeTime(t.updatedAt, trans)}
                       </span>
                     </div>
                   </div>
@@ -407,8 +412,8 @@ function InboxPageContent() {
                                 if (countRejected >= rejectLimit) {
                                   window.dispatchEvent(new CustomEvent('bl_show_toast', {
                                     detail: {
-                                      title: 'Rejection Limit Reached',
-                                      body: `You have reached the maximum limit of ${rejectLimit} rejected requests. Please approve some requests first.`
+                                      title: trans('inbox.rejectionLimitTitle'),
+                                      body: trans('inbox.rejectionLimitBody').replace('{n}', String(rejectLimit))
                                     }
                                   }));
                                 } else {
@@ -416,7 +421,7 @@ function InboxPageContent() {
                                 }
                               }}
                               disabled={actionLoading === t.id}>
-                              ✕ Reject
+                              ✕ {trans('inbox.reject')}
                             </button>
                             <button id={`approve-${t.id}`}
                               className="btn"
@@ -435,12 +440,12 @@ function InboxPageContent() {
                               }}
                               onClick={() => handleApprove(t.id)}
                               disabled={actionLoading === t.id}>
-                              {actionLoading === t.id ? <Loader2 size={12} className="animate-spin" /> : '✓ Approve'}
+                              {actionLoading === t.id ? <Loader2 size={12} className="animate-spin" /> : `✓ ${trans('inbox.approve')}`}
                             </button>
                           </>
                         ) : (
                           <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: '4px' }}>
-                            <Loader2 size={12} className="animate-spin" /> Waiting for them to accept
+                            <Loader2 size={12} className="animate-spin" /> {trans('inbox.waitingForAccept')}
                           </span>
                         )}
                       </div>
@@ -450,10 +455,10 @@ function InboxPageContent() {
                     {isRejecting && (
                       <div onClick={e => e.stopPropagation()} style={{ width: 140 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--red)', marginBottom: 4 }}>
-                          <span>Rejecting in {rejectCount}s…</span>
+                          <span>{trans('inbox.rejectingIn').replace('{n}', String(rejectCount))}</span>
                           <button onClick={e => { e.stopPropagation(); setRejectId(null); }}
                             style={{ color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>
-                            Cancel
+                            {trans('app.cancel')}
                           </button>
                         </div>
                         <div className="countdown-bar"><div className="countdown-fill" /></div>
@@ -464,14 +469,14 @@ function InboxPageContent() {
                     {!pending && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         {t.status === 'REJECTED' ? (
-                          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--red)' }}>Rejected</span>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--red)' }}>{trans('inbox.filterRejected')}</span>
                         ) : t.status === 'PENDING' ? (
                           <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: '4px' }}>
-                            <Loader2 size={12} className="animate-spin" /> Waiting for them to accept
+                            <Loader2 size={12} className="animate-spin" /> {trans('inbox.waitingForAccept')}
                           </span>
                         ) : (
                           <span style={{ fontSize: '0.75rem', fontWeight: 600, color: t.stage === 'PLACED' ? '#10b981' : 'var(--text-secondary)' }}>
-                            {t.stage === 'PLACED' ? 'Link Placed ✓' : t.stage === 'CHAT' ? '' : ''}
+                            {t.stage === 'PLACED' ? trans('inbox.linkPlaced') : t.stage === 'CHAT' ? '' : ''}
                           </span>
                         )}
                       </div>
@@ -480,7 +485,7 @@ function InboxPageContent() {
                     {/* Timestamp (Desktop Only - Far Right) */}
                     <div className="desktop-time">
                       <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                        {formatRelativeTime(t.updatedAt)}
+                        {formatRelativeTime(t.updatedAt, trans)}
                       </span>
                     </div>
                   </div>

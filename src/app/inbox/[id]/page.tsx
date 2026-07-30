@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, type ReactNode } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import AddLinkModal from '@/components/AddLinkModal';
 import { io } from 'socket.io-client';
+import { useLanguage } from '@/context/LanguageContext';
 
 type Message = {
   id: string;
@@ -86,8 +87,18 @@ const getOwnerName = (workspace: any) => {
   return 'User';
 };
 
+// Splits a translation template on {tokenName} placeholders and swaps each one
+// for the matching bold React node, so the surrounding sentence stays translatable.
+const renderTemplate = (template: string, tokens: Record<string, ReactNode>) => {
+  const pattern = new RegExp(`\\{(${Object.keys(tokens).join('|')})\\}`, 'g');
+  return template.split(pattern).map((part, i) =>
+    part in tokens ? <strong key={i}>{tokens[part]}</strong> : part
+  );
+};
+
 export default function ThreadPage() {
   const { id } = useParams<{ id: string }>();
+  const { t: trans } = useLanguage();
   const { user, workspace } = useAuth();
   const router = useRouter();
   const [thread, setThread] = useState<Thread | null>(null);
@@ -211,7 +222,7 @@ export default function ThreadPage() {
             <span style={{ fontSize:'0.9rem', color:'var(--text-secondary)' }}>· {getOwnerName(isGiver ? thread.receiverWorkspace : thread.giverWorkspace)}</span>
           </div>
           <span style={{ fontSize:'0.85rem', color:'var(--text-secondary)', fontStyle:'italic' }}>
-            {(isGiver ? thread.receiverWorkspace : thread.giverWorkspace).description || 'Async-first work tools and a weekly publication on distributed teams.'}
+            {(isGiver ? thread.receiverWorkspace : thread.giverWorkspace).description || trans('inbox.defaultWorkspaceDesc')}
           </span>
         </div>
         
@@ -219,7 +230,7 @@ export default function ThreadPage() {
         <div>
           {!isGiver ? (
             <span 
-              title={`${thread.giverWorkspace.domain} gives a backlink to ${thread.receiverWorkspace.domain}`}
+              title={`${thread.giverWorkspace.domain} ${trans('inbox.givesBacklinkToVerb')} ${thread.receiverWorkspace.domain}`}
               style={{ 
                 fontSize: '0.75rem', 
                 fontWeight: 600, 
@@ -232,11 +243,11 @@ export default function ThreadPage() {
                 gap: 4,
                 cursor: 'help'
               }}>
-              <ArrowDownLeft size={14} /> Backlink In
+              <ArrowDownLeft size={14} /> {trans('inbox.backlinkIn')}
             </span>
           ) : (
             <span 
-              title={`${thread.giverWorkspace.domain} gives a backlink to ${thread.receiverWorkspace.domain}`}
+              title={`${thread.giverWorkspace.domain} ${trans('inbox.givesBacklinkToVerb')} ${thread.receiverWorkspace.domain}`}
               style={{ 
                 fontSize: '0.75rem', 
                 fontWeight: 600, 
@@ -249,7 +260,7 @@ export default function ThreadPage() {
                 gap: 4,
                 cursor: 'help'
               }}>
-              <ArrowUpRight size={14} /> Backlink Out
+              <ArrowUpRight size={14} /> {trans('inbox.backlinkOut')}
             </span>
           )}
         </div>
@@ -260,7 +271,7 @@ export default function ThreadPage() {
         
         {/* Gives / Receives */}
         <div 
-          title={`${thread.giverWorkspace.domain} gives a backlink to ${thread.receiverWorkspace.domain}`}
+          title={`${thread.giverWorkspace.domain} ${trans('inbox.givesBacklinkToVerb')} ${thread.receiverWorkspace.domain}`}
           style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, cursor: 'help' }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -276,7 +287,7 @@ export default function ThreadPage() {
               gap: 2,
               letterSpacing: '0.05em'
             }}>
-              <ArrowUpRight size={12} /> BACKLINK OUT
+              <ArrowUpRight size={12} /> {trans('inbox.backlinkOut').toUpperCase()}
             </span>
             <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)' }}>
               {thread.giverWorkspace.domain}
@@ -302,7 +313,7 @@ export default function ThreadPage() {
               gap: 2,
               letterSpacing: '0.05em'
             }}>
-              <ArrowDownLeft size={12} /> BACKLINK IN
+              <ArrowDownLeft size={12} /> {trans('inbox.backlinkIn').toUpperCase()}
             </span>
             <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)' }}>
               {thread.receiverWorkspace.domain}
@@ -328,7 +339,7 @@ export default function ThreadPage() {
             }}
             onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
             onMouseLeave={e => e.currentTarget.style.background = 'none'}
-            title="How this connection works"
+            title={trans('inbox.howConnectionWorks')}
           >
             <HelpCircle size={16} />
           </button>
@@ -351,7 +362,7 @@ export default function ThreadPage() {
               cursor: 'pointer'
             }}>
             <Link2 size={16} />
-            {hasLink ? 'Link details' : 'Add link details'}
+            {hasLink ? trans('inbox.linkDetails') : trans('inbox.addLinkDetails')}
           </button>
         )}
       </div>
@@ -398,19 +409,19 @@ export default function ThreadPage() {
                 <div style={{ background: '#f3e8ff', color: '#a855f7', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <HelpCircle size={20} />
                 </div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Connection Details</h3>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{trans('inbox.connectionDetailsTitle')}</h3>
               </div>
 
               {/* Explanation Diagram */}
               <div style={{ background: 'var(--bg-base)', border: '1px solid var(--border)', borderRadius: '8px', padding: '16px', marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                   <div style={{ textAlign: 'center', flex: 1 }}>
-                    <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#a855f7', background: '#f3e8ff', padding: '2px 6px', borderRadius: '4px', display: 'block', marginBottom: 4 }}>GIVER</span>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#a855f7', background: '#f3e8ff', padding: '2px 6px', borderRadius: '4px', display: 'block', marginBottom: 4 }}>{trans('inbox.giverLabel').toUpperCase()}</span>
                     <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', wordBreak: 'break-all' }}>{thread.giverWorkspace.domain}</span>
                   </div>
                   
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Gives backlink to</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{trans('inbox.givesBacklinkToShort')}</span>
                     <div style={{ display: 'flex', alignItems: 'center', color: 'var(--accent)', marginTop: 4 }}>
                       <span style={{ width: 30, height: 2, background: 'var(--border)' }}></span>
                       <ArrowRight size={14} style={{ marginLeft: -4 }} />
@@ -418,7 +429,7 @@ export default function ThreadPage() {
                   </div>
 
                   <div style={{ textAlign: 'center', flex: 1 }}>
-                    <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#0284c7', background: '#e0f2fe', padding: '2px 6px', borderRadius: '4px', display: 'block', marginBottom: 4 }}>RECEIVER</span>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#0284c7', background: '#e0f2fe', padding: '2px 6px', borderRadius: '4px', display: 'block', marginBottom: 4 }}>{trans('inbox.receiverLabel').toUpperCase()}</span>
                     <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', wordBreak: 'break-all' }}>{thread.receiverWorkspace.domain}</span>
                   </div>
                 </div>
@@ -427,17 +438,22 @@ export default function ThreadPage() {
               {/* Text description */}
               <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <p>
-                  <strong>{thread.giverWorkspace.domain}</strong> gives a backlink to <strong>{thread.receiverWorkspace.domain}</strong>.
+                  <strong>{thread.giverWorkspace.domain}</strong> {trans('inbox.givesBacklinkToVerb')} <strong>{thread.receiverWorkspace.domain}</strong>.
                 </p>
                 {isGiver ? (
                   <div style={{ background: 'rgba(168,85,247,0.05)', borderLeft: '3px solid #a855f7', padding: '10px 12px', borderRadius: '0 4px 4px 0' }}>
-                    <span style={{ fontWeight: 700, color: '#a855f7', display: 'block', fontSize: '0.8rem', marginBottom: 4, letterSpacing: '0.05em' }}>YOUR ACTION REQUIRED</span>
-                    As the <strong>Giver</strong>, you need to place a backlink on your site pointing to the Receiver's site. Click the <strong>Add link details</strong> button above to save the specific URL and anchor text once placed.
+                    <span style={{ fontWeight: 700, color: '#a855f7', display: 'block', fontSize: '0.8rem', marginBottom: 4, letterSpacing: '0.05em' }}>{trans('inbox.actionRequiredLabel')}</span>
+                    {renderTemplate(trans('inbox.giverActionInstructions'), {
+                      giver: trans('inbox.giverLabel'),
+                      addLinkDetails: trans('inbox.addLinkDetails'),
+                    })}
                   </div>
                 ) : (
                   <div style={{ background: 'rgba(2,132,199,0.05)', borderLeft: '3px solid #0284c7', padding: '10px 12px', borderRadius: '0 4px 4px 0' }}>
-                    <span style={{ fontWeight: 700, color: '#0284c7', display: 'block', fontSize: '0.8rem', marginBottom: 4, letterSpacing: '0.05em' }}>INCOMING BACKLINK</span>
-                    As the <strong>Receiver</strong>, you will receive a backlink from the Giver's site. You can view the placement details here as soon as they add them.
+                    <span style={{ fontWeight: 700, color: '#0284c7', display: 'block', fontSize: '0.8rem', marginBottom: 4, letterSpacing: '0.05em' }}>{trans('inbox.incomingBacklinkLabel')}</span>
+                    {renderTemplate(trans('inbox.receiverActionInstructions'), {
+                      receiver: trans('inbox.receiverLabel'),
+                    })}
                   </div>
                 )}
               </div>
@@ -460,7 +476,7 @@ export default function ThreadPage() {
                   onMouseEnter={e => e.currentTarget.style.background = '#333'}
                   onMouseLeave={e => e.currentTarget.style.background = '#1a1a1a'}
                 >
-                  Got it
+                  {trans('inbox.gotIt')}
                 </button>
               </div>
             </div>
@@ -469,7 +485,7 @@ export default function ThreadPage() {
         <div style={{ padding:'20px 24px', display:'flex', flexDirection:'column', gap:12 }}>
           {messages.length === 0 && !showLinkModal && (
             <div style={{ paddingTop: 80, textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem', fontStyle: 'italic' }}>
-              No messages yet — send the first one to start the conversation.
+              {trans('inbox.noMessagesYet')}
             </div>
           )}
           {messages.map(msg => {
@@ -497,14 +513,14 @@ export default function ThreadPage() {
         <div style={{ padding:'16px 24px', borderTop:'1px solid var(--border)', background:'var(--bg-surface)', display:'flex', alignItems:'center', gap:10, flexShrink:0 }}>
           <Ban size={16} style={{ color:'var(--red)', flexShrink:0 }} />
           <span style={{ fontSize:'0.875rem', color:'var(--text-muted)' }}>
-            This connection was rejected — messaging is disabled.
+            {trans('inbox.connectionRejectedNotice')}
           </span>
         </div>
       ) : thread.status === 'PENDING' ? (
         <div style={{ padding:'16px 24px', borderTop:'1px solid var(--border)', background:'var(--bg-surface)', display:'flex', alignItems:'center', gap:10, flexShrink:0 }}>
           <Loader2 size={16} className="animate-spin" style={{ color:'var(--amber)', flexShrink:0 }} />
           <span style={{ fontSize:'0.875rem', color:'var(--text-muted)' }}>
-            Waiting for mutual acceptance before messaging unlocks...
+            {trans('inbox.waitingMutualAcceptance')}
           </span>
         </div>
       ) : (
@@ -514,7 +530,7 @@ export default function ThreadPage() {
             value={text}
             onChange={e => setText(e.target.value)}
             className="input-field"
-            placeholder="Type a message…"
+            placeholder={trans('inbox.typeMessage')}
             style={{ flex:1 }}
             disabled={sending}
           />

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/translations';
@@ -32,6 +32,20 @@ export default function LanguageSelectionPage() {
   const [selected, setSelected] = useState<Locale>(locale || 'en');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Order: current subdomain's language first, then English (unless it's already
+  // first), then the remaining language. e.g. on nl.localhost -> Nederlands, English, Suomi.
+  // Computed post-mount (not during the initial render) so SSR output and the
+  // client's first paint always match, avoiding a hydration mismatch.
+  const [regions, setRegions] = useState(REGIONS);
+
+  useEffect(() => {
+    const orderedCodes: Locale[] =
+      locale === 'en'
+        ? ['en', 'nl', 'fi']
+        : [locale, 'en', (['nl', 'fi'] as Locale[]).find((c) => c !== locale)!];
+    setRegions(orderedCodes.map((code) => REGIONS.find((r) => r.code === code)!));
+  }, [locale]);
 
   const handleContinue = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,7 +116,7 @@ export default function LanguageSelectionPage() {
 
         <form onSubmit={handleContinue}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
-            {REGIONS.map((item) => {
+            {regions.map((item) => {
               const isSelected = selected === item.code;
               return (
                 <div
