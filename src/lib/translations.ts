@@ -319,6 +319,9 @@ export const translations: Record<Locale, Record<string, string>> = {
 
     // GlobalSearch & General App
     'app.cancel': 'Cancel',
+    'app.previous': 'Previous',
+    'app.next': 'Next',
+    'inbox.showing': 'Showing',
     'app.searchPlaceholder': 'Search...',
     'app.noResults': 'No results found',
     'app.partners': 'PARTNERS',
@@ -837,6 +840,9 @@ export const translations: Record<Locale, Record<string, string>> = {
 
     // GlobalSearch & General App
     'app.cancel': 'Peruuta',
+    'app.previous': 'Edellinen',
+    'app.next': 'Seuraava',
+    'inbox.showing': 'Näytetään',
     'app.searchPlaceholder': 'Hae...',
     'app.noResults': 'Ei tuloksia',
     'app.partners': 'KUMPpanit',
@@ -1355,6 +1361,9 @@ export const translations: Record<Locale, Record<string, string>> = {
 
     // GlobalSearch & General App
     'app.cancel': 'Annuleren',
+    'app.previous': 'Vorige',
+    'app.next': 'Volgende',
+    'inbox.showing': 'Weergegeven',
     'app.searchPlaceholder': 'Zoeken...',
     'app.noResults': 'Geen resultaten gevonden',
     'app.partners': 'PARTNERS',
