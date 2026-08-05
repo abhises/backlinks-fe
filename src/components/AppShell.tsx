@@ -453,8 +453,10 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
               {(workspace?.domain || user.name).substring(0, 2).toUpperCase()}
             </div>
             <div style={{ minWidth: 0, overflow: 'hidden' }}>
-              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'flex', alignItems: 'center', gap: 6 }}>
-                {workspace?.domain || user.name}
+              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+                  {workspace?.domain || user.name}
+                </span>
                 {isPro ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#fff', fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.03em', padding: '2px 5px', borderRadius: 999, flexShrink: 0 }}>
                     <Sparkles size={8} /> PRO
