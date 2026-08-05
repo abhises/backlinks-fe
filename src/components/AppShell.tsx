@@ -6,7 +6,8 @@ import api from '@/lib/api';
 import Link from 'next/link';
 import {
   Inbox, LayoutDashboard, Settings, LogOut, Sun, Moon, Palette,
-  Bell, Menu, X, ArrowDownLeft, ArrowUpRight, Sparkles, MessageCircle, Check, User, Link2
+  Bell, Menu, X, ArrowDownLeft, ArrowUpRight, Sparkles, MessageCircle, Check, User, Link2,
+  CreditCard
 } from 'lucide-react';
 import { io } from 'socket.io-client';
 import GlobalSearch from './GlobalSearch';
@@ -97,6 +98,8 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeToast, setActiveToast] = useState<{ id: string, title: string, body: string } | null>(null);
+  const [billingStatus, setBillingStatus] = useState<{ hasAccess: boolean; isTrialActive: boolean; trialDaysLeft: number; subscriptionStatus: string; isSubscribed: boolean } | null>(null);
+  const isPro = !!billingStatus?.isSubscribed;
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
@@ -115,6 +118,16 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
     if (user.role === 'ADMIN') { router.replace('/admin/dashboard'); return; }
     if (!workspace) { router.replace('/onboarding'); return; }
   }, [user, workspace, loading, router]);
+
+  useEffect(() => {
+    if (!user || user.role === 'ADMIN') return;
+    api.get('/api/billing/status').then(res => {
+      setBillingStatus(res.data);
+      if (!res.data.hasAccess && pathname !== '/billing') {
+        router.replace('/billing');
+      }
+    }).catch(() => {});
+  }, [user, pathname, router]);
 
   useEffect(() => {
     if (!workspace?.id) return;
@@ -158,6 +171,14 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
                 ? t('notif.linkPlacedBodyWithDomain').replace('{domain}', data.giverDomain)
                 : t('notif.linkPlacedBody'));
               link = `/dashboard`;
+            } else if (notifType === 'subscription_active') {
+              title = data.title || t('notif.subscriptionActiveTitle');
+              body = data.body || t('notif.subscriptionActiveBody');
+              link = '/billing';
+            } else if (notifType === 'subscription_canceled') {
+              title = data.title || t('notif.subscriptionCanceledTitle');
+              body = data.body || t('notif.subscriptionCanceledBody');
+              link = '/billing';
             } else if (notifType === 'admin_broadcast') {
               title = data.title || n.title || t('notif.systemAnnouncementTitle');
               body = data.body || data.description || data.messageText || n.body || '';
@@ -232,6 +253,14 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
           ? t('notif.linkPlacedBodyWithDomain').replace('{domain}', data.giverDomain)
           : t('notif.linkPlacedBody'));
         link = `/dashboard`;
+      } else if (data.type === 'subscription_active') {
+        title = data.title || t('notif.subscriptionActiveTitle');
+        body = data.body || t('notif.subscriptionActiveBody');
+        link = '/billing';
+      } else if (data.type === 'subscription_canceled') {
+        title = data.title || t('notif.subscriptionCanceledTitle');
+        body = data.body || t('notif.subscriptionCanceledBody');
+        link = '/billing';
       } else if (data.type === 'admin_broadcast') {
         title = data.title || t('notif.systemAnnouncementTitle');
         body = data.body || data.description || data.messageText || '';
@@ -424,7 +453,18 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
               {(workspace?.domain || user.name).substring(0, 2).toUpperCase()}
             </div>
             <div style={{ minWidth: 0, overflow: 'hidden' }}>
-              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{workspace?.domain || user.name}</div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'flex', alignItems: 'center', gap: 6 }}>
+                {workspace?.domain || user.name}
+                {isPro ? (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#fff', fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.03em', padding: '2px 5px', borderRadius: 999, flexShrink: 0 }}>
+                    <Sparkles size={8} /> PRO
+                  </span>
+                ) : billingStatus?.isTrialActive && (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, background: 'var(--bg-hover)', border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.03em', padding: '2px 5px', borderRadius: 999, flexShrink: 0 }}>
+                    TRIAL
+                  </span>
+                )}
+              </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 <Settings size={12} /> {t('app.settings')} · {user.name.split(' ')[0]}
               </div>
@@ -610,6 +650,18 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
         {/* Content Wrapper */}
         <div style={{ flex: 1, overflowY: 'auto', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+          {billingStatus?.isTrialActive && pathname !== '/billing' && (
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+              background: 'var(--bg-hover)', borderBottom: '1px solid var(--border)',
+              padding: '8px 16px', fontSize: '0.8125rem', color: 'var(--text-secondary)'
+            }}>
+              <span>{t('billing.bannerTrial').replace('{n}', String(billingStatus.trialDaysLeft))}</span>
+              <Link href="/billing" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'none' }}>
+                {t('billing.bannerUpgrade')}
+              </Link>
+            </div>
+          )}
           {children}
         </div>
 
@@ -664,6 +716,8 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
                     else if (n.type === 'connection_accepted' || n.type === 'link_placed') { IconComp = Check; iconBg = 'rgba(16, 185, 129, 0.1)'; iconColor = '#10b981'; }
                     else if (n.type === 'new_connection') { IconComp = Sparkles; iconBg = 'rgba(168, 85, 247, 0.1)'; iconColor = '#a855f7'; }
                     else if (n.type === 'connection_rejected') { IconComp = X; iconBg = 'rgba(239, 68, 68, 0.1)'; iconColor = '#ef4444'; }
+                    else if (n.type === 'subscription_active') { IconComp = CreditCard; iconBg = 'rgba(217, 119, 6, 0.1)'; iconColor = '#d97706'; }
+                    else if (n.type === 'subscription_canceled') { IconComp = CreditCard; iconBg = 'rgba(239, 68, 68, 0.1)'; iconColor = '#ef4444'; }
                     else if (n.type === 'admin_broadcast') { IconComp = User; iconBg = 'var(--bg-hover)'; iconColor = 'var(--text-primary)'; }
 
                     return (

@@ -2,10 +2,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
-import { 
-  Globe, User, Gift, Bell, CreditCard, 
-  HelpCircle, AlertTriangle, Check, Copy, 
-  Mail, Shield, ArrowRight, HelpCircle as HelpIcon, Plus, Loader2, Sun, Moon
+import {
+  Globe, User, Gift, Bell, CreditCard,
+  HelpCircle, AlertTriangle, Check, Copy,
+  Mail, Shield, ArrowRight, HelpCircle as HelpIcon, Plus, Loader2, Sun, Moon,
+  Sparkles, ExternalLink
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -69,6 +70,50 @@ export default function SettingsPage() {
       setSaveError(err.response?.data?.error || t('settings.failedUpdate'));
     } finally {
       setSaveLoading(false);
+    }
+  };
+
+  // Billing state
+  type BillingStatus = {
+    subscriptionStatus: 'TRIALING' | 'ACTIVE' | 'PAST_DUE' | 'CANCELED' | 'EXPIRED';
+    trialEndsAt: string | null;
+    isTrialActive: boolean;
+    trialDaysLeft: number;
+    hasAccess: boolean;
+    isSubscribed: boolean;
+    renewalDate: string | null;
+    daysUntilRenewal: number;
+    cancelAtPeriodEnd: boolean;
+  };
+  const [billingStatus, setBillingStatus] = useState<BillingStatus | null>(null);
+  const [billingActionLoading, setBillingActionLoading] = useState(false);
+  const [billingError, setBillingError] = useState<string | null>(null);
+
+  useEffect(() => {
+    api.get('/api/billing/status').then(res => setBillingStatus(res.data)).catch(() => {});
+  }, []);
+
+  const handleSubscribe = async () => {
+    setBillingActionLoading(true);
+    setBillingError(null);
+    try {
+      const res = await api.post('/api/billing/create-checkout-session');
+      window.location.href = res.data.url;
+    } catch (err: any) {
+      setBillingError(err.response?.data?.error || t('billing.checkoutError'));
+      setBillingActionLoading(false);
+    }
+  };
+
+  const handleManageBilling = async () => {
+    setBillingActionLoading(true);
+    setBillingError(null);
+    try {
+      const res = await api.post('/api/billing/create-portal-session');
+      window.location.href = res.data.url;
+    } catch (err: any) {
+      setBillingError(err.response?.data?.error || t('billing.checkoutError'));
+      setBillingActionLoading(false);
     }
   };
 
@@ -361,51 +406,55 @@ export default function SettingsPage() {
             <CreditCard size={18} color="var(--accent)" />
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('settings.hBilling')}</h2>
           </div>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20, marginBottom: 30 }}>
-            {/* Current Plan */}
-            <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: 24, borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <div>
-                <span className="pill pill-live" style={{ fontSize: '0.7rem', fontWeight: 700 }}>{t('settings.activePlan')}</span>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: 12 }}>{t('settings.planName')}</h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: 4 }}>{t('settings.planDesc')}</p>
-              </div>
-              <div style={{ marginTop: 20 }}>
-                <p style={{ fontSize: '1.25rem', fontWeight: 800 }}>$29<span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>/mo</span></p>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>{t('settings.nextInvoice')}</p>
-              </div>
-            </div>
 
-            {/* Payment Method */}
-            <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: 24, borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <div>
-                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)' }}>{t('settings.paymentMethod')}</span>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  {t('settings.cardInfo')}
-                </h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: 4 }}>{t('settings.cardExpires')}</p>
-              </div>
-              <button className="btn btn-secondary btn-sm" style={{ width: 'fit-content', marginTop: 20 }}>{t('settings.updateCard')}</button>
-            </div>
-          </div>
+          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: 24, borderRadius: 'var(--radius)', maxWidth: 420 }}>
+            <span className="pill pill-live" style={{ fontSize: '0.7rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <Sparkles size={12} /> {t('billing.planName')}
+            </span>
+            <p style={{ marginTop: 14, fontSize: '1.75rem', fontWeight: 800 }}>
+              {t('billing.planPrice')}
+              <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 500 }}>{t('billing.planPeriod')}</span>
+            </p>
+            <p style={{ marginTop: 8, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+              {billingStatus?.isSubscribed
+                ? (billingStatus.cancelAtPeriodEnd
+                  ? t('billing.cancelsIn').replace('{n}', String(billingStatus.daysUntilRenewal))
+                  : t('billing.renewsIn').replace('{n}', String(billingStatus.daysUntilRenewal)))
+                : billingStatus?.isTrialActive
+                ? t('billing.trialActive').replace('{n}', String(billingStatus.trialDaysLeft))
+                : billingStatus
+                ? t('billing.trialExpired')
+                : ' '}
+            </p>
+            {billingStatus?.subscriptionStatus === 'PAST_DUE' && (
+              <p style={{ marginTop: 8, fontSize: '0.8125rem', color: 'var(--red)', fontWeight: 600 }}>{t('billing.pastDue')}</p>
+            )}
 
-          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: 12 }}>{t('settings.invoices')}</h3>
-          <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', overflow: 'hidden', background: 'var(--bg-surface)', fontSize: '0.8125rem' }}>
-            {[
-              { id: 'INV-0912', date: 'May 15, 2026', amount: '$29.00', status: t('settings.paid') },
-              { id: 'INV-0877', date: 'Apr 15, 2026', amount: '$29.00', status: t('settings.paid') }
-            ].map(inv => (
-              <div key={inv.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
-                <div>
-                  <span style={{ fontWeight: 600 }}>{inv.id}</span>
-                  <span style={{ color: 'var(--text-muted)', marginLeft: 12 }}>{inv.date}</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                  <span>{inv.amount}</span>
-                  <span style={{ color: 'var(--green)', fontWeight: 600 }}>{inv.status}</span>
-                </div>
-              </div>
-            ))}
+            {billingStatus?.isSubscribed ? (
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={handleManageBilling}
+                disabled={billingActionLoading}
+                style={{ marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                {billingActionLoading ? <Loader2 size={14} className="animate-spin" /> : <ExternalLink size={14} />}
+                {t('settings.updateCard')}
+              </button>
+            ) : (
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={handleSubscribe}
+                disabled={billingActionLoading}
+                style={{ marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                {billingActionLoading ? <Loader2 size={14} className="animate-spin" /> : null}
+                {t('billing.subscribeBtn')}
+              </button>
+            )}
+
+            {billingError && (
+              <p style={{ marginTop: 10, fontSize: '0.8125rem', color: 'var(--red)', fontWeight: 600 }}>{billingError}</p>
+            )}
           </div>
         </section>
 

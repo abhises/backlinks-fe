@@ -5,13 +5,14 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Shield, LayoutDashboard, Settings, Bell,
-  LogOut, Sun, Moon, Palette, Menu, X, Globe, Link2
+  LogOut, Sun, Moon, Palette, Menu, X, Globe, Link2, CreditCard
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 const NAV = [
   { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard', key: 'admin.dashboard' },
   { href: '/admin/users', icon: Shield, label: 'Users', key: 'admin.users' },
+  { href: '/admin/subscriptions', icon: CreditCard, label: 'Subscriptions', key: 'admin.subscriptions' },
   { href: '/admin/backlinks', icon: Globe, label: 'Backlinks', key: 'admin.backlinks' },
   { href: '/admin/notifications', icon: Bell, label: 'Notifications', key: 'admin.notifications' },
   { href: '/admin/settings', icon: Settings, label: 'Settings', key: 'admin.settings' },
