@@ -80,6 +80,7 @@ const formatTimeAgo = (date: Date, trans: (key: string) => string) => {
 const NAV = [
   { href: '/inbox', icon: Inbox, label: 'Inbox', key: 'app.inbox' },
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', key: 'app.dashboard' },
+  { href: '/billing', icon: CreditCard, label: 'Subscription', key: 'app.subscription' },
   { href: '/how-it-works', icon: Sparkles, label: 'How it works', key: 'app.howItWorks' },
 ];
 

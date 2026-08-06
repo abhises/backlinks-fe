@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { CheckCircle2, Loader2, ShieldAlert, Sparkles } from 'lucide-react';
+import { CheckCircle2, Loader2, ShieldAlert, Sparkles, FileText } from 'lucide-react';
 import api from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -17,6 +17,17 @@ type BillingStatus = {
   cancelAtPeriodEnd: boolean;
 };
 
+type Invoice = {
+  id: string;
+  number: string | null;
+  status: string;
+  amountPaid: number;
+  currency: string;
+  created: number;
+  hostedInvoiceUrl: string | null;
+  invoicePdf: string | null;
+};
+
 export default function BillingPage() {
   const { t } = useLanguage();
   const searchParams = useSearchParams();
@@ -27,6 +38,15 @@ export default function BillingPage() {
   const [finalizingCheckout, setFinalizingCheckout] = useState(checkoutResult === 'success');
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [invoicesLoading, setInvoicesLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/api/billing/invoices')
+      .then(res => setInvoices(res.data.invoices))
+      .catch(() => {})
+      .finally(() => setInvoicesLoading(false));
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -203,6 +223,58 @@ export default function BillingPage() {
           <p style={{ marginTop: 12, color: 'var(--red)', fontSize: '0.8125rem', fontWeight: 600 }}>{error}</p>
         )}
         </div>
+
+        {!invoicesLoading && invoices.length > 0 && (
+          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: 28, marginTop: 24 }}>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: 4 }}>{t('billing.invoiceHistory')}</h2>
+            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 20 }}>
+              {t('billing.lastPayment')}: {' '}
+              <span style={{
+                fontWeight: 700, textTransform: 'capitalize',
+                color: invoices[0].status === 'paid' ? 'var(--accent)' : 'var(--red)',
+              }}>
+                {invoices[0].status}
+              </span>
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              {invoices.map(inv => (
+                <div key={inv.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderTop: '1px solid var(--border)', gap: 12, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <FileText size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                        {(inv.amountPaid / 100).toFixed(2)} {inv.currency.toUpperCase()}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        {new Date(inv.created).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <span style={{
+                      fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: 99, textTransform: 'capitalize',
+                      background: inv.status === 'paid' ? 'rgba(0,184,153,0.15)' : 'rgba(239,68,68,0.15)',
+                      color: inv.status === 'paid' ? 'var(--accent)' : 'var(--red)',
+                    }}>
+                      {inv.status}
+                    </span>
+                    {(inv.hostedInvoiceUrl || inv.invoicePdf) && (
+                      <a
+                        href={inv.invoicePdf || inv.hostedInvoiceUrl || '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--accent)', textDecoration: 'none' }}
+                      >
+                        {t('billing.viewInvoice')}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
