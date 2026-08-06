@@ -84,6 +84,7 @@ export default function SettingsPage() {
     renewalDate: string | null;
     daysUntilRenewal: number;
     cancelAtPeriodEnd: boolean;
+    platformMode?: 'BETA' | 'PAID';
   };
   const [billingStatus, setBillingStatus] = useState<BillingStatus | null>(null);
   const [billingActionLoading, setBillingActionLoading] = useState(false);
@@ -418,6 +419,15 @@ export default function SettingsPage() {
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('settings.hBilling')}</h2>
           </div>
 
+          {billingStatus?.platformMode === 'BETA' ? (
+            <div style={{ background: 'rgba(168, 85, 247, 0.06)', border: '1px solid #a855f7', padding: 24, borderRadius: 'var(--radius)', maxWidth: 420 }}>
+              <span className="pill" style={{ fontSize: '0.7rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4, background: '#a855f7', color: '#fff' }}>
+                <Sparkles size={12} /> {t('billing.betaBadge')}
+              </span>
+              <p style={{ marginTop: 14, fontSize: '1.125rem', fontWeight: 700 }}>{t('billing.betaTitle')}</p>
+              <p style={{ marginTop: 8, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{t('billing.betaDesc')}</p>
+            </div>
+          ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', maxWidth: 800 }}>
             {/* Card 1: Remaining Days */}
             <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: 24, borderRadius: 'var(--radius)' }}>
@@ -494,6 +504,7 @@ export default function SettingsPage() {
               )}
             </div>
           </div>
+          )}
         </section>
 
         {/* 7. Help & FAQ */}

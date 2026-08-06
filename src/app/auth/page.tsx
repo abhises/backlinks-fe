@@ -35,9 +35,14 @@ export default function AuthPage() {
   const [domainSuggest, setDomainSuggest] = useState<{ targetDomain: string; requiredLanguage: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
+  const [platformMode, setPlatformMode] = useState<'BETA' | 'PAID'>('PAID');
   const { login, register, loginWithGoogle, workspace, loading: authLoading } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
+
+  useEffect(() => {
+    api.get('/api/platform-mode').then(res => setPlatformMode(res.data.platformMode)).catch(() => {});
+  }, []);
 
   const initGoogleSignIn = () => {
     if (typeof window !== 'undefined' && (window as any).google) {
@@ -340,7 +345,7 @@ export default function AuthPage() {
 
               <button id="auth-submit" type="submit" className="btn btn-primary" style={{ justifyContent:'center', marginTop:4 }} disabled={loading}>
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-                {loading ? t('auth.pleaseWait') : t('auth.startTrial')}
+                {loading ? t('auth.pleaseWait') : platformMode === 'BETA' ? t('auth.startBeta') : t('auth.startTrial')}
               </button>
             </form>
           </>

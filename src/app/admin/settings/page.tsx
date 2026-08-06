@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
-import { Loader2, Settings2, Clock, Check, Save, Sliders, Users, Hourglass } from 'lucide-react';
+import { Loader2, Settings2, Clock, Check, Save, Sliders, Users, Hourglass, Rocket } from 'lucide-react';
 
 export default function AdminSettings() {
   const { t } = useLanguage();
@@ -13,6 +13,9 @@ export default function AdminSettings() {
   const [rejectLimit, setRejectLimit] = useState(5);
   const [answerTimeoutDays, setAnswerTimeoutDays] = useState(7);
   const [placementTimeoutDays, setPlacementTimeoutDays] = useState(30);
+  const [platformMode, setPlatformMode] = useState<'BETA' | 'PAID'>('BETA');
+  const [pendingMode, setPendingMode] = useState<'BETA' | 'PAID' | null>(null);
+  const [switchingMode, setSwitchingMode] = useState(false);
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [triggering, setTriggering] = useState(false);
@@ -43,11 +46,29 @@ export default function AdminSettings() {
         if (res.data.settings.placementTimeoutDays !== undefined) {
           setPlacementTimeoutDays(res.data.settings.placementTimeoutDays);
         }
+        if (res.data.settings.platformMode) {
+          setPlatformMode(res.data.settings.platformMode);
+        }
       }
     } catch (err) {
       setToastMessage({ type: 'error', text: t('adminSettings.failedLoad') });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const confirmSwitchMode = async () => {
+    if (!pendingMode) return;
+    setSwitchingMode(true);
+    try {
+      await api.put('/api/admin/settings', { platformMode: pendingMode });
+      setPlatformMode(pendingMode);
+      setToastMessage({ type: 'success', text: t('adminSettings.modeSwitched') });
+      setPendingMode(null);
+    } catch (err: any) {
+      setToastMessage({ type: 'error', text: err?.response?.data?.error || t('adminSettings.failedSave') });
+    } finally {
+      setSwitchingMode(false);
     }
   };
 
@@ -102,6 +123,7 @@ export default function AdminSettings() {
       <aside className="settings-sidebar">
         <h2>{t('adminSettings.title')}</h2>
         {[
+          { label: t('adminSettings.hMode'), id: 'platform-mode', icon: Rocket },
           { label: t('adminSettings.hSchedule'), id: 'schedule', icon: Clock },
           { label: t('adminSettings.hLimits'), id: 'limits', icon: Users },
           { label: t('adminSettings.hTimeouts'), id: 'timeouts', icon: Hourglass },
@@ -148,8 +170,55 @@ export default function AdminSettings() {
             <Loader2 className="animate-spin" size={24} color="var(--text-muted)" />
           </div>
         ) : (
+          <>
+          {/* 0. Platform Mode */}
+          <section id="platform-mode" style={{ marginBottom: 48 }}>
+            <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+              <Rocket size={18} color="var(--accent)" />
+              <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('adminSettings.hMode')}</h2>
+            </div>
+            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 20, maxWidth: 600 }}>
+              {t('adminSettings.modeDesc')}
+            </p>
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', maxWidth: 600 }}>
+              <button
+                type="button"
+                onClick={() => platformMode !== 'BETA' && setPendingMode('BETA')}
+                style={{
+                  flex: 1, minWidth: 220, textAlign: 'left', padding: 20, borderRadius: 'var(--radius)', cursor: platformMode === 'BETA' ? 'default' : 'pointer',
+                  border: platformMode === 'BETA' ? '2px solid #a855f7' : '1px solid var(--border)',
+                  background: platformMode === 'BETA' ? 'rgba(168, 85, 247, 0.08)' : 'var(--bg-surface)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#a855f7', display: 'inline-block' }} />
+                  <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>{t('adminSettings.modeBeta')}</span>
+                  {platformMode === 'BETA' && <Check size={14} color="#a855f7" style={{ marginLeft: 'auto' }} />}
+                </div>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t('adminSettings.modeBetaDesc')}</p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => platformMode !== 'PAID' && setPendingMode('PAID')}
+                style={{
+                  flex: 1, minWidth: 220, textAlign: 'left', padding: 20, borderRadius: 'var(--radius)', cursor: platformMode === 'PAID' ? 'default' : 'pointer',
+                  border: platformMode === 'PAID' ? '2px solid var(--accent)' : '1px solid var(--border)',
+                  background: platformMode === 'PAID' ? 'rgba(0, 184, 153, 0.08)' : 'var(--bg-surface)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block' }} />
+                  <span style={{ fontWeight: 700, fontSize: '0.9375rem' }}>{t('adminSettings.modePaid')}</span>
+                  {platformMode === 'PAID' && <Check size={14} color="var(--accent)" style={{ marginLeft: 'auto' }} />}
+                </div>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{t('adminSettings.modePaidDesc')}</p>
+              </button>
+            </div>
+          </section>
+
           <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
-            
+
             {/* 1. Matchmaking Schedule */}
             <section id="schedule">
               <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
@@ -289,6 +358,7 @@ export default function AdminSettings() {
               </div>
             </section>
           </form>
+          </>
         )}
       </div>
 
@@ -326,6 +396,46 @@ export default function AdminSettings() {
               >
                 {triggering ? <Loader2 size={16} className="animate-spin" /> : <Settings2 size={16} />}
                 {triggering ? t('adminSettings.running') : t('adminSettings.runBtn')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {pendingMode && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            background: 'var(--bg-surface)', padding: 32, borderRadius: 'var(--radius-lg)', maxWidth: 450, width: '90%',
+            boxShadow: 'var(--shadow-xl)', border: '1px solid var(--border)',
+            animation: 'modalIn 0.2s ease-out'
+          }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: 12 }}>{t('adminSettings.modeConfirmTitle')}</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.5, marginBottom: 24 }}>
+              {pendingMode === 'PAID' ? t('adminSettings.modeConfirmToPaid') : t('adminSettings.modeConfirmToBeta')}
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+              <button
+                onClick={() => setPendingMode(null)}
+                className="btn btn-secondary"
+                disabled={switchingMode}
+              >
+                {t('app.cancel')}
+              </button>
+              <button
+                onClick={confirmSwitchMode}
+                style={{
+                  background: '#1a1a1a', color: '#ffffff', border: 'none',
+                  borderRadius: '6px', padding: '8px 16px', fontWeight: 600, fontSize: '0.875rem',
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  cursor: switchingMode ? 'not-allowed' : 'pointer', opacity: switchingMode ? 0.7 : 1
+                }}
+                disabled={switchingMode}
+              >
+                {switchingMode ? <Loader2 size={16} className="animate-spin" /> : <Rocket size={16} />}
+                {switchingMode ? t('adminSettings.switching') : t('adminSettings.confirmSwitch')}
               </button>
             </div>
           </div>

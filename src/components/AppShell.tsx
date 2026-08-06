@@ -99,8 +99,10 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeToast, setActiveToast] = useState<{ id: string, title: string, body: string } | null>(null);
-  const [billingStatus, setBillingStatus] = useState<{ hasAccess: boolean; isTrialActive: boolean; trialDaysLeft: number; subscriptionStatus: string; isSubscribed: boolean } | null>(null);
+  const [billingStatus, setBillingStatus] = useState<{ hasAccess: boolean; isTrialActive: boolean; trialDaysLeft: number; subscriptionStatus: string; isSubscribed: boolean; platformMode?: 'BETA' | 'PAID' } | null>(null);
   const isPro = !!billingStatus?.isSubscribed;
+  const isBetaMode = billingStatus?.platformMode === 'BETA';
+  const nav = NAV.filter(item => item.href !== '/billing' || !isBetaMode);
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
@@ -427,7 +429,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Nav links */}
-        {NAV.map(({ href, icon: Icon, label, key }) => {
+        {nav.map(({ href, icon: Icon, label, key }) => {
           const active = isLinkActive(href);
           return (
             <Link key={href} href={href}
@@ -458,7 +460,11 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
                   {workspace?.domain || user.name}
                 </span>
-                {isPro ? (
+                {isBetaMode ? (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, background: '#a855f7', color: '#fff', fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.03em', padding: '2px 5px', borderRadius: 999, flexShrink: 0 }}>
+                    <Sparkles size={8} /> BETA
+                  </span>
+                ) : isPro ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, background: 'var(--accent)', color: '#fff', fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.03em', padding: '2px 5px', borderRadius: 999, flexShrink: 0 }}>
                     <Sparkles size={8} /> PRO
                   </span>
@@ -560,7 +566,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        {NAV.map(({ href, icon: Icon, label, key }) => {
+        {nav.map(({ href, icon: Icon, label, key }) => {
           const active = isLinkActive(href);
           return (
             <Link key={href} href={href}
@@ -653,7 +659,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
         {/* Content Wrapper */}
         <div style={{ flex: 1, overflowY: 'auto', position: 'relative', display: 'flex', flexDirection: 'column' }}>
-          {billingStatus?.isTrialActive && pathname !== '/settings' && (
+          {!isBetaMode && billingStatus?.isTrialActive && pathname !== '/settings' && (
             <div style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
               background: 'var(--bg-hover)', borderBottom: '1px solid var(--border)',
