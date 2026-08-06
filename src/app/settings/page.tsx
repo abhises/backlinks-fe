@@ -407,54 +407,81 @@ export default function SettingsPage() {
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('settings.hBilling')}</h2>
           </div>
 
-          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: 24, borderRadius: 'var(--radius)', maxWidth: 420 }}>
-            <span className="pill pill-live" style={{ fontSize: '0.7rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              <Sparkles size={12} /> {t('billing.planName')}
-            </span>
-            <p style={{ marginTop: 14, fontSize: '1.75rem', fontWeight: 800 }}>
-              {t('billing.planPrice')}
-              <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 500 }}>{t('billing.planPeriod')}</span>
-            </p>
-            <p style={{ marginTop: 8, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-              {billingStatus?.isSubscribed
-                ? (billingStatus.cancelAtPeriodEnd
-                  ? t('billing.cancelsIn').replace('{n}', String(billingStatus.daysUntilRenewal))
-                  : t('billing.renewsIn').replace('{n}', String(billingStatus.daysUntilRenewal)))
-                : billingStatus?.isTrialActive
-                ? t('billing.trialActive').replace('{n}', String(billingStatus.trialDaysLeft))
-                : billingStatus
-                ? t('billing.trialExpired')
-                : ' '}
-            </p>
-            {billingStatus?.subscriptionStatus === 'PAST_DUE' && (
-              <p style={{ marginTop: 8, fontSize: '0.8125rem', color: 'var(--red)', fontWeight: 600 }}>{t('billing.pastDue')}</p>
-            )}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', maxWidth: 800 }}>
+            {/* Card 1: Remaining Days */}
+            <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: 24, borderRadius: 'var(--radius)' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 8 }}>{t('billing.statusTitle')}</h3>
+              
+              <div style={{ marginTop: 14 }}>
+                <p style={{ fontSize: '2.5rem', fontWeight: 800, lineHeight: 1 }}>
+                  {billingStatus?.isSubscribed
+                    ? billingStatus.daysUntilRenewal
+                    : billingStatus?.isTrialActive
+                    ? billingStatus.trialDaysLeft
+                    : 0}
+                </p>
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 4, fontWeight: 500 }}>
+                  {t('billing.daysRemaining')}
+                </p>
+              </div>
 
-            {billingStatus?.isSubscribed ? (
-              <button
-                className="btn btn-secondary btn-sm"
-                onClick={handleManageBilling}
-                disabled={billingActionLoading}
-                style={{ marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}
-              >
-                {billingActionLoading ? <Loader2 size={14} className="animate-spin" /> : <ExternalLink size={14} />}
-                {t('settings.updateCard')}
-              </button>
-            ) : (
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={handleSubscribe}
-                disabled={billingActionLoading}
-                style={{ marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}
-              >
-                {billingActionLoading ? <Loader2 size={14} className="animate-spin" /> : null}
-                {t('billing.subscribeBtn')}
-              </button>
-            )}
+              <p style={{ marginTop: 16, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                {billingStatus?.isSubscribed
+                  ? (billingStatus.cancelAtPeriodEnd
+                    ? t('billing.cancelsIn').replace('{n}', String(billingStatus.daysUntilRenewal))
+                    : t('billing.renewsIn').replace('{n}', String(billingStatus.daysUntilRenewal)))
+                  : billingStatus?.isTrialActive
+                  ? t('billing.trialActive').replace('{n}', String(billingStatus.trialDaysLeft))
+                  : billingStatus
+                  ? t('billing.trialExpired')
+                  : ' '}
+              </p>
+              {billingStatus?.subscriptionStatus === 'PAST_DUE' && (
+                <p style={{ marginTop: 8, fontSize: '0.8125rem', color: 'var(--red)', fontWeight: 600 }}>{t('billing.pastDue')}</p>
+              )}
+            </div>
 
-            {billingError && (
-              <p style={{ marginTop: 10, fontSize: '0.8125rem', color: 'var(--red)', fontWeight: 600 }}>{billingError}</p>
-            )}
+            {/* Card 2: Plan + action (Update Subscription if subscribed, Subscribe Now otherwise) */}
+            <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: 24, borderRadius: 'var(--radius)' }}>
+              <span className="pill pill-live" style={{ fontSize: '0.7rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <Sparkles size={12} /> {t('billing.planName')}
+              </span>
+              <p style={{ marginTop: 14, fontSize: '1.75rem', fontWeight: 800 }}>
+                {t('billing.planPrice')}
+                <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 500 }}>{t('billing.planPeriod')}</span>
+              </p>
+              {!billingStatus?.isSubscribed && (
+                <p style={{ marginTop: 8, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                  {t('billing.upgradePrompt')}
+                </p>
+              )}
+
+              {billingStatus?.isSubscribed ? (
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={handleManageBilling}
+                  disabled={billingActionLoading}
+                  style={{ marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                >
+                  {billingActionLoading ? <Loader2 size={14} className="animate-spin" /> : <ExternalLink size={14} />}
+                  {t('settings.updateCard')}
+                </button>
+              ) : (
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={handleSubscribe}
+                  disabled={billingActionLoading}
+                  style={{ marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                >
+                  {billingActionLoading ? <Loader2 size={14} className="animate-spin" /> : null}
+                  {t('billing.subscribeBtn')}
+                </button>
+              )}
+
+              {billingError && (
+                <p style={{ marginTop: 10, fontSize: '0.8125rem', color: 'var(--red)', fontWeight: 600 }}>{billingError}</p>
+              )}
+            </div>
           </div>
         </section>
 
