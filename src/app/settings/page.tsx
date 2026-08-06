@@ -6,7 +6,7 @@ import {
   Globe, User, Gift, Bell, CreditCard,
   HelpCircle, AlertTriangle, Check, Copy,
   Mail, Shield, ArrowRight, HelpCircle as HelpIcon, Plus, Loader2, Sun, Moon,
-  Sparkles, ExternalLink
+  Sparkles, ExternalLink, type LucideIcon
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -202,15 +202,15 @@ export default function SettingsPage() {
       {/* Settings Sub-Sidebar Navigation */}
       <aside className="settings-sidebar">
         <h2>{t('settings.title')}</h2>
-        {[
+        {([
           { label: t('settings.navProfile'), id: 'website-profile', icon: Globe },
           { label: t('settings.navAccount'), id: 'account', icon: User },
           { label: t('settings.navInvite'), id: 'invite', icon: Gift },
           { label: t('settings.navNotifications'), id: 'notifications', icon: Bell },
           { label: t('settings.navBilling'), id: 'billing', icon: CreditCard },
           { label: t('settings.navHelp'), id: 'help', icon: HelpCircle },
-          { label: t('settings.navDanger'), id: 'danger', icon: AlertTriangle, color: 'var(--red)' }
-        ].map(s => (
+          // { label: t('settings.navDanger'), id: 'danger', icon: AlertTriangle, color: 'var(--red)' }
+        ] as { label: string; id: string; icon: LucideIcon; color?: string }[]).map(s => (
           <a key={s.id} href={`#${s.id}`} className="settings-nav-item" style={{ color: s.color || 'var(--text-secondary)' }}>
             <s.icon size={16} />
             {s.label}
@@ -517,7 +517,7 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        {/* 8. Danger Zone */}
+        {/* 8. Danger Zone
         <section id="danger">
           <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
             <AlertTriangle size={18} color="var(--red)" />
@@ -532,7 +532,7 @@ export default function SettingsPage() {
               </div>
               <button className="btn btn-danger btn-sm">{t('settings.deleteWorkspace')}</button>
             </div>
-            
+
             <div style={{ borderTop: '1px solid rgba(220, 38, 38, 0.1)', paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
               <div>
                 <h3 style={{ fontSize: '0.875rem', fontWeight: 700 }}>{t('settings.deleteAccount')}</h3>
@@ -542,6 +542,7 @@ export default function SettingsPage() {
             </div>
           </div>
         </section>
+        */}
 
       </div>
     </div>
