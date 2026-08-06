@@ -139,8 +139,8 @@ export default function BillingPage() {
           </div>
         )}
 
-        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '48px 40px 40px', minHeight: 480, position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+        <div style={{ position: 'absolute', top: 20, right: 20, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
           <span className="pill pill-live" style={{ fontSize: '0.7rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <Sparkles size={12} /> {t('billing.planName')}
           </span>
@@ -167,6 +167,15 @@ export default function BillingPage() {
             ? t('billing.trialActive').replace('{n}', String(status.trialDaysLeft))
             : t('billing.trialExpired')}
         </p>
+
+        <ul style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 14, listStyle: 'none', padding: 0, textAlign: 'left', width: '100%', maxWidth: 380 }}>
+          {[t('billing.feature1'), t('billing.feature2'), t('billing.feature3')].map((feature, i) => (
+            <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+              <CheckCircle2 size={18} style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 1 }} />
+              {feature}
+            </li>
+          ))}
+        </ul>
 
         {status?.isSubscribed ? (
           <button
