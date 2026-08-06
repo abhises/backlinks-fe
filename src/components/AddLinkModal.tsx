@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { X, Link2, Loader2, AlertCircle, ExternalLink, Pencil, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import api from '@/lib/api';
 
@@ -17,6 +18,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
   onClose: () => void; onSaved: () => void;
 }) {
   const { t } = useLanguage();
+  const router = useRouter();
   const lp = thread.linkPlacement;
   const canEdit = !hasLink || isGiver;
 
@@ -60,6 +62,10 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
       await api.post('/api/links', { threadId: thread.id, sourceUrl, targetUrl, anchorText, linkType });
       onSaved();
     } catch (err: any) {
+      if (err?.response?.data?.code === 'SUBSCRIPTION_REQUIRED') {
+        router.push('/billing');
+        return;
+      }
       setError(err?.response?.data?.error || 'Failed to save link details');
     } finally { setLoading(false); }
   };

@@ -157,7 +157,11 @@ function InboxPageContent() {
     try {
       const res = await api.patch(`/api/threads/${id}/status`, { status: 'ACCEPTED' });
       setThreads(prev => prev.map(t => t.id === id ? { ...t, ...res.data.thread } : t));
-    } catch { } finally { setActionLoading(null); }
+    } catch (err: any) {
+      if (err?.response?.data?.code === 'SUBSCRIPTION_REQUIRED') {
+        router.push('/billing');
+      }
+    } finally { setActionLoading(null); }
   };
 
   const isIncoming = (t: Thread) => t.receiverWorkspace.id === workspace?.id;
