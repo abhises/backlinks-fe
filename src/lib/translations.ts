@@ -94,6 +94,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'admin.subscriptions': 'Subscriptions',
     'admin.backlinks': 'Backlinks',
     'admin.notifications': 'Notifications',
+    'admin.tickets': 'Tickets',
     'admin.settings': 'Settings',
 
     // Auth Page
@@ -293,6 +294,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'settings.ticketPlaceholder': 'Explain what went wrong or ask a question...',
     'settings.submitTicket': 'Submit Ticket',
     'settings.ticketSuccess': 'Ticket submitted successfully!',
+    'settings.ticketError': 'Could not submit ticket. Please try again.',
     'settings.hDanger': 'Danger Zone',
     'settings.deleteWorkspace': 'Delete Workspace',
     'settings.deleteWorkspaceDesc': 'Permanently delete this website workspace and all of its backlink threads.',
@@ -451,6 +453,13 @@ export const translations: Record<Locale, Record<string, string>> = {
     'adminNotifs.historyTitle': 'Broadcast History',
     'adminNotifs.noBroadcasts': 'No broadcasts yet',
     'adminNotifs.noBroadcastsDesc': 'You haven\'t sent any global notifications.',
+
+    'adminTickets.title': 'Support Tickets',
+    'adminTickets.sub': 'View support tickets submitted by clients.',
+    'adminTickets.failedLoad': 'Failed to load tickets.',
+    'adminTickets.noTickets': 'No tickets yet',
+    'adminTickets.noTicketsDesc': 'Submitted support tickets will show up here.',
+    'adminTickets.from': 'From',
 
     'adminSettings.title': 'Platform Settings',
     'adminSettings.sub': 'Configure automated system behaviors and matchmaking logic.',
@@ -668,6 +677,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'admin.subscriptions': 'Tilaukset',
     'admin.backlinks': 'Paluulinkit',
     'admin.notifications': 'Ilmoitukset',
+    'admin.tickets': 'Tukipyynnöt',
     'admin.settings': 'Asetukset',
 
     // Auth Page
@@ -867,6 +877,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'settings.ticketPlaceholder': 'Kerro mitä tapahtui tai esitä kysymys...',
     'settings.submitTicket': 'Lähetä tukipyyntö',
     'settings.ticketSuccess': 'Tukipyyntö lähetetty onnistuneesti!',
+    'settings.ticketError': 'Tukipyyntöä ei voitu lähettää. Yritä uudelleen.',
     'settings.hDanger': 'Vaaravyöhyke',
     'settings.deleteWorkspace': 'Poista työtila',
     'settings.deleteWorkspaceDesc': 'Poista tämä työtila ja kaikki sen paluulinkkikeskustelut pysyvästi.',
@@ -1025,6 +1036,13 @@ export const translations: Record<Locale, Record<string, string>> = {
     'adminNotifs.historyTitle': 'Lähetyshistoria',
     'adminNotifs.noBroadcasts': 'Ei vielä lähetyksiä',
     'adminNotifs.noBroadcastsDesc': 'Et ole lähettänyt yhtään yleistä ilmoitusta.',
+
+    'adminTickets.title': 'Tukipyynnöt',
+    'adminTickets.sub': 'Näytä asiakkaiden lähettämät tukipyynnöt.',
+    'adminTickets.failedLoad': 'Tukipyyntöjen lataus epäonnistui.',
+    'adminTickets.noTickets': 'Ei vielä tukipyyntöjä',
+    'adminTickets.noTicketsDesc': 'Lähetetyt tukipyynnöt näkyvät täällä.',
+    'adminTickets.from': 'Lähettäjä',
 
     'adminSettings.title': 'Alustan asetukset',
     'adminSettings.sub': 'Määritä automaattiset järjestelmätoiminnot ja hakuvalintalogiikka.',
@@ -1242,6 +1260,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'admin.subscriptions': 'Abonnementen',
     'admin.backlinks': 'Backlinks',
     'admin.notifications': 'Meldingen',
+    'admin.tickets': 'Tickets',
     'admin.settings': 'Instellingen',
 
     // Auth Page
@@ -1441,6 +1460,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'settings.ticketPlaceholder': 'Leg uit wat er misging of stel een vraag...',
     'settings.submitTicket': 'Verzend ticket',
     'settings.ticketSuccess': 'Ticket succesvol verzonden!',
+    'settings.ticketError': 'Kon ticket niet verzenden. Probeer het opnieuw.',
     'settings.hDanger': 'Gevarenzone',
     'settings.deleteWorkspace': 'Verwijder werkruimte',
     'settings.deleteWorkspaceDesc': 'Verwijdert deze werkruimte en alle bijbehorende backlinkgesprekken. Dit kan niet ongedaan gemaakt worden.',
@@ -1599,6 +1619,13 @@ export const translations: Record<Locale, Record<string, string>> = {
     'adminNotifs.historyTitle': 'Verzendgeschiedenis',
     'adminNotifs.noBroadcasts': 'Nog geen meldingen verzonden',
     'adminNotifs.noBroadcastsDesc': 'Je hebt nog geen globale meldingen verzonden.',
+
+    'adminTickets.title': 'Supporttickets',
+    'adminTickets.sub': 'Bekijk supporttickets die door klanten zijn ingediend.',
+    'adminTickets.failedLoad': 'Tickets laden mislukt.',
+    'adminTickets.noTickets': 'Nog geen tickets',
+    'adminTickets.noTicketsDesc': 'Ingediende supporttickets verschijnen hier.',
+    'adminTickets.from': 'Van',
 
     'adminSettings.title': 'Platforminstellingen',
     'adminSettings.sub': 'Configureer geautomatiseerd systeemgedrag en matchinglogica.',

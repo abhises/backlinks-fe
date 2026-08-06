@@ -155,6 +155,8 @@ export default function SettingsPage() {
   // Help support ticket state
   const [supportMsg, setSupportMsg] = useState('');
   const [supportSuccess, setSupportSuccess] = useState(false);
+  const [supportSubmitting, setSupportSubmitting] = useState(false);
+  const [supportError, setSupportError] = useState('');
 
   // Copy referral utility
   const copyReferral = () => {
@@ -189,12 +191,21 @@ export default function SettingsPage() {
   };
 
   // Submit help ticket
-  const handleSupportSubmit = (e: React.FormEvent) => {
+  const handleSupportSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!supportMsg.trim()) return;
-    setSupportSuccess(true);
-    setSupportMsg('');
-    setTimeout(() => setSupportSuccess(false), 3000);
+    setSupportSubmitting(true);
+    setSupportError('');
+    try {
+      await api.post('/api/tickets', { message: supportMsg });
+      setSupportSuccess(true);
+      setSupportMsg('');
+      setTimeout(() => setSupportSuccess(false), 3000);
+    } catch (err: any) {
+      setSupportError(err?.response?.data?.error || t('settings.ticketError'));
+    } finally {
+      setSupportSubmitting(false);
+    }
   };
 
   return (
@@ -509,10 +520,16 @@ export default function SettingsPage() {
             <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 16 }}>{t('settings.ticketDesc')}</p>
             <form onSubmit={handleSupportSubmit}>
               <textarea value={supportMsg} onChange={e => setSupportMsg(e.target.value)} className="input-field" style={{ height: 80, padding: '10px 12px', marginBottom: 12, fontSize: '0.8125rem' }} placeholder={t('settings.ticketPlaceholder')} required />
-              <button type="submit" className="btn btn-secondary btn-sm">{t('settings.submitTicket')}</button>
+              <button type="submit" className="btn btn-secondary btn-sm" disabled={supportSubmitting} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                {supportSubmitting ? <Loader2 size={14} className="animate-spin" /> : null}
+                {t('settings.submitTicket')}
+              </button>
             </form>
             {supportSuccess && (
               <p style={{ color: 'var(--green)', fontSize: '0.75rem', fontWeight: 600, marginTop: 10 }}>{t('settings.ticketSuccess')}</p>
+            )}
+            {supportError && (
+              <p style={{ color: 'var(--red)', fontSize: '0.75rem', fontWeight: 600, marginTop: 10 }}>{supportError}</p>
             )}
           </div>
         </section>

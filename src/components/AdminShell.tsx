@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Shield, LayoutDashboard, Settings, Bell,
-  LogOut, Sun, Moon, Palette, Menu, X, Globe, Link2, CreditCard
+  LogOut, Sun, Moon, Palette, Menu, X, Globe, Link2, CreditCard, LifeBuoy
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -15,6 +15,7 @@ const NAV = [
   { href: '/admin/subscriptions', icon: CreditCard, label: 'Subscriptions', key: 'admin.subscriptions' },
   { href: '/admin/backlinks', icon: Globe, label: 'Backlinks', key: 'admin.backlinks' },
   { href: '/admin/notifications', icon: Bell, label: 'Notifications', key: 'admin.notifications' },
+  { href: '/admin/tickets', icon: LifeBuoy, label: 'Tickets', key: 'admin.tickets' },
   { href: '/admin/settings', icon: Settings, label: 'Settings', key: 'admin.settings' },
 ];
 
