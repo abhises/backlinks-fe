@@ -99,7 +99,6 @@ export default function BillingPage() {
   }
 
   return (
-  return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 100px)', padding: '40px 20px' }}>
       <div style={{ width: '100%', maxWidth: 800 }}>
         <div style={{ padding: '4px 0 24px', borderBottom: '1px solid var(--border)', marginBottom: 32, textAlign: 'center' }}>
@@ -194,6 +193,7 @@ export default function BillingPage() {
         {error && (
           <p style={{ marginTop: 12, color: 'var(--red)', fontSize: '0.8125rem', fontWeight: 600 }}>{error}</p>
         )}
+        </div>
       </div>
     </div>
   );
