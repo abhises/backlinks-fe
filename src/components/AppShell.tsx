@@ -459,11 +459,11 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
                   {workspace?.domain || user.name}
                 </span>
                 {isPro ? (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#fff', fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.03em', padding: '2px 5px', borderRadius: 999, flexShrink: 0 }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, background: 'var(--accent)', color: '#fff', fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.03em', padding: '2px 5px', borderRadius: 999, flexShrink: 0 }}>
                     <Sparkles size={8} /> PRO
                   </span>
                 ) : billingStatus?.isTrialActive && (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, background: 'var(--bg-hover)', border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.03em', padding: '2px 5px', borderRadius: 999, flexShrink: 0 }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, background: 'var(--amber)', color: '#1a1a1a', fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.03em', padding: '2px 5px', borderRadius: 999, flexShrink: 0 }}>
                     TRIAL
                   </span>
                 )}
