@@ -460,6 +460,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'adminTickets.noTickets': 'No tickets yet',
     'adminTickets.noTicketsDesc': 'Submitted support tickets will show up here.',
     'adminTickets.from': 'From',
+    'adminTickets.markResolved': 'Mark Resolved',
 
     'adminSettings.title': 'Platform Settings',
     'adminSettings.sub': 'Configure automated system behaviors and matchmaking logic.',
@@ -1043,6 +1044,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'adminTickets.noTickets': 'Ei vielä tukipyyntöjä',
     'adminTickets.noTicketsDesc': 'Lähetetyt tukipyynnöt näkyvät täällä.',
     'adminTickets.from': 'Lähettäjä',
+    'adminTickets.markResolved': 'Merkitse ratkaistuksi',
 
     'adminSettings.title': 'Alustan asetukset',
     'adminSettings.sub': 'Määritä automaattiset järjestelmätoiminnot ja hakuvalintalogiikka.',
@@ -1626,6 +1628,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'adminTickets.noTickets': 'Nog geen tickets',
     'adminTickets.noTicketsDesc': 'Ingediende supporttickets verschijnen hier.',
     'adminTickets.from': 'Van',
+    'adminTickets.markResolved': 'Markeer als opgelost',
 
     'adminSettings.title': 'Platforminstellingen',
     'adminSettings.sub': 'Configureer geautomatiseerd systeemgedrag en matchinglogica.',

@@ -3,6 +3,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { io } from 'socket.io-client';
+import api from '@/lib/api';
 import {
   Shield, LayoutDashboard, Settings, Bell,
   LogOut, Sun, Moon, Palette, Menu, X, Globe, Link2, CreditCard, LifeBuoy
@@ -30,6 +32,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const [theme, setTheme] = useState<Theme>('dark');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [openTicketCount, setOpenTicketCount] = useState(0);
 
   useEffect(() => {
     const saved = (localStorage.getItem('bl_theme') as Theme) || 'dark';
@@ -42,6 +45,31 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     if (!user) { router.replace('/auth'); return; }
     if (user.role !== 'ADMIN') { router.replace('/dashboard'); return; }
   }, [user, loading, router]);
+
+  // Ticket notification badge - fetches current open count, then listens for
+  // new tickets in real time over the admin-only socket room.
+  useEffect(() => {
+    if (!user || user.role !== 'ADMIN') return;
+
+    api.get('/api/admin/tickets')
+      .then(res => {
+        const openCount = res.data.tickets.filter((t: { status: string }) => t.status === 'OPEN').length;
+        setOpenTicketCount(openCount);
+      })
+      .catch(console.error);
+
+    const socketUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    const socket = io(socketUrl);
+    socket.emit('joinAdmin');
+    socket.on('new_ticket', () => {
+      setOpenTicketCount(prev => prev + 1);
+    });
+
+    return () => {
+      socket.emit('leaveAdmin');
+      socket.disconnect();
+    };
+  }, [user]);
 
   const cycleTheme = () => {
     const next = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
@@ -211,6 +239,28 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           </div>
 
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {/* Ticket Notification Bell */}
+            <button
+              onClick={() => router.push('/admin/tickets')}
+              className="btn btn-secondary btn-icon"
+              title={t('admin.tickets')}
+              style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', height: 36, width: 36, padding: 0, borderRadius: 'var(--radius-sm)' }}
+            >
+              <Bell size={16} />
+              {openTicketCount > 0 && (
+                <span style={{
+                  position: 'absolute', top: -4, right: -4,
+                  background: 'var(--red)', color: '#fff',
+                  fontSize: '0.65rem', fontWeight: 700, lineHeight: 1,
+                  minWidth: 16, height: 16, borderRadius: 8,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: '0 3px',
+                }}>
+                  {openTicketCount > 99 ? '99+' : openTicketCount}
+                </span>
+              )}
+            </button>
+
             {/* Theme Toggle */}
             <button
               onClick={cycleTheme}

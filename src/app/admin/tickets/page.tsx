@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
-import { LifeBuoy, Loader2, Clock } from 'lucide-react';
+import { LifeBuoy, Loader2, Clock, Check } from 'lucide-react';
 
 type Ticket = {
   id: string;
@@ -20,6 +20,7 @@ export default function AdminTickets() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [resolvingId, setResolvingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTickets();
@@ -33,6 +34,18 @@ export default function AdminTickets() {
       setError(err?.response?.data?.error || t('adminTickets.failedLoad'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResolve = async (id: string) => {
+    setResolvingId(id);
+    try {
+      await api.put(`/api/admin/tickets/${id}/resolve`);
+      setTickets(prev => prev.map(ticket => ticket.id === id ? { ...ticket, status: 'RESOLVED' } : ticket));
+    } catch (err) {
+      console.error('Failed to resolve ticket', err);
+    } finally {
+      setResolvingId(null);
     }
   };
 
@@ -82,6 +95,17 @@ export default function AdminTickets() {
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.5, whiteSpace: 'pre-wrap', marginTop: 8 }}>
                   {ticket.message}
                 </p>
+                {ticket.status === 'OPEN' && (
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => handleResolve(ticket.id)}
+                    disabled={resolvingId === ticket.id}
+                    style={{ marginTop: 12, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                  >
+                    {resolvingId === ticket.id ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                    {t('adminTickets.markResolved')}
+                  </button>
+                )}
               </div>
             ))}
           </div>
