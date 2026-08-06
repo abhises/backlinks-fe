@@ -99,46 +99,48 @@ export default function BillingPage() {
   }
 
   return (
-    <div style={{ maxWidth: 640, margin: '0 auto', padding: '40px 20px' }}>
-      <div style={{ padding: '4px 0 24px', borderBottom: '1px solid var(--border)', marginBottom: 32 }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>{t('billing.title')}</h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: 4 }}>{t('billing.subtitle')}</p>
-      </div>
-
-      {checkoutResult === 'success' && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(16,185,129,0.08)', border: '1px solid var(--green)', color: 'var(--green)', padding: '12px 16px', borderRadius: 'var(--radius-sm)', marginBottom: 24, fontSize: '0.875rem', fontWeight: 600 }}>
-          <CheckCircle2 size={18} /> {t('billing.checkoutSuccess')}
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 100px)', padding: '40px 20px' }}>
+      <div style={{ width: '100%', maxWidth: 800 }}>
+        <div style={{ padding: '4px 0 24px', borderBottom: '1px solid var(--border)', marginBottom: 32, textAlign: 'center' }}>
+          <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>{t('billing.title')}</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginTop: 8 }}>{t('billing.subtitle')}</p>
         </div>
-      )}
-      {checkoutResult === 'cancelled' && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-secondary)', padding: '12px 16px', borderRadius: 'var(--radius-sm)', marginBottom: 24, fontSize: '0.875rem', fontWeight: 600 }}>
-          {t('billing.checkoutCancelled')}
-        </div>
-      )}
 
-      {finalizingCheckout && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-secondary)', padding: '12px 16px', borderRadius: 'var(--radius-sm)', marginBottom: 24, fontSize: '0.875rem', fontWeight: 600 }}>
-          <Loader2 size={16} className="animate-spin" /> {t('billing.finalizingCheckout')}
-        </div>
-      )}
-
-      {status && !status.hasAccess && !finalizingCheckout && (
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: 'rgba(239,68,68,0.06)', border: '1px solid var(--red)', color: 'var(--red)', padding: '14px 16px', borderRadius: 'var(--radius-sm)', marginBottom: 24, fontSize: '0.875rem' }}>
-          <ShieldAlert size={18} style={{ flexShrink: 0, marginTop: 1 }} />
-          <div>
-            <p style={{ fontWeight: 700 }}>{t('billing.trialExpired')}</p>
-            <p style={{ marginTop: 2, color: 'var(--text-secondary)' }}>{t('billing.trialExpiredDesc')}</p>
+        {checkoutResult === 'success' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(16,185,129,0.08)', border: '1px solid var(--green)', color: 'var(--green)', padding: '16px 20px', borderRadius: 'var(--radius-sm)', marginBottom: 24, fontSize: '1rem', fontWeight: 600 }}>
+            <CheckCircle2 size={20} /> {t('billing.checkoutSuccess')}
           </div>
-        </div>
-      )}
+        )}
+        {checkoutResult === 'cancelled' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-secondary)', padding: '16px 20px', borderRadius: 'var(--radius-sm)', marginBottom: 24, fontSize: '1rem', fontWeight: 600 }}>
+            {t('billing.checkoutCancelled')}
+          </div>
+        )}
 
-      {status?.subscriptionStatus === 'PAST_DUE' && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(239,68,68,0.06)', border: '1px solid var(--red)', color: 'var(--red)', padding: '12px 16px', borderRadius: 'var(--radius-sm)', marginBottom: 24, fontSize: '0.875rem', fontWeight: 600 }}>
-          <ShieldAlert size={18} /> {t('billing.pastDue')}
-        </div>
-      )}
+        {finalizingCheckout && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-secondary)', padding: '16px 20px', borderRadius: 'var(--radius-sm)', marginBottom: 24, fontSize: '1rem', fontWeight: 600 }}>
+            <Loader2 size={20} className="animate-spin" /> {t('billing.finalizingCheckout')}
+          </div>
+        )}
 
-      <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: 28 }}>
+        {status && !status.hasAccess && !finalizingCheckout && (
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, background: 'rgba(239,68,68,0.06)', border: '1px solid var(--red)', color: 'var(--red)', padding: '16px 20px', borderRadius: 'var(--radius-sm)', marginBottom: 24, fontSize: '1rem' }}>
+            <ShieldAlert size={20} style={{ flexShrink: 0, marginTop: 2 }} />
+            <div>
+              <p style={{ fontWeight: 700 }}>{t('billing.trialExpired')}</p>
+              <p style={{ marginTop: 4, color: 'var(--text-secondary)' }}>{t('billing.trialExpiredDesc')}</p>
+            </div>
+          </div>
+        )}
+
+        {status?.subscriptionStatus === 'PAST_DUE' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(239,68,68,0.06)', border: '1px solid var(--red)', color: 'var(--red)', padding: '16px 20px', borderRadius: 'var(--radius-sm)', marginBottom: 24, fontSize: '1rem', fontWeight: 600 }}>
+            <ShieldAlert size={20} /> {t('billing.pastDue')}
+          </div>
+        )}
+
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <span className="pill pill-live" style={{ fontSize: '0.7rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <Sparkles size={12} /> {t('billing.planName')}
