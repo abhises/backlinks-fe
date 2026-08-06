@@ -32,6 +32,12 @@
 
   --pill-live:      var(--accent);
   --pill-live-text: #ffffff;
+  --pill-new:          rgba(37, 62, 187, 0.15);
+  --pill-new-text:     var(--blue);
+  --pill-removed:      rgba(225, 29, 72, 0.15);
+  --pill-removed-text: var(--red);
+  --pill-departed:      rgba(245, 158, 11, 0.15);
+  --pill-departed-text: var(--amber);
 
   --shadow-sm:     0 1px 3px rgba(0,0,0,0.1);
   --shadow-md:     0 4px 20px rgba(0,0,0,0.08);
@@ -70,6 +76,12 @@
 
   --pill-live:      var(--accent);
   --pill-live-text: #ffffff;
+  --pill-new:          rgba(37, 62, 187, 0.15);
+  --pill-new-text:     var(--blue);
+  --pill-removed:      rgba(225, 29, 72, 0.15);
+  --pill-removed-text: var(--red);
+  --pill-departed:      rgba(245, 158, 11, 0.15);
+  --pill-departed-text: var(--amber);
 
   --shadow-sm:     0 1px 3px rgba(0,0,0,0.4);
   --shadow-md:     0 4px 20px rgba(0,0,0,0.5);
@@ -108,6 +120,12 @@
 
   --pill-live:      var(--accent);
   --pill-live-text: #ffffff;
+  --pill-new:          rgba(37, 62, 187, 0.15);
+  --pill-new-text:     var(--blue);
+  --pill-removed:      rgba(225, 29, 72, 0.15);
+  --pill-removed-text: var(--red);
+  --pill-departed:      rgba(245, 158, 11, 0.15);
+  --pill-departed-text: var(--amber);
 
   --shadow-sm:     0 1px 3px rgba(0,0,0,0.5);
   --shadow-md:     0 4px 20px rgba(0,0,0,0.6);
