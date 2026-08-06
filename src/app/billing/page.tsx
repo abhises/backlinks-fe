@@ -24,23 +24,47 @@ export default function BillingPage() {
 
   const [status, setStatus] = useState<BillingStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [finalizingCheckout, setFinalizingCheckout] = useState(checkoutResult === 'success');
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadStatus = async () => {
-    try {
-      const res = await api.get('/api/billing/status');
-      setStatus(res.data);
-    } catch {
-      // ignore, handled by global 401 redirect if unauthenticated
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadStatus();
-  }, []);
+    let cancelled = false;
+
+    // Stripe redirects back the instant checkout completes, but the webhook that
+    // marks the subscription ACTIVE in our DB arrives asynchronously and can lag
+    // behind that redirect — so right after ?checkout=success, status.hasAccess
+    // may still read stale/false for a moment. Poll briefly until it catches up.
+    const run = async () => {
+      const isSuccessRedirect = checkoutResult === 'success';
+      const maxAttempts = isSuccessRedirect ? 6 : 1;
+      const delayMs = 1500;
+
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        try {
+          const res = await api.get('/api/billing/status');
+          if (cancelled) return;
+          setStatus(res.data);
+          setLoading(false);
+          if (res.data.hasAccess) {
+            setFinalizingCheckout(false);
+            return;
+          }
+        } catch {
+          // ignore, handled by global 401 redirect if unauthenticated
+          if (cancelled) return;
+          setLoading(false);
+        }
+        if (attempt < maxAttempts - 1) {
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+        }
+      }
+      if (!cancelled) setFinalizingCheckout(false);
+    };
+
+    run();
+    return () => { cancelled = true; };
+  }, [checkoutResult]);
 
   const handleSubscribe = async () => {
     setCheckoutLoading(true);
@@ -92,7 +116,13 @@ export default function BillingPage() {
         </div>
       )}
 
-      {status && !status.hasAccess && (
+      {finalizingCheckout && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-secondary)', padding: '12px 16px', borderRadius: 'var(--radius-sm)', marginBottom: 24, fontSize: '0.875rem', fontWeight: 600 }}>
+          <Loader2 size={16} className="animate-spin" /> {t('billing.finalizingCheckout')}
+        </div>
+      )}
+
+      {status && !status.hasAccess && !finalizingCheckout && (
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: 'rgba(239,68,68,0.06)', border: '1px solid var(--red)', color: 'var(--red)', padding: '14px 16px', borderRadius: 'var(--radius-sm)', marginBottom: 24, fontSize: '0.875rem' }}>
           <ShieldAlert size={18} style={{ flexShrink: 0, marginTop: 1 }} />
           <div>
