@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
-import { ExternalLink, Loader2, ArrowUpRight } from 'lucide-react';
+import { ExternalLink, Loader2, ArrowUpRight, CreditCard, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -17,6 +17,26 @@ type LinkRow = {
   giverWorkspace: { id: string; domain: string };
   receiverWorkspace: { id: string; domain: string };
   thread?: { id: string; stage: string };
+};
+
+type BillingStatus = {
+  subscriptionStatus: 'TRIALING' | 'ACTIVE' | 'PAST_DUE' | 'CANCELED' | 'EXPIRED';
+  isTrialActive: boolean;
+  trialDaysLeft: number;
+  hasAccess: boolean;
+  isSubscribed: boolean;
+  cancelAtPeriodEnd: boolean;
+};
+
+type Invoice = {
+  id: string;
+  number: string | null;
+  status: string;
+  amountPaid: number;
+  currency: string;
+  created: number;
+  hostedInvoiceUrl: string | null;
+  invoicePdf: string | null;
 };
 
 const StatusDropdown = ({ linkId, currentStatus, onStatusChange, t }: { linkId: string; currentStatus: string; onStatusChange: (id: string, status: string) => void; t: any }) => {
@@ -116,6 +136,14 @@ export default function LinksPage() {
   const [directionFilter, setDirectionFilter] = useState<'ALL' | 'GIVEN' | 'RECEIVED'>('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'LIVE' | 'REMOVED' | 'DEPARTED'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  const [billingStatus, setBillingStatus] = useState<BillingStatus | null>(null);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [billingLoading, setBillingLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/api/billing/status').then(res => setBillingStatus(res.data)).catch(() => {});
+    api.get('/api/billing/invoices').then(res => setInvoices(res.data.invoices)).catch(() => {}).finally(() => setBillingLoading(false));
+  }, []);
 
   useEffect(() => {
     const handleSearch = (e: Event) => {
@@ -191,6 +219,69 @@ export default function LinksPage() {
         <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '6px 0 0 0' }}>
           {t('dash.subtitle')}
         </p>
+      </div>
+
+      {/* Subscription Section */}
+      <div style={{ margin: '20px 32px 0 32px' }}>
+        <div className="card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <CreditCard size={18} style={{ color: 'var(--accent)' }} />
+            <div>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('dash.subscription')}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                {billingLoading ? '…' : billingStatus?.isSubscribed
+                  ? t('billing.planName')
+                  : billingStatus?.isTrialActive
+                  ? t('billing.trialActive').replace('{n}', String(billingStatus.trialDaysLeft))
+                  : t('billing.trialExpired')}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ width: 1, height: 30, background: 'var(--border)' }} />
+
+          <div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{t('dash.lastPayment')}</div>
+            {billingLoading ? (
+              <Loader2 size={14} className="animate-spin" style={{ color: 'var(--text-muted)', marginTop: 2 }} />
+            ) : invoices.length > 0 ? (
+              <div style={{ fontSize: '0.825rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+                <span style={{
+                  fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: 99, textTransform: 'capitalize',
+                  background: invoices[0].status === 'paid' ? 'rgba(0,184,153,0.15)' : 'rgba(239,68,68,0.15)',
+                  color: invoices[0].status === 'paid' ? 'var(--accent)' : 'var(--red)',
+                }}>
+                  {invoices[0].status}
+                </span>
+                <span>
+                  {(invoices[0].amountPaid / 100).toFixed(2)} {invoices[0].currency.toUpperCase()} · {new Date(invoices[0].created).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                </span>
+              </div>
+            ) : (
+              <div style={{ fontSize: '0.825rem', color: 'var(--text-muted)', marginTop: 2 }}>{t('dash.noInvoices')}</div>
+            )}
+          </div>
+
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 16 }}>
+            {invoices.slice(0, 3).map(inv => (
+              <a
+                key={inv.id}
+                href={inv.invoicePdf || inv.hostedInvoiceUrl || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`${t('dash.invoice')} · ${new Date(inv.created).toLocaleDateString()}`}
+                style={{ color: 'var(--text-muted)', display: 'inline-flex' }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
+              >
+                <FileText size={16} />
+              </a>
+            ))}
+            <Link href="/billing" style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--accent)', textDecoration: 'none' }}>
+              {t('dash.viewBilling')}
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* Filters Bar */}
