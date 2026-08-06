@@ -159,7 +159,7 @@ function InboxPageContent() {
       setThreads(prev => prev.map(t => t.id === id ? { ...t, ...res.data.thread } : t));
     } catch (err: any) {
       if (err?.response?.data?.code === 'SUBSCRIPTION_REQUIRED') {
-        router.push('/billing');
+        router.push('/settings#billing');
       }
     } finally { setActionLoading(null); }
   };

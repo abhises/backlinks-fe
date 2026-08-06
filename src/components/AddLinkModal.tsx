@@ -63,7 +63,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
       onSaved();
     } catch (err: any) {
       if (err?.response?.data?.code === 'SUBSCRIPTION_REQUIRED') {
-        router.push('/billing');
+        router.push('/settings#billing');
         return;
       }
       setError(err?.response?.data?.error || 'Failed to save link details');

@@ -124,8 +124,8 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
     if (!user || user.role === 'ADMIN') return;
     api.get('/api/billing/status').then(res => {
       setBillingStatus(res.data);
-      if (!res.data.hasAccess && pathname !== '/billing') {
-        router.replace('/billing');
+      if (!res.data.hasAccess && pathname !== '/settings') {
+        router.replace('/settings#billing');
       }
     }).catch(() => {});
   }, [user, pathname, router]);
@@ -653,14 +653,14 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
         {/* Content Wrapper */}
         <div style={{ flex: 1, overflowY: 'auto', position: 'relative', display: 'flex', flexDirection: 'column' }}>
-          {billingStatus?.isTrialActive && pathname !== '/billing' && (
+          {billingStatus?.isTrialActive && pathname !== '/settings' && (
             <div style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
               background: 'var(--bg-hover)', borderBottom: '1px solid var(--border)',
               padding: '8px 16px', fontSize: '0.8125rem', color: 'var(--text-secondary)'
             }}>
               <span>{t('billing.bannerTrial').replace('{n}', String(billingStatus.trialDaysLeft))}</span>
-              <Link href="/billing" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'none' }}>
+              <Link href="/settings#billing" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'none' }}>
                 {t('billing.bannerUpgrade')}
               </Link>
             </div>
