@@ -139,14 +139,23 @@ export default function BillingPage() {
       )}
 
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: 28 }}>
-        <span className="pill pill-live" style={{ fontSize: '0.7rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <Sparkles size={12} /> {t('billing.planName')}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <span className="pill pill-live" style={{ fontSize: '0.7rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <Sparkles size={12} /> {t('billing.planName')}
+          </span>
+          {status?.isSubscribed && (
+            <span className="pill pill-live" style={{ fontSize: '0.7rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              {t('settings.updateCard')}
+            </span>
+          )}
+        </div>
 
-        <p style={{ marginTop: 16, fontSize: '2rem', fontWeight: 800 }}>
-          {t('billing.planPrice')}
-          <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>{t('billing.planPeriod')}</span>
-        </p>
+        {!status?.isSubscribed && (
+          <p style={{ marginTop: 16, fontSize: '2rem', fontWeight: 800 }}>
+            {t('billing.planPrice')}
+            <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>{t('billing.planPeriod')}</span>
+          </p>
+        )}
 
         <p style={{ marginTop: 12, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
           {status?.isSubscribed
@@ -166,7 +175,7 @@ export default function BillingPage() {
             style={{ marginTop: 24, width: 'fit-content', display: 'flex', alignItems: 'center', gap: 8 }}
           >
             {checkoutLoading ? <Loader2 size={16} className="animate-spin" /> : null}
-            {checkoutLoading ? t('billing.redirecting') : t('billing.manageBilling')}
+            {checkoutLoading ? t('billing.redirecting') : t('settings.updateCard')}
           </button>
         ) : (
           <button
