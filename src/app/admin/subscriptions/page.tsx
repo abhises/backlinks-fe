@@ -34,6 +34,7 @@ const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
 export default function AdminSubscriptions() {
   const { t } = useLanguage();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [stripeMode, setStripeMode] = useState<'test' | 'live'>('test');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,7 +43,10 @@ export default function AdminSubscriptions() {
 
   useEffect(() => {
     api.get('/api/admin/subscriptions')
-      .then(res => setSubscriptions(res.data.subscriptions))
+      .then(res => {
+        setSubscriptions(res.data.subscriptions);
+        setStripeMode(res.data.stripeMode === 'live' ? 'live' : 'test');
+      })
       .catch((err) => setError(err?.response?.data?.error || t('adminSubscriptions.failedLoad')))
       .finally(() => setLoading(false));
   }, []);
@@ -189,7 +193,7 @@ export default function AdminSubscriptions() {
                       <td style={{ padding: '16px', fontSize: '0.875rem' }}>
                         {s.stripeCustomerId ? (
                           <a
-                            href={`https://dashboard.stripe.com/test/customers/${s.stripeCustomerId}`}
+                            href={`https://dashboard.stripe.com/${stripeMode === 'live' ? '' : 'test/'}customers/${s.stripeCustomerId}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{ color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.8rem' }}
