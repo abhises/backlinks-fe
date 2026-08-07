@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import {
-  Globe, User, Gift, Bell, CreditCard,
+  Globe, User, Bell, CreditCard,
   HelpCircle, AlertTriangle, Check, Copy,
   Mail, Shield, ArrowRight, HelpCircle as HelpIcon, Plus, Loader2, Sun, Moon,
   Sparkles, ExternalLink, type LucideIcon
@@ -217,7 +217,7 @@ export default function SettingsPage() {
         {([
           { label: t('settings.navProfile'), id: 'website-profile', icon: Globe },
           { label: t('settings.navAccount'), id: 'account', icon: User },
-          { label: t('settings.navInvite'), id: 'invite', icon: Gift },
+          // { label: t('settings.navInvite'), id: 'invite', icon: Gift },
           { label: t('settings.navNotifications'), id: 'notifications', icon: Bell },
           { label: t('settings.navBilling'), id: 'billing', icon: CreditCard },
           { label: t('settings.navHelp'), id: 'help', icon: HelpCircle },
@@ -367,8 +367,8 @@ export default function SettingsPage() {
 
 
 
-        {/* 4. Invite a Friend */}
-        <section id="invite" style={{ marginBottom: 48 }}>
+        {/* 4. Invite a Friend — hidden for now */}
+        {/* <section id="invite" style={{ marginBottom: 48 }}>
           <div style={{ position: 'sticky', top: 0, background: 'var(--bg-base)', zIndex: 5, padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
             <Gift size={18} color="var(--accent)" />
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{t('settings.hInvite')}</h2>
@@ -378,7 +378,7 @@ export default function SettingsPage() {
             <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: 20, lineHeight: 1.5 }}>
               {t('settings.inviteDesc')}
             </p>
-            
+
             <div style={{ display: 'flex', gap: 10 }}>
               <input type="text" value={referralLink} readOnly className="input-field" style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.8125rem' }} />
               <button onClick={copyReferral} className={`btn ${copiedRef ? 'btn-success' : 'btn-secondary'}`} style={{ minWidth: 100 }}>
@@ -387,7 +387,7 @@ export default function SettingsPage() {
               </button>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* 5. Notifications */}
         <section id="notifications" style={{ marginBottom: 48 }}>
