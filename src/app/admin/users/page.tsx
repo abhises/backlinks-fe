@@ -324,10 +324,11 @@ export default function AdminUsers() {
                                 <Edit2 size={14} />
                               </button>
                               <button
-                                onClick={() => setDeleteModalId(u.id)}
+                                onClick={() => !isAdmin && setDeleteModalId(u.id)}
                                 className="btn btn-ghost btn-icon"
-                                style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--red)', opacity: 1, cursor: 'pointer' }}
-                                title={t('app.delete')}
+                                style={{ width: 32, height: 32, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--red)', opacity: isAdmin ? 0.3 : 1, cursor: isAdmin ? 'not-allowed' : 'pointer' }}
+                                disabled={isAdmin}
+                                title={isAdmin ? t('adminUsers.cannotDeleteAdmin') : t('app.delete')}
                               >
                                 <Trash2 size={14} />
                               </button>
