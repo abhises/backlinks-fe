@@ -1,7 +1,7 @@
 'use client';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import api from '@/lib/api';
 import Link from 'next/link';
 import {
@@ -16,7 +16,7 @@ import { useLanguage } from '@/context/LanguageContext';
 
 type NotificationItem = {
   id: string;
-  type: 'new_message' | 'new_connection' | 'connection_accepted' | 'connection_rejected' | 'link_placed';
+  type: string;
   title: string;
   body: string;
   timestamp: Date;
@@ -103,6 +103,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
   const isPro = !!billingStatus?.isSubscribed;
   const isBetaMode = billingStatus?.platformMode === 'BETA';
   const nav = NAV.filter(item => item.href !== '/billing' || !isBetaMode);
+  const signupToastShownRef = useRef(false);
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
@@ -121,6 +122,23 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
     if (user.role === 'ADMIN') { router.replace('/admin/dashboard'); return; }
     if (!workspace) { router.replace('/onboarding'); return; }
   }, [user, workspace, loading, router]);
+
+  // Shown once, right after a fresh signup's workspace setup completes and
+  // lands here (the flag is set by AuthContext.register()). Guarded by a ref
+  // (not just the sessionStorage removal) so React's dev-mode double effect
+  // invocation can't fire the toast twice.
+  useEffect(() => {
+    if (!workspace?.id || signupToastShownRef.current) return;
+    if (typeof window === 'undefined' || !sessionStorage.getItem('bl_just_signed_up')) return;
+    signupToastShownRef.current = true;
+    sessionStorage.removeItem('bl_just_signed_up');
+
+    const toastId = Math.random().toString();
+    setActiveToast({ id: toastId, title: t('auth.signupSuccessTitle'), body: t('auth.signupSuccessBody') });
+    setTimeout(() => {
+      setActiveToast(prev => prev?.id === toastId ? null : prev);
+    }, 5000);
+  }, [workspace?.id, t]);
 
   useEffect(() => {
     if (!user || user.role === 'ADMIN') return;
@@ -194,6 +212,10 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
               title = data.title || n.title || t('notif.systemAlertTitle');
               body = data.body || n.body || '';
               link = '/dashboard';
+            } else if (notifType === 'signup_welcome') {
+              title = data.title || t('auth.signupSuccessTitle');
+              body = data.body || t('auth.signupSuccessBody');
+              link = '/inbox';
             } else {
               // Fallback for unknown types so the user at least sees what it is
               title = data.title || n.title || (notifType ? t('notif.alertType').replace('{type}', notifType) : t('notif.default'));
@@ -203,7 +225,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         } catch(e: any) {
           body = n.body || `Raw: ${n.payload}`;
         }
-        
+
         return {
           id: n.id,
           type: n.type || 'unknown',
@@ -214,6 +236,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
           link
         };
       });
+
       setNotifications(persisted);
     }).catch(console.error);
 
@@ -276,6 +299,10 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         title = data.title || t('notif.systemAlertTitle');
         body = data.body || '';
         link = '/dashboard';
+      } else if (data.type === 'signup_welcome') {
+        title = data.title || t('auth.signupSuccessTitle');
+        body = data.body || t('auth.signupSuccessBody');
+        link = '/inbox';
       } else {
         title = data.title || (data.type ? t('notif.alertType').replace('{type}', data.type) : t('notif.default'));
         body = data.body || data.messageText || data.description || (typeof data === 'object' ? JSON.stringify(data) : String(data));
@@ -728,6 +755,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
                     else if (n.type === 'subscription_active') { IconComp = CreditCard; iconBg = 'rgba(217, 119, 6, 0.1)'; iconColor = '#d97706'; }
                     else if (n.type === 'subscription_canceled') { IconComp = CreditCard; iconBg = 'rgba(239, 68, 68, 0.1)'; iconColor = '#ef4444'; }
                     else if (n.type === 'admin_broadcast') { IconComp = User; iconBg = 'var(--bg-hover)'; iconColor = 'var(--text-primary)'; }
+                    else if (n.type === 'signup_welcome') { IconComp = Sparkles; iconBg = 'rgba(16, 185, 129, 0.1)'; iconColor = '#10b981'; }
 
                     return (
                       <div key={n.id} 

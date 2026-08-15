@@ -13,15 +13,9 @@ const REGIONS = [
     region: 'Global / United Kingdom & United States',
   },
   {
-    code: 'fi' as Locale,
-    flag: '🇫🇮',
-    name: 'Suomi',
-    region: 'Suomi / Finland',
-  },
-  {
     code: 'nl' as Locale,
     flag: '🇳🇱',
-    name: 'Nederlands',
+    name: 'Nederlands (Dutch)',
     region: 'Nederland & België / Netherlands & Belgium',
   },
 ];
@@ -34,16 +28,14 @@ export default function LanguageSelectionPage() {
   const [error, setError] = useState('');
 
   // Order: current subdomain's language first, then English (unless it's already
-  // first), then the remaining language. e.g. on nl.localhost -> Nederlands, English, Suomi.
+  // first). e.g. on nl.localhost -> Nederlands, English.
   // Computed post-mount (not during the initial render) so SSR output and the
   // client's first paint always match, avoiding a hydration mismatch.
   const [regions, setRegions] = useState(REGIONS);
 
   useEffect(() => {
     const orderedCodes: Locale[] =
-      locale === 'en'
-        ? ['en', 'nl', 'fi']
-        : [locale, 'en', (['nl', 'fi'] as Locale[]).find((c) => c !== locale)!];
+      locale === 'nl' ? ['nl', 'en'] : ['en', 'nl'];
     setRegions(orderedCodes.map((code) => REGIONS.find((r) => r.code === code)!));
   }, [locale]);
 

@@ -83,6 +83,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { user: u } = res.data;
     setToken('secure_cookie');
     setUser(u);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('bl_just_signed_up', '1');
+    }
   };
 
   const loginWithGoogle = async (credential: string) => {
