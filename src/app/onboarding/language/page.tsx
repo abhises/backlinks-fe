@@ -8,14 +8,14 @@ import { Link2, Check, Loader2 } from 'lucide-react';
 const REGIONS = [
   {
     code: 'en' as Locale,
-    flag: '🇬🇧',
+    countryCode: 'GB',
     name: 'English',
-    region: 'Global / United Kingdom & United States',
+    region: 'Global',
   },
   {
     code: 'nl' as Locale,
-    flag: '🇳🇱',
-    name: 'Nederlands (Dutch)',
+    countryCode: 'NL',
+    name: 'Nederlands',
     region: 'Nederland & België / Netherlands & Belgium',
   },
 ];
@@ -93,12 +93,9 @@ export default function LanguageSelectionPage() {
         </div>
 
         {/* Title */}
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#ffffff', marginBottom: 8, letterSpacing: '-0.01em', lineHeight: 1.25 }}>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#ffffff', marginBottom: 24, letterSpacing: '-0.01em', lineHeight: 1.25 }}>
           {t('onboard.step2Title') || 'Select your region & language'}
         </h1>
-        <p style={{ color: '#8e9391', fontSize: '0.9rem', marginBottom: 24, lineHeight: 1.5 }}>
-          {t('onboard.step2Desc') || 'Choose your preferred language portal for your SERPsupport account.'}
-        </p>
 
         {error && (
           <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: '10px 14px', marginBottom: 20, fontSize: '0.875rem', color: 'var(--red)' }}>
@@ -133,7 +130,9 @@ export default function LanguageSelectionPage() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <span style={{ fontSize: '1.6rem', lineHeight: 1 }}>{item.flag}</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 700, color: isSelected ? '#ffffff' : '#c5c9c7', lineHeight: 1, minWidth: 32 }}>
+                      {item.countryCode}
+                    </span>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       <span style={{ fontSize: '1rem', fontWeight: 700, color: isSelected ? '#ffffff' : '#e2e6e4' }}>
                         {item.name}
@@ -216,7 +215,7 @@ export default function LanguageSelectionPage() {
               onMouseEnter={e => e.currentTarget.style.color = '#ffffff'}
               onMouseLeave={e => e.currentTarget.style.color = '#c5c9c7'}
             >
-              ← {t('onboard.back') || 'Back'}
+              {t('onboard.back') || '← Back'}
             </button>
           </div>
         </form>

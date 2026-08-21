@@ -478,11 +478,30 @@ function InboxPageContent() {
                           <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-hover)', borderRadius: '4px' }}>
                             <Loader2 size={12} className="animate-spin" /> {trans('inbox.waitingForAccept')}
                           </span>
-                        ) : (
-                          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: t.stage === 'PLACED' ? '#10b981' : 'var(--text-secondary)' }}>
-                            {t.stage === 'PLACED' ? trans('inbox.linkPlaced') : t.stage === 'CHAT' ? '' : ''}
+                        ) : t.stage === 'PLACED' ? (
+                          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#10b981' }}>
+                            {trans('inbox.linkPlaced')}
                           </span>
-                        )}
+                        ) : t.stage === 'CHAT' ? (
+                          <button
+                            className="btn"
+                            style={{
+                              background: '#10b981',
+                              color: '#ffffff',
+                              border: 'none',
+                              borderRadius: '4px',
+                              padding: '6px 16px',
+                              fontWeight: 700,
+                              fontSize: '0.8rem',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 6
+                            }}
+                            onClick={e => { e.stopPropagation(); router.push(`/inbox/${t.id}`); }}>
+                            <MessageSquare size={12} /> {trans('inbox.chatNow')}
+                          </button>
+                        ) : null}
                       </div>
                     )}
 
