@@ -7,7 +7,7 @@ import { io } from 'socket.io-client';
 import api from '@/lib/api';
 import {
   Shield, LayoutDashboard, Settings, Bell,
-  LogOut, Sun, Moon, Palette, Menu, X, Globe, Link2, CreditCard, LifeBuoy
+  LogOut, Sun, Moon, Palette, Menu, X, Globe, Link2, CreditCard, LifeBuoy, MessageSquare
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -18,6 +18,7 @@ const NAV = [
   { href: '/admin/backlinks', icon: Globe, label: 'Backlinks', key: 'admin.backlinks' },
   { href: '/admin/notifications', icon: Bell, label: 'Notifications', key: 'admin.notifications' },
   { href: '/admin/tickets', icon: LifeBuoy, label: 'Tickets', key: 'admin.tickets' },
+  { href: '/admin/feedback', icon: MessageSquare, label: 'Feedback', key: 'admin.feedback' },
   { href: '/admin/settings', icon: Settings, label: 'Settings', key: 'admin.settings' },
 ];
 
@@ -33,6 +34,14 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const [theme, setTheme] = useState<Theme>('dark');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openTicketCount, setOpenTicketCount] = useState(0);
+  const [newFeedbackCount, setNewFeedbackCount] = useState(0);
+  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    if (pathname === '/admin/feedback') {
+      setNewFeedbackCount(0);
+    }
+  }, [pathname]);
 
   useEffect(() => {
     const saved = (localStorage.getItem('bl_theme') as Theme) || 'dark';
@@ -63,6 +72,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     socket.emit('joinAdmin');
     socket.on('new_ticket', () => {
       setOpenTicketCount(prev => prev + 1);
+    });
+    socket.on('new_feedback', () => {
+      setNewFeedbackCount(prev => prev + 1);
     });
 
     return () => {
@@ -239,27 +251,69 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           </div>
 
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            {/* Ticket Notification Bell */}
-            <button
-              onClick={() => router.push('/admin/tickets')}
-              className="btn btn-secondary btn-icon"
-              title={t('admin.tickets')}
-              style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', height: 36, width: 36, padding: 0, borderRadius: 'var(--radius-sm)' }}
-            >
-              <Bell size={16} />
-              {openTicketCount > 0 && (
-                <span style={{
-                  position: 'absolute', top: -4, right: -4,
-                  background: 'var(--red)', color: '#fff',
-                  fontSize: '0.65rem', fontWeight: 700, lineHeight: 1,
-                  minWidth: 16, height: 16, borderRadius: 8,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  padding: '0 3px',
-                }}>
-                  {openTicketCount > 99 ? '99+' : openTicketCount}
-                </span>
+            {/* Notification Bell Dropdown */}
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setNotifDropdownOpen(v => !v)}
+                className="btn btn-secondary btn-icon"
+                title={t('admin.notifications') || 'Notifications'}
+                style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', height: 36, width: 36, padding: 0, borderRadius: 'var(--radius-sm)' }}
+              >
+                <Bell size={16} />
+                {(openTicketCount > 0 || newFeedbackCount > 0) && (
+                  <span style={{
+                    position: 'absolute', top: -4, right: -4,
+                    background: 'var(--red)', color: '#fff',
+                    fontSize: '0.65rem', fontWeight: 700, lineHeight: 1,
+                    minWidth: 16, height: 16, borderRadius: 8,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: '0 3px',
+                  }}>
+                    {(openTicketCount + newFeedbackCount) > 99 ? '99+' : (openTicketCount + newFeedbackCount)}
+                  </span>
+                )}
+              </button>
+
+              {notifDropdownOpen && (
+                <>
+                  <div style={{ position: 'fixed', inset: 0, zIndex: 100 }} onClick={() => setNotifDropdownOpen(false)} />
+                  <div style={{ 
+                    position: 'absolute', top: '100%', right: 0, marginTop: 8, 
+                    background: 'var(--bg-surface)', border: '1px solid var(--border)', 
+                    borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-lg)', 
+                    minWidth: '220px', zIndex: 101, overflow: 'hidden'
+                  }}>
+                    <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                      Activity
+                    </div>
+                    <button 
+                      onClick={() => { router.push('/admin/tickets'); setNotifDropdownOpen(false); }}
+                      style={{ 
+                        width: '100%', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        background: 'transparent', border: 'none', borderBottom: '1px solid var(--border)', cursor: 'pointer',
+                        fontSize: '0.9rem', color: 'var(--text-primary)', textAlign: 'left'
+                      }}
+                      className="nav-item"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><LifeBuoy size={16} /> Support Tickets</div>
+                      {openTicketCount > 0 && <span style={{ background: 'var(--red)', color: '#fff', fontSize: '0.75rem', fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>{openTicketCount}</span>}
+                    </button>
+                    <button 
+                      onClick={() => { router.push('/admin/feedback'); setNotifDropdownOpen(false); }}
+                      style={{ 
+                        width: '100%', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        background: 'transparent', border: 'none', cursor: 'pointer',
+                        fontSize: '0.9rem', color: 'var(--text-primary)', textAlign: 'left'
+                      }}
+                      className="nav-item"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><MessageSquare size={16} /> Feedback</div>
+                      {newFeedbackCount > 0 && <span style={{ background: 'var(--accent)', color: '#fff', fontSize: '0.75rem', fontWeight: 700, padding: '2px 6px', borderRadius: 10 }}>{newFeedbackCount}</span>}
+                    </button>
+                  </div>
+                </>
               )}
-            </button>
+            </div>
 
             {/* Theme Toggle */}
             <button

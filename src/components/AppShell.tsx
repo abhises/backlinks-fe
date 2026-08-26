@@ -82,6 +82,7 @@ const NAV = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', key: 'app.dashboard' },
   { href: '/billing', icon: CreditCard, label: 'Subscription', key: 'app.subscription' },
   { href: '/how-it-works', icon: Sparkles, label: 'How it works', key: 'app.howItWorks' },
+  { href: '/feedback', icon: MessageCircle, label: 'Feedback', key: 'app.feedback' },
 ];
 
 const THEMES = ['dark', 'light'] as const;
