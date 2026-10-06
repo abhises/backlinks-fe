@@ -8,13 +8,11 @@ import { Link2, Check, Loader2 } from 'lucide-react';
 const REGIONS = [
   {
     code: 'en' as Locale,
-    countryCode: 'GB',
     name: 'English',
     region: 'Global',
   },
   {
     code: 'nl' as Locale,
-    countryCode: 'NL',
     name: 'Nederlands',
     region: 'Nederland & België / Netherlands & Belgium',
   },
@@ -130,9 +128,6 @@ export default function LanguageSelectionPage() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <span style={{ fontSize: '1.1rem', fontWeight: 700, color: isSelected ? '#ffffff' : '#c5c9c7', lineHeight: 1, minWidth: 32 }}>
-                      {item.countryCode}
-                    </span>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       <span style={{ fontSize: '1rem', fontWeight: 700, color: isSelected ? '#ffffff' : '#e2e6e4' }}>
                         {item.name}
