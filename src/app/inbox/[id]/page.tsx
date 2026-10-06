@@ -129,13 +129,6 @@ export default function ThreadPage() {
     return () => window.removeEventListener('refresh_inbox', handleRefresh);
   }, [load]);
 
-  // Auto-open link details card if a link already exists
-  useEffect(() => {
-    if (thread?.linkPlacement) {
-      setShowLinkModal(true);
-    }
-  }, [thread]);
-
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
   useEffect(() => {
@@ -367,18 +360,37 @@ export default function ThreadPage() {
         )}
       </div>
 
+      {/* Link details popup */}
+      {showLinkModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 9999,
+          background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 20
+        }} onClick={() => setShowLinkModal(false)}>
+          <div
+            style={{ width: '100%', maxWidth: 700, maxHeight: '90vh', overflowY: 'auto', borderRadius: 8, boxShadow: 'var(--shadow-xl)', animation: 'fadeIn 0.2s ease-out' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <AddLinkModal
+              thread={thread}
+              isGiver={isGiver}
+              hasLink={hasLink}
+              myWorkspace={workspace}
+              onClose={() => setShowLinkModal(false)}
+              onSaved={() => { setShowLinkModal(false); load(); }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Messages */}
-      <div style={{ flex:1, overflowY:'auto', display:'flex', flexDirection:'column', gap:12 }}>
-        {showLinkModal && (
-          <AddLinkModal
-            thread={thread}
-            isGiver={isGiver}
-            hasLink={hasLink}
-            myWorkspace={workspace}
-            onClose={() => setShowLinkModal(false)}
-            onSaved={() => { setShowLinkModal(false); load(); }}
-          />
-        )}
+      <div style={{ flex:1, minHeight:0, overflowY:'auto', display:'flex', flexDirection:'column', gap:12 }}>
         {showInfoModal && (
           <div style={{
             position: 'fixed',
@@ -483,7 +495,7 @@ export default function ThreadPage() {
           </div>
         )}
         <div style={{ padding:'20px 24px', display:'flex', flexDirection:'column', gap:12 }}>
-          {messages.length === 0 && !showLinkModal && (
+          {messages.length === 0 && (
             <div style={{ paddingTop: 80, textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem', fontStyle: 'italic' }}>
               {trans('inbox.noMessagesYet')}
             </div>

@@ -73,7 +73,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
   // ── Read-only summary view (shown when link already saved) ──────────────────
   if (hasLink && lp && !isEditing) {
     return (
-      <div style={{ margin: '24px auto 0 auto', maxWidth: '700px', width: '100%', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--bg-base)', overflow: 'hidden', flexShrink: 0 }}>
+      <div style={{ margin: '0 auto', maxWidth: '700px', width: '100%', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--bg-base)', overflow: 'hidden', flexShrink: 0 }}>
         {/* Header */}
         <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -93,6 +93,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
                 </button>
               </>
             )}
+            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex' }}><X size={16} /></button>
           </div>
         </div>
 
@@ -156,7 +157,7 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
 
   // ── Edit / Add form view ─────────────────────────────────────────────────────
   return (
-    <div style={{ margin: '24px auto 0 auto', maxWidth: '700px', width: '100%', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--bg-base)', overflow: 'hidden', flexShrink: 0 }}>
+    <div style={{ margin: '0 auto', maxWidth: '700px', width: '100%', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--bg-base)', overflow: 'hidden', flexShrink: 0 }}>
       <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <Link2 size={14} style={{ color: 'var(--text-muted)' }} />
