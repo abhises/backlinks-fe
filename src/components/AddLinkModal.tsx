@@ -70,6 +70,25 @@ export default function AddLinkModal({ thread, isGiver, hasLink, myWorkspace, on
     } finally { setLoading(false); }
   };
 
+  // ── Waiting view (receiver, before the giver has saved anything) ────────────
+  if (!hasLink && !isGiver) {
+    return (
+      <div style={{ margin: '0 auto', maxWidth: '700px', width: '100%', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--bg-base)', overflow: 'hidden', flexShrink: 0 }}>
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Link2 size={14} style={{ color: 'var(--text-muted)' }} />
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{t('linkModal.title')}</span>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex' }}><X size={16} /></button>
+        </div>
+        <div style={{ padding: '20px', display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+          <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 2, color: 'var(--amber)' }} />
+          <span>{t('linkModal.waitingForGiver')}</span>
+        </div>
+      </div>
+    );
+  }
+
   // ── Read-only summary view (shown when link already saved) ──────────────────
   if (hasLink && lp && !isEditing) {
     return (

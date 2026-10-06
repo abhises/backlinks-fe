@@ -338,8 +338,8 @@ export default function ThreadPage() {
           </button>
         </div>
 
-        {/* Action Button */}
-        {(isGiver || hasLink) && (
+        {/* Action Button — shown to both sides; the receiver gets a read-only view */}
+        {(
           <button id={hasLink ? 'view-link-btn' : 'add-link-btn'} onClick={() => setShowLinkModal(true)}
             style={{
               background: '#a855f7',
@@ -355,7 +355,7 @@ export default function ThreadPage() {
               cursor: 'pointer'
             }}>
             <Link2 size={16} />
-            {hasLink ? trans('inbox.linkDetails') : trans('inbox.addLinkDetails')}
+            {hasLink || !isGiver ? trans('inbox.linkDetails') : trans('inbox.addLinkDetails')}
           </button>
         )}
       </div>
