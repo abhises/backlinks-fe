@@ -136,7 +136,7 @@
 .demoInner { max-width: 1080px; margin: 0 auto; padding: 110px 24px 40px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; }
 .demoInner .h2, .demoInner .lead { max-width: 760px; }
 .videoFrame { position: relative; width: 100%; margin-top: 28px; background: var(--ink); border-radius: 18px; padding: 10px; box-shadow: 0 40px 80px -30px rgba(11,16,32,.35); }
-.videoFrame video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; background: #141A2C; }
+.videoFrame iframe { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 12px; background: #141A2C; }
 
 /* Importance */
 .importance { padding: 80px 24px 0; }

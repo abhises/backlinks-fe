@@ -6,7 +6,7 @@ const cspHeader = `
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com;
   img-src 'self' blob: data: https:;
   font-src 'self' data: https://fonts.gstatic.com;
-  frame-src 'self' https://accounts.google.com;
+  frame-src 'self' https://accounts.google.com https://www.youtube-nocookie.com https://www.youtube.com;
   object-src 'none';
   base-uri 'self';
   form-action 'self';

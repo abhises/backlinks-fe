@@ -188,7 +188,14 @@ export default function Landing({ fontClassName }: { fontClassName: string }) {
           <h2 className={s.h2}>{t.demoH2}</h2>
           <p className={s.lead}>{t.demoSub}</p>
           <div className={s.videoFrame}>
-            <video controls playsInline preload="metadata" src="https://www.serpsupport.com/wp-content/uploads/2024/09/SERPsupport-September.mp4" />
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/hxRucpw_yXI?rel=0"
+              title="SERPsupport demo"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
           </div>
         </div>
       </section>
