@@ -126,7 +126,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'auth.backToSignIn': 'Back to sign in',
     'auth.checkInbox': 'Check your inbox! ✉️',
     'auth.checkInboxDesc': 'If an account exists, we have sent a password reset link to your email.',
-    'auth.step1': 'Step 1 of 3',
+    'auth.step1': 'Step 1 of 2',
 
 
     // Inbox Page
@@ -320,7 +320,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'onboard.step': 'Step 1 of 1',
     'onboard.step2': 'Step 3 of 3',
     'onboard.step2Indicator': 'Step 2 of 3',
-    'onboard.step3Indicator': 'Step 3 of 3',
+    'onboard.step3Indicator': 'Step 2 of 2',
     'onboard.step2Title': 'Select your region & language',
     'onboard.step2Desc': 'Choose your preferred language portal for your SERPsupport account.',
     'onboard.continue': 'Continue',
@@ -767,7 +767,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'auth.backToSignIn': 'Takaisin kirjautumiseen',
     'auth.checkInbox': 'Tarkista sähköpostisi! ✉️',
     'auth.checkInboxDesc': 'Jos tili on olemassa, olemme lähettäneet salasanan palautuslinkin sähköpostiisi.',
-    'auth.step1': 'Vaihe 1 / 3',
+    'auth.step1': 'Vaihe 1 / 2',
 
 
     // Inbox Page
@@ -961,7 +961,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'onboard.step': 'Vaihe 1 / 1',
     'onboard.step2': 'Vaihe 3 / 3',
     'onboard.step2Indicator': 'Vaihe 2 / 3',
-    'onboard.step3Indicator': 'Vaihe 3 / 3',
+    'onboard.step3Indicator': 'Vaihe 2 / 2',
     'onboard.step2Title': 'Valitse alueesi ja kielesi',
     'onboard.step2Desc': 'Valitse haluamasi kieliportaali SERPsupport-tilillesi.',
     'onboard.continue': 'Jatka',
@@ -1408,7 +1408,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'auth.backToSignIn': 'Terug naar inloggen',
     'auth.checkInbox': 'Check je inbox! ✉️',
     'auth.checkInboxDesc': 'Als er een account bestaat, hebben we je een e-mail gestuurd met een herstellink.',
-    'auth.step1': 'Stap 1 van 3',
+    'auth.step1': 'Stap 1 van 2',
 
 
     // Inbox Page
@@ -1602,7 +1602,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'onboard.step': 'Stap 1 van 1',
     'onboard.step2': 'Stap 3 van 3',
     'onboard.step2Indicator': 'Stap 2 van 3',
-    'onboard.step3Indicator': 'Stap 3 van 3',
+    'onboard.step3Indicator': 'Stap 2 van 2',
     'onboard.step2Title': 'Kies je regio en taal',
     'onboard.step2Desc': 'Kies het taalportaal dat bij jouw account past.',
     'onboard.continue': 'Doorgaan',

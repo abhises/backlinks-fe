@@ -201,7 +201,7 @@ export default function OnboardingPage() {
             {/* Back Button */}
             <button
               type="button"
-              onClick={() => router.push('/onboarding/language')}
+              onClick={() => logout('/auth?mode=register')}
               style={{
                 width: '100%',
                 background: 'none',
