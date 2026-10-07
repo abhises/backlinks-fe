@@ -15,9 +15,10 @@
   color: var(--ink);
   font-family: var(--font-geist), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow-x: clip; /* not "hidden": that creates a scroll container and breaks the sticky header */
 }
 .root * { box-sizing: border-box; }
+.root section[id] { scroll-margin-top: 72px; } /* keep anchor targets clear of the sticky header */
 .root h1, .root h2, .root h3, .root p { margin: 0; font-family: inherit; color: inherit; }
 .root a { text-decoration: none; }
 .mono { font-family: var(--font-geist-mono), ui-monospace, monospace; }
