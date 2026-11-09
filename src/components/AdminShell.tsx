@@ -7,7 +7,7 @@ import { io } from 'socket.io-client';
 import api from '@/lib/api';
 import {
   Shield, LayoutDashboard, Settings, Bell,
-  LogOut, Sun, Moon, Palette, Menu, X, Globe, Link2, CreditCard, LifeBuoy, MessageSquare
+  LogOut, Sun, Moon, Palette, Menu, X, Globe, Link2, CreditCard, LifeBuoy, MessageSquare, Newspaper
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -19,6 +19,7 @@ const NAV = [
   { href: '/admin/notifications', icon: Bell, label: 'Notifications', key: 'admin.notifications' },
   { href: '/admin/tickets', icon: LifeBuoy, label: 'Tickets', key: 'admin.tickets' },
   { href: '/admin/feedback', icon: MessageSquare, label: 'Feedback', key: 'admin.feedback' },
+  { href: '/admin/blog', icon: Newspaper, label: 'Blog', key: 'admin.blog' },
   { href: '/admin/settings', icon: Settings, label: 'Settings', key: 'admin.settings' },
 ];
 

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { getSiteUrl, siteUrls } from '@/lib/siteUrl';
+import { getSitemapEntries } from '@/lib/blog';
 
 const publicRoutes: { path: string; priority: number }[] = [
   { path: '', priority: 1 },
@@ -8,14 +9,21 @@ const publicRoutes: { path: string; priority: number }[] = [
   { path: '/feedback', priority: 0.5 },
   { path: '/auth', priority: 0.5 },
   { path: '/signup', priority: 0.5 },
+  { path: '/blog', priority: 0.8 },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = await getSiteUrl();
+  const [siteUrl, blog] = await Promise.all([getSiteUrl(), getSitemapEntries()]);
 
-  return publicRoutes.map(({ path, priority }) => ({
+  const routes = [
+    ...publicRoutes.map(r => ({ ...r, lastModified: new Date() })),
+    ...blog.categories.map(c => ({ path: `/blog/category/${c.slug}`, priority: 0.6, lastModified: new Date() })),
+    ...blog.posts.map(p => ({ path: `/blog/${p.slug}`, priority: 0.7, lastModified: new Date(p.updatedAt) })),
+  ];
+
+  return routes.map(({ path, priority, lastModified }) => ({
     url: `${siteUrl}${path}`,
-    lastModified: new Date(),
+    lastModified,
     changeFrequency: 'weekly',
     priority,
     alternates: {

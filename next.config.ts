@@ -4,7 +4,7 @@ const cspHeader = `
   default-src 'self';
   script-src 'self' 'unsafe-eval' 'unsafe-inline' https://apis.google.com https://accounts.google.com;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com;
-  img-src 'self' blob: data: https:;
+  img-src 'self' blob: data: https: http://localhost:4000;
   font-src 'self' data: https://fonts.gstatic.com;
   frame-src 'self' https://accounts.google.com https://www.youtube-nocookie.com https://www.youtube.com;
   object-src 'none';

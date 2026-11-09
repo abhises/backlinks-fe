@@ -96,6 +96,7 @@ export default function Landing({ fontClassName }: { fontClassName: string }) {
       <a href="#how" onClick={() => setMenuOpen(false)}>{t.navHow}</a>
       <a href="#pricing" onClick={() => setMenuOpen(false)}>{t.navPricing}</a>
       <a href="#faq" onClick={() => setMenuOpen(false)}>{t.navFaq}</a>
+      <Link href="/blog" onClick={() => setMenuOpen(false)}>Blog</Link>
     </>
   );
   const authLinks = user ? (
@@ -417,6 +418,7 @@ export default function Landing({ fontClassName }: { fontClassName: string }) {
             <a href="#features">{t.navFeatures}</a>
             <a href="#pricing">{t.navPricing}</a>
             <a href="#faq">{t.navFaq}</a>
+            <Link href="/blog">Blog</Link>
             <a href="mailto:info@serpsupport.com">info@serpsupport.com</a>
           </nav>
           <span>© {new Date().getFullYear()} SERPsupport</span>
