@@ -69,7 +69,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       .catch(console.error);
 
     const socketUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-    const socket = io(socketUrl);
+    const socket = io(socketUrl, { withCredentials: true });
     socket.emit('joinAdmin');
     socket.on('new_ticket', () => {
       setOpenTicketCount(prev => prev + 1);

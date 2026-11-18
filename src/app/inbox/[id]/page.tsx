@@ -135,7 +135,7 @@ export default function ThreadPage() {
     if (!id) return;
 
     const socketUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-    const socket = io(socketUrl);
+    const socket = io(socketUrl, { withCredentials: true });
 
     socket.emit('join', id);
 
